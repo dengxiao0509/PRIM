@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<!--###############################################################################
+##
+###############################################################################
+-->
+<html>
+<head>
+    <title>Control Interface</title>
+    <script>AUTOBAHN_DEBUG = true;</script>
+    <script src="http://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"></script>
+
+
+    <!--<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>-->
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+    <!--<script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>-->
+    <!--<link href="lib/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet"/>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.15.1/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.15.1/vis.min.css" rel="stylesheet"/>
+
+    <script type="text/javascript" src="lib/jquery.leanModal.min.js"></script>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
+
+    <style>
+        #header {
+            width: 100%;
+            height: 70px;
+            margin: 10px auto;
+            padding: 15px 0;
+            min-width: 860px;
+            border-bottom: 1px solid lightgray;
+        }
+
+        #header .bigtitle {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        #body {
+            width: 100%;
+            height: 570px;
+            margin: 0 auto;
+            min-width: 860px;
+        }
+
+        #graph {
+            float: left;
+            width: 100%;
+            height: 100%;
+        }
+
+        #footer {
+            width: 980px;
+            height: 0px;
+            margin: 0 auto;
+            min-width: 860px;
+        }
+
+
+        .clearfix {
+            clear: both;
+        }
+
+        #addNodePopup {
+            position: absolute;
+            left: 400px;
+            top: 200px;
+            border: 3px solid lightskyblue;
+            padding: 10px;
+            width: 300px;
+            height: auto;
+            z-index: 100px;
+            background-color: #f9f9f9;
+            text-align: center;
+            display: none;
+        }
+
+        #NodeShapeBts {
+            display: inline;
+        }
+
+        #NodeShapeBts input[type="radio"] {
+            display: none;
+        }
+
+        #NodeShapeBts label{
+            display: inline-block;
+        }
+
+        /*add node form*/
+        .table {
+            display: block;
+        }
+
+        .row {
+            clear: both;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .cell{
+            display: block;
+            text-align: left;
+        }
+
+        .row_textarea {
+            margin-top: 30px;
+        }
+
+        .celllabel {
+            width: 100px;
+            text-align: left;
+            float: left;
+        }
+
+        #AMFields, #userFields {
+            display: none;
+        }
+
+        .cell textarea,
+        .cell input[type="text"],
+        .cell input[type="number"]{
+            width: 150px;
+        }
+
+        #header_title {
+            float:left;
+        }
+
+        .header_obj {
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .btn_radio{
+            padding: 5px 10px;
+            background: #F4F4F2;
+            cursor: pointer;
+        }
+
+        #NodeShapeBts input[type="radio"]:checked+label {
+            background: lightblue;
+        }
+
+        #loginInfo {
+            float:right;
+            height: 20px;
+            margin-top: 25px;
+        }
+
+        /* Overlay when Modal is open */
+        #lean_overlay {
+            position: fixed;
+            z-index:100;
+            top: 0px;
+            left: 0px;
+            height:100%;
+            width:100%;
+            background: #000;
+            display: none;
+        }
+
+        /* Modal box or Popup box */
+        .popupContainer{
+            position:absolute;
+            width:330px;
+            height: auto;
+            left:45%;
+            top:80px;
+            background: #FFF;
+        }
+
+        #logout_btn {
+            display: none;
+        }
+        
+        #welcome_msg {
+            display: none;
+            margin-right: 10px;
+        }
+
+        /*Popup */
+        .popupHeader {
+            font-size: 16px;
+            text-transform: uppercase;
+            background: #F4F4F2;
+            position: relative;
+            padding:10px 20px;
+            border-bottom: 1px solid #DDD;
+            font-weight: bold;
+        }
+
+        .popupHeader .modal_close {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding:10px 15px;
+            background: #E4E4E2;
+            cursor: pointer;
+            color: #aaa;
+            font-size: 16px;
+        }
+
+        .popupBody {
+            padding: 20px;
+        }
+
+        /* Buttons */
+
+        .btn{
+            padding: 10px 20px;
+            background: #F4F4F2;
+            cursor: pointer;
+        }
+
+        .btn_obj{
+            padding: 5px 10px;
+            background: #F4F4F2;
+            cursor: pointer;
+            border: none;
+            margin-right: 25px ;
+        }
+
+        #btns_obj {
+            padding-left: 50px;
+        }
+
+        .btn:hover,
+        .btn_obj:hover,
+        .btn_radio:hover{
+            background:  #E4E4E2;
+        }
+
+        .btn_blue {
+            background: lightblue;
+            color: #FFF;
+        }
+
+        .btn_blue:hover  {
+            background:  lightseagreen;
+        }
+
+        a.btn {
+            color: #666;
+            text-align: center;
+            text-decoration: none;
+        }
+
+
+        .one_half {
+            width: 50%;
+            display: block;
+            float: left;
+        }
+
+        .one_half.last {
+            width: 45%;
+            margin-left: 5%;
+        }
+
+        /*User Login Form*/
+        .user_login {
+            /*display: none;*/
+        }
+
+        .user_login label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .user_login input[type='text'],
+        .user_login input[type='password']{
+            display: block;
+            width: 90%;
+            padding:10px;
+            border:1px solid #DDD;
+            color: #666
+        }
+
+        .user_login input[type='checkbox'] {
+            float:left;
+            margin-right:5px;
+        }
+
+        .user_login input[type='checkbox']+label {
+            float: left;
+        }
+
+        .user_login .checkbox {
+            margin-bottom:10px;
+            clear:both;
+            overflow: hidden;
+        }
+
+        .action_btns {
+            clear:both;
+            overflow: hidden;
+        }
+
+        .action_btns a {
+            display: block;
+        }
+
+        /*User Register Form*/
+        .user_register {
+            display:none;
+        }
+
+        .user_register label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .user_register input[type='text'],
+        .user_register input[type='password']{
+            display: block;
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #DDD;
+            color:#666;
+        }
+
+        .err_msg {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        /*SDL server connection buttons*/
+        #btns_SDL {
+            padding-left: 10px;
+            padding-top: 10px;
+            width: 100%;
+            clear: both;
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+<div id="wrapper">
+    <div id="header">
+        <div id="header_title"><span class="bigtitle">Control Everything in Your Home</span></div>
+        <div id="loginInfo">
+            <span id="welcome_msg"></span>
+            <a id="logout_btn" class="btn">Log out</a>
+            <a id="modal_trigger" href="#modal" class="btn">Log in or Register</a>
+        </div>
+        <div id="btns_SDL">
+            <input type="button" class="btn_obj" id="btn_connect" value="Connect" />
+            <input type="button" class="btn_obj" id="btn_go" value="Go" />
+        </div>
+    </div>
+    <div id="body" class="clearfix">
+
+        <div id="graph"></div>
+        <div id="modal" class="popupContainer" style="display: none;">
+            <header class="popupHeader">
+                <span class="header_title">Login</span>
+                <span class="modal_close"><i class="fa fa-times"></i></span>
+            </header>
+            <section class="popupBody">
+                <div class="user_login">
+                    <div id="login_msg" class="err_msg"></div>
+                    <form>
+                        <label>Username</label><input type="text" id="username"/><br/>
+                        <label>Password</label><input type="password" id="pw"/><br/>
+                        <div class="checkbox">
+                            <input id="remember" type="checkbox"><label for="remember">Remember me</label>
+                        </div>
+
+                        <div class="action_btns">
+                            <div class="one_half">
+                                <a id='loginSubmit' class="btn btn_blue">Login</a>
+                            </div>
+                            <div class="one_half last">
+                                <a class="btn" id="register_form" name="register_form">Sign up</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="user_register">
+                    <div id="register_msg" class="err_msg"></div>
+                    <form>
+                        <label>Username</label><input id="newUsername" type="text"/><br/>
+                        <label>Password</label><input id="newPw" type="password"><br/>
+                        <label>Confirm Password</label><input id="newPwConfirm" type="password"><br/>
+
+                        <div class="action_btns">
+                            <div class="one_half">
+                                <a id="back_btn" class="btn">Back</a>
+                            </div>
+                            <div class="one_half last">
+                                <a id='register_btn' class="btn btn_blue">Register</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div id="footer" class="clearfix"></div>
+    <div id="addNodePopup">
+        <div class="header_obj">
+            <span id="nodeFormTitle" class="header_title">Add an Object</span>
+        </div>
+        <p id="nodeFormMsg" class="err_msg"></p>
+        <div class="table">
+            <div>
+                <div class="row">
+                    <div class="celllabel">Type *</div>
+                    <div class="cell">
+                        <div id="NodeShapeBts">
+                            <input type="radio" id="circle" name="nodeShapes" value="circle" checked/><label class="btn_radio"
+                                for="circle">EM</label>
+                            <input type="radio" id="triangle" name="nodeShapes" value="triangle"/><label class="btn_radio" for="triangle">AM</label>
+                            <input type="radio" id="square" name="nodeShapes" value="square"/><label class="btn_radio"
+                                for="square">User</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="celllabel">Name *</div>
+                    <div class="cell"><input type="text" id="nodeName" name="nodeName" /></div>
+                </div>
+            </div>
+            <div id="EMFields">
+                <div class="row">
+                    <div class="celllabel">Device State</div>
+                    <div class="cell">
+                        <input type="text" id="dsVal"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="celllabel">Consumption</div>
+                    <div class="cell">
+                        <input type="number" id="cVal"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="celllabel">Priority Level</div>
+                    <div class="cell">
+                        <input type="number" id="plVal"/>
+                    </div>
+                </div>
+                <div class="row row_textarea">
+                    <div class="celllabel">Description</div>
+                    <div class="cell">
+                        <textarea id='EMdes' rows="2" cols="19"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div id="AMFields">
+                <div class="row ">
+                    <div class="celllabel">Hierarchy Level</div>
+                    <div class="cell">
+                        <input type="number" id="hlVal"/>
+                    </div>
+                </div>
+                <div class="row row_textarea">
+                    <div class="celllabel">Description</div>
+                    <div class="cell">
+                        <textarea id='AMdes' rows="2" cols="19"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div id="userFields">
+                <div class="row">
+                    <div class="celllabel">Authority Level</div>
+                    <div class="cell">
+                        <input type="number" id="alVal"/>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <br/>
+        <div id="btns_obj">
+            <input type="button" class="btn_blue btn_obj" value="Save" id="savebt"/>
+            <input type="button" class="btn_obj" value="Cancel" id="cancelbt"/>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+//    $("#tabs").tabs();
+
+    $("#modal_trigger").leanModal({top:200,overlay:0.3,closeButton: ".modal_close"});
+
+    $("#register_form").click(function(){
+        $(".user_register").show();
+        $(".user_login").hide();
+        $(".header_title").text('Register');
+    });
+
+    $("#back_btn").click(function(){
+        $(".user_login").show();
+        $(".user_register").hide();
+        $(".header_title").text('Login');
+
+        //clear register form
+        $("#newUsername").val("");
+        $("#newPw").val("");
+        $("#newPwConfirm").val("");
+    });
+
+
+
+    //change node type in the addNode form
+    $('input[name=nodeShapes]:radio').change(updateNodeFormByShape);
+
+
+    function updateNodeFormByShape() {
+        resetAddNodeForm(true);
+        var newShape = $('input:radio[name=nodeShapes]:checked').val();
+
+        if (newShape == 'circle') {
+            $('#AMFields').css('display', 'none');
+            $('#userFields').css('display', 'none');
+            $('#EMFields').css('display', 'block');
+        }
+        else if (newShape == 'triangle') {
+            $('#AMFields').css('display', 'block');
+            $('#userFields').css('display', 'none');
+            $('#EMFields').css('display', 'none');
+        }
+        else if (newShape == 'square') {
+            $('#AMFields').css('display', 'none');
+            $('#userFields').css('display', 'block');
+            $('#EMFields').css('display', 'none');
+        }
+    }
+
+    //graph
+    //define local data
+    //define nodes
+    var localNodes = new vis.DataSet([
+        {id: 1, label: '1'},
+        {id: 2, label: '2'},
+        {id: 3, label: '3'},
+        {id: 4, label: '4'},
+        {id: 5, label: '5'}
+    ]);
+
+    //define edges
+    var localEdges = new vis.DataSet([
+        {from: 1, to: 3},
+        {from: 1, to: 2},
+        {from: 2, to: 4},
+        {from: 2, to: 5}
+    ]);
+
+    var localData = {
+        nodes: localNodes,
+        edges: localEdges
+    };
+
+    var seed = 2;
+
+    var container = document.getElementById('graph');
+
+    //    var options = {
+    ////        layout: {
+    ////          randomSeed:seed
+    ////        },
+    //        manipulation: {
+    //            addNode: function (data, callback) {
+    //                resetAddNodeForm(false);
+    //                $('#nodeFormTitle').html('Add an object');
+    //                $('#addNodePopup').css("display", "block");
+    //
+    //                //save button
+    //                data.id = -1;
+    ////                $('#savebt').click(saveNodeData.bind(func_this, data, callback));  Wrong, functions will be added not replaced!!!
+    //                document.getElementById('savebt').onclick = saveNodeData.bind(this, data, callback);
+    //
+    //                //cancel button
+    //                document.getElementById('cancelbt').onclick = function () {
+    //                    $('#addNodePopup').css("display", "none");
+    //                }
+    //
+    //            },
+    //            editNode: function (data, callback) {
+    //                resetAddNodeForm(false);
+    //                $('#nodeFormTitle').html('Edit an object');
+    //                $('#addNodePopup').css("display", "block");
+    //                $('#nodeName').val(data.label);
+    //                console.log('before edit:',data);
+    //                var shape = data.shape;
+    //
+    //                //doesn't trigger change event
+    //                $('#'+shape).prop("checked",true);
+    //
+    //                updateNodeFormByShape();
+    //
+    //                //EM
+    //                if (shape == 'circle') {
+    //                    $('#dsVal').val(data.devicestate);
+    //                    $('#cVal').val(data.consumption);
+    //                    $('#plVal').val(data.prioritylever);
+    //                    $('#EMdes').val(data.description);
+    //                }
+    //                //AM
+    //                else if (shape == 'triangle') {
+    //                    $('#hlVal').val(data.hierarchylevel);
+    //                    $('#AMdes').val(data.description);
+    //                }
+    //                //user
+    //                else if (shape == 'square') {
+    //                    $('#alVal').val(data.authoritylevel);
+    //                }
+    //                else {
+    //                    console.log('no shape info got');
+    //                }
+    //
+    //                //save button
+    ////                $('#savebt').click(saveNodeData.bind(this,data, callback));
+    //                document.getElementById('savebt').onclick = saveNodeData.bind(this, data, callback);
+    //
+    //                //cancel button
+    //                document.getElementById('cancelbt').onclick = function () {
+    //                    $('#addNodePopup').css("display", "none");
+    //                    callback(null);
+    //                }
+    //            },
+    //            addEdge: function (data, callback) {
+    //                if (data.from == data.to) {
+    //                    var r = confirm("Do you want to connect this object to itself?");
+    //                    if (r) {
+    //                        callback(data);
+    //                    }
+    //                }
+    //                else {
+    //                    callback(data);
+    //                }
+    //            },
+    //            deleteNode: function(data,callback) {
+    //                if(confirm("Are you sure that you want to delete this node?")) {
+    //                    callback(data);
+    //                }
+    //                else {
+    //                    callback(null);
+    //                }
+    //            },
+    //            deleteEdge: function(data,callback) {
+    //                if(confirm("Are you sure that you want to delete this edge?")) {
+    //                    callback(data);
+    //                }
+    //                else {
+    //                    callback(null);
+    //                }
+    //            }
+    //        }
+    //
+    //    };
+
+
+    //    var network = new vis.Network(container, data, options);
+
+    function resetAddNodeForm(isEdit) {
+        //isEdit =  false : clear all fields
+        //true : clear all fields except Name and Shape
+        if (!isEdit) {
+            $('#nodeName').val('');
+            $('#circle').prop("checked", true);
+        }
+
+        $('#dsVal').val('');
+        $('#cVal').val('');
+        $('#plVal').val('');
+        $('#EMdes').val('');
+        $('#hlVal').val('');
+        $('#AMdes').val('');
+        $('#alVal').val('');
+    }
+
+
+    function saveNodeData(data, callback) {
+        if (data.id == '-1') {
+            data.id = (Math.random() * 1e7).toString(32);
+        }
+
+        data.label = $('#nodeName').val();
+
+        //if label is empty or contains only spaces
+        if(data.label.replace(/ /g,'') == "") {
+            return null;
+        }
+
+        var newShape = $('input:radio[name=nodeShapes]:checked').val();
+        data.shape = newShape;
+        if (newShape == 'circle') {
+            data.devicestate = $('#dsVal').val();
+            data.consumption = $('#cVal').val();
+            data.prioritylever = $('#plVal').val();
+            data.description = $('#EMdes').val();
+        }
+        //AM
+        else if (newShape == 'triangle') {
+            data.hierarchylevel = $('#hlVal').val();
+            data.description = $('#AMdes').val();
+        }
+        //user
+        else if (newShape == 'square') {
+            data.authoritylevel = $('#alVal').val();
+        }
+        else {
+            console.log('no node shape detected');
+        }
+
+        $('#addNodePopup').css("display", "none");
+        callback(data);
+        return data;
+    }
+    //    }
+
+    function onchallenge(session, method, extra) {
+//        console.log('onchallenge',method,extra);
+        if (method === 'wampcra') {
+//            console.log("authenticating via '" + method + "' and challenge '" + extra.challenge + "'");
+            return autobahn.auth_cra.sign(key, extra.challenge);
+        } else {
+            throw "don't know how to authenticate using '" + method + "'";
+        }
+    }
+
+    // the URL of the WAMP Router (Crossbar.io)
+    //
+
+    var wsuri;
+    if (document.location.origin == "file://") {
+        wsuri = "ws://127.0.0.1:8080/ws";
+
+    } else {
+        wsuri = (document.location.protocol === "http:" ? "ws:" : "wss:") + "//" +
+                document.location.host + "/ws";
+    }
+
+    // CALL a remote procedure: when user registering
+    //
+    $("#register_btn").click(function(){
+        $("#register_msg").html("");
+
+        var newUsername = $("#newUsername").val();
+        var newPw = $("#newPw").val();
+
+        if($("#newPwConfirm").val() == newPw){
+
+            // the WAMP connection to the Router
+            //
+            user = "registerUser";
+            key = 'registerUser';
+
+            var connection = new autobahn.Connection({
+                url: wsuri,
+                realm: "realm1",
+
+                //
+                authmethods: ["wampcra"],
+                authid: user,
+                onchallenge: onchallenge
+
+            });
+
+            connection.onopen = function (session, details) {
+
+                session.call('sdl.auth.registerUser', [newUsername, newPw]).then(
+                        function (res) {
+                            console.log(res);
+                            if (res === "ok") {
+                                // clear all fields
+                                $("#newUsername").val('');
+                                $("#newPw").val('');
+                                $("#newPwConfirm").val('');
+
+                                close_modal_login();
+                                alert("Sign up finished with success ;), now you can log in and enjoy !");
+
+                                connection.close('Register procedure finished with success.');
+                            }
+                            else if(res == "duplicate_username"){
+                                $("#register_msg").html("Opps, this username is already taken...");
+                                connection.close('Register procedure not finished.');
+                            }
+                            else if(res == "short_pw"){
+                                $("#register_msg").html("Your password must have at least 6 characters... ");
+                                connection.close('Register procedure not finished.');
+                            }
+                            else {
+                                $("#register_msg").html("error!");
+                                connection.close('Register procedure ended with error.');
+                            }
+                        }, session.log
+                );
+            }
+
+            connection.onclose = function (reason, details) {
+                onclose(reason, details);
+            }
+
+            connection.open();
+
+        }
+        else{
+            $("#register_msg").html("* Two passwords entered are different,please try again ...");
+        }
+    });
+
+    if (typeof (Storage) !== "undefined") {
+
+        $("#modal_trigger").click(function(){
+
+            if(localStorage.username) {
+                $("#username").val(localStorage.username);
+                $("#pw").val(localStorage.pw);
+                $("#remember").prop("checked",true);
+            }
+            else {
+                $("#username").val("");
+                $("#pw").val("");
+                $("#remember").prop("checked",false);
+            }
+
+            $(".user_login").show();
+            $(".user_register").hide();
+
+            $(".header_title").html("Login");
+
+        });
+
+        // check whether there exists saved username and password
+        if (localStorage.username && localStorage.isLogin == "true") {
+
+            user = localStorage.username;
+            key = localStorage.pw;
+
+
+            // the WAMP connection to the Router
+            //
+            var connection = new autobahn.Connection({
+                url: wsuri,
+                realm: "realm1",
+
+                //
+                authmethods: ["wampcra"],
+                authid: user,
+                onchallenge: onchallenge
+
+            });
+
+            connection.onopen = function (session, details) {
+
+                //change Login/Register Button to Welcome Username
+                $("#welcome_msg").html("Welcome "+user);
+                $("#welcome_msg").show();
+                $("#modal_trigger").hide();
+                $("#logout_btn").show();
+
+                $("#btns_SDL").show();
+
+                main(session, details);
+            }
+            connection.onclose = function (reason, details) {
+                if(details.reason === "wamp.error.authentication_failed") {
+                    $("#login_msg").html("Wrong username or password!");
+                }
+                onclose(reason, details);
+            }
+
+            //define log out event handler
+//            $("#logout_btn").click(function(e){
+            document.getElementById("logout_btn").onclick = function(){
+
+                console.log('logout');
+
+
+                $("#welcome_msg").html('');
+                $("#welcome_msg").hide();
+                $("#modal_trigger").show();
+                $("#logout_btn").hide();
+
+                $("#btns_SDL").hide();
+
+
+                if(localStorage.remember == "false") {
+
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('pw');
+                    localStorage.removeItem('remember');
+                    localStorage.removeItem('isLogin');
+                }
+                else {
+                    localStorage.isLogin = "false";
+                }
+
+                connection.close('User Loged out.');
+                network.destroy();
+            }
+
+            // now actually open the connection
+
+            connection.open();
+
+        }
+        //no login saved
+        else {
+            $("#welcome_msg").html('');
+            $("#welcome_msg").hide();
+            $("#modal_trigger").show();
+            $("#logout_btn").hide();
+
+//            alert("please log in first...");
+        }
+
+    }
+    else {
+        console.log('Sorry, no web storage support.');
+    }
+
+
+    $("#loginSubmit").click(function () {
+        console.log("log in");
+
+        $("#login_msg").html("");
+
+        user = $("#username").val();
+        key = $("#pw").val();
+
+        // the WAMP connection to the Router
+        //
+        var connection = new autobahn.Connection({
+            url: wsuri,
+            realm: "realm1",
+
+            //
+            authmethods: ["wampcra"],
+            authid: user,
+            onchallenge: onchallenge
+
+        });
+
+        connection.onclose = function (reason, details) {
+//            console.log(details);
+            if(details.reason === "wamp.error.authentication_failed") {
+                $("#login_msg").html("* Wrong username or password!");
+            }
+            onclose(reason, details);
+        }
+
+        connection.onopen = function (session, details) {
+            main(session, details);
+
+            close_modal_login();
+
+            //change Login/Register Button to Welcome Username
+            $("#welcome_msg").html("Welcome "+user);
+            $("#welcome_msg").show();
+            $("#modal_trigger").hide();
+            $("#logout_btn").show();
+
+            //show SDL server connection buttons
+            $("#btns_SDL").show();
+
+            if (typeof (Storage) !== "undefined") {
+                localStorage.username = user;
+                localStorage.pw = key;
+
+                if($("#remember").prop('checked')) {
+                    localStorage.remember = "true";
+                }
+                else {
+                    localStorage.remember = "false";
+                }
+                localStorage.isLogin = "true";
+
+                //define log out event handler
+
+//                $("#logout_btn").click(function(){
+                  document.getElementById("logout_btn").onclick = function(){
+                    console.log('logout');
+
+                    $("#welcome_msg").html('');
+                    $("#welcome_msg").hide();
+                    $("#modal_trigger").show();
+                    $("#logout_btn").hide();
+
+                    $("#btns_SDL").hide();
+
+                    //remember me not checked
+                    if(localStorage.remember == "false") {
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('pw');
+                        localStorage.removeItem('remember');
+                        localStorage.removeItem('isLogin');
+                    }
+                    else {
+                        localStorage.isLogin = "false";
+                    }
+                    connection.close('User Loged out.');
+                    network.destroy();
+                }
+            }
+            else {
+                console.log('sorry, no web localstorage support...');
+            }
+        }
+
+
+        // now actually open the connection
+        //
+        connection.open();
+    });
+
+    // fired when connection is established and session attached
+    //
+    function main(session, details) {
+
+        console.log("Connected");
+        console.log("connected session with ID " + session.id);
+        console.log("authenticated using method '" + details.authmethod + "' and provider '" + details.authprovider + "'");
+        console.log("authenticated with authid '" + details.authid + "' and authrole '" + details.authrole + "'");
+
+        // subscribe to future change data event
+        session.subscribe("sdlSCI.data.onChange",
+                function (args) {
+//                 console.log(args);
+                    var type = args[0];
+                    var event = args[1];
+                    var affectedItem = args[2];
+                    if (type === 'node') {
+                        if (event === 'add') {
+                            if (localData.nodes.get(affectedItem.id) == null) {
+                                localData.nodes.add(affectedItem);
+                            }
+                        }
+                        else if (event === 'remove') {
+                            var itemId;
+                            for (itemId in affectedItem.nodes) {
+                                if (localData.nodes.get(affectedItem.nodes[itemId])) {
+                                    localData.nodes.remove(affectedItem.nodes[itemId]);
+                                }
+                            }
+                            for (itemId in affectedItem.edges) {
+                                if (localData.edges.get(affectedItem.edges[itemId])) {
+                                    localData.edges.remove(affectedItem.edges[itemId]);
+                                }
+                            }
+                        }
+                        else if (event === 'update') {
+                            if (localData.nodes.get(affectedItem.id)) {
+                                localData.nodes.update(affectedItem);
+                            }
+                        }
+                        else {
+                            console.log('event unknown :', event);
+                        }
+                    }
+                    else if (type === 'edge') {
+                        if (event === 'add') {
+                            if (localData.edges.get(affectedItem.id) == null) {
+                                localData.edges.add(affectedItem);
+                            }
+                        }
+                        else if (event === 'remove') {
+                            var itemId;
+                            for (itemId in affectedItem.edges) {
+                                if (localData.edges.get(affectedItem.edges[itemId])) {
+                                    localData.edges.remove(affectedItem.edges[itemId]);
+                                }
+                            }
+                        }
+                        else if (event === 'update') {
+                            if (localData.edges.get(affectedItem.id)) {
+                                localData.edges.update(affectedItem);
+                            }
+                        }
+                        else {
+                            console.log('event unknown:', event);
+                        }
+                    }
+                    else {
+                        console.log('Type of affected item unknown');
+                    }
+                });
+
+
+        //define options for Network
+        /***********************************************************/
+        var options = {
+            //        layout: {
+            //          randomSeed:seed
+            //        },
+            manipulation: {
+                addNode: function (data, callback) {
+                    resetAddNodeForm(false);
+                    $('#nodeFormTitle').html('Add an object');
+                    $('#addNodePopup').css("display", "block");
+
+                    //save button
+                    data.id = -1;
+//                $('#savebt').click(saveNodeData.bind(func_this, data, callback));  Wrong, functions will be added not replaced!!!
+                    document.getElementById('savebt').onclick = function () {
+
+                        var affectedItem = saveNodeData.bind(this, data, callback)();
+
+                        if(affectedItem == null) {
+                            $("#nodeFormMsg").html("You must fill all the fields with * ");
+                        }
+
+                        else {
+                            //change data in server, call remote function
+                            session.call('sdlSCI.data.changeData', ['node', 'add', affectedItem]).then(
+                                    function (res) {
+                                        console.log(res);
+                                    }, session.log);
+
+                            //publish to server, tell it send SDL cmd to SDL server
+                            if (affectedItem.shape == "circle") {
+                                session.call('sdlSCI.data.create_EM', [affectedItem.label, '0']);
+                            }
+                            else if (affectedItem.shape == "square") {
+
+                            }
+                            else if (affectedItem.shape == "triangle") {
+
+                            }
+                        }
+                    }
+
+                    //cancel button
+                    document.getElementById('cancelbt').onclick = function () {
+                        $('#addNodePopup').css("display", "none");
+                    }
+
+                },
+                editNode: function (data, callback) {
+                    resetAddNodeForm(false);
+                    $('#nodeFormTitle').html('Edit an object');
+                    $('#addNodePopup').css("display", "block");
+                    $('#nodeName').val(data.label);
+                    var shape = data.shape;
+
+                    //doesn't trigger change event
+                    $('#' + shape).prop("checked", true);
+
+                    updateNodeFormByShape();
+
+                    //EM
+                    if (shape == 'circle') {
+                        $('#dsVal').val(data.devicestate);
+                        $('#cVal').val(data.consumption);
+                        $('#plVal').val(data.prioritylever);
+                        $('#EMdes').val(data.description);
+                    }
+                    //AM
+                    else if (shape == 'triangle') {
+                        $('#hlVal').val(data.hierarchylevel);
+                        $('#AMdes').val(data.description);
+                    }
+                    //user
+                    else if (shape == 'square') {
+                        $('#alVal').val(data.authoritylevel);
+                    }
+                    else {
+                        console.log('no shape info got');
+                    }
+
+                    //remove shadow
+                    data.shadow = false;
+
+                    //save button
+//                $('#savebt').click(saveNodeData.bind(this,data, callback));
+                    document.getElementById('savebt').onclick = function () {
+                        saveNodeData.bind(this, data, callback)();
+                        session.call('sdlSCI.data.changeData', ['node', 'update', data]).then(
+                                function (res) {
+                                    console.log(res);
+                                }, session.log);
+                    }
+
+                    //cancel button
+                    document.getElementById('cancelbt').onclick = function () {
+                        $('#addNodePopup').css("display", "none");
+                        callback(null);
+                    }
+                },
+                addEdge: function (data, callback) {
+                    if (data.from == data.to) {
+                        var r = confirm("Do you want to connect this object to itself?");
+                        if (r) {
+                            callback(data);
+                            session.call('sdlSCI.data.changeData', ['edge', 'add', data]).then(
+                                    function (res) {
+                                        console.log(res);
+                                    }, session.log);
+                        }
+                    }
+                    else {
+                        callback(data);
+                        session.call('sdlSCI.data.changeData', ['edge', 'add', data]).then(
+                                function (res) {
+                                    console.log(res);
+                                }, session.log);
+                    }
+                },
+                editEdge: function (data, callback) {
+                    if (data.from == data.to) {
+                        var r = confirm("Do you want to connect this object to itself?");
+                        if (r) {
+                            callback(data);
+                            session.call('sdlSCI.data.changeData', ['edge', 'update', data]).then(
+                                    function (res) {
+                                        console.log(res);
+                                    }, session.log);
+                        }
+                        else {
+                            callback(null);
+                        }
+                    }
+                    else {
+                        callback(data);
+                        session.call('sdlSCI.data.changeData', ['edge', 'update', data]).then(
+                                function (res) {
+                                    console.log(res);
+                                }, session.log);
+                    }
+                },
+                deleteNode: function (data, callback) {
+
+                    if (confirm("Are you sure that you want to delete this node?")) {
+                        callback(data);
+                        //data is an array of selected Nodes and Edges
+                        session.call('sdlSCI.data.changeData', ['node', 'remove', data]).then(
+                                function (res) {
+                                    console.log(res);
+                                }, session.log);
+                    }
+                    else {
+                        callback(null);
+                    }
+                },
+                deleteEdge: function (data, callback) {
+                    if (confirm("Are you sure that you want to delete this edge?")) {
+                        callback(data);
+                        session.call('sdlSCI.data.changeData', ['edge', 'remove', data]).then(
+                                function (res) {
+                                    console.log(res);
+                                }, session.log);
+                    }
+                    else {
+                        callback(null);
+                    }
+                }
+            },
+            interaction: {
+                hover: true,
+                multiselect: true
+            }
+
+        };
+
+        /***********************************************************/
+
+        // CALL a remote procedure: get initial data
+        //
+        session.call('sdlSCI.data.getData').then(
+                function (res) {
+                    var nodesArray = Object.keys(res.nodes).map(key => res.nodes[key]);
+                    var edgesArray = Object.keys(res.edges).map(key => res.edges[key]);
+                    var nodesDataSet = new vis.DataSet(nodesArray);
+                    var edgesDataSet = new vis.DataSet(edgesArray);
+                    var data = {
+                        nodes: nodesDataSet,
+                        edges: edgesDataSet
+                    }
+                    localData = data;
+                    console.log('getdata then draw');
+                    network = new vis.Network(container, localData, options);
+                },
+                //// ????????  if get data error?  sychronous ?
+                function (err) {
+                    console.log("getData() error:", err);
+                    //listen on changes of localData
+                    localData.nodes.on("*", function (event, properties) {
+                        console.log("event", event, "prop", properties);
+                    });
+                    localData.edges.on("*", function (event, properties) {
+                        console.log("event", event, "prop", properties);
+                    });
+                    network = new vis.Network(container, localData, options);
+                }
+        );
+
+        $("#btn_go").click(function(){
+            session.call('sdlSCI.data.SendCMD_Go');
+
+        });
+
+        $("#btn_connect").click(function(){
+            session.call('sdlSCI.data.connectSDL');
+        });
+
+    }
+
+    // fired when connection was lost (or could not be established)
+    //
+
+    function onclose(reason, details) {
+        console.log("Connection lost: " + reason);
+        if (reason !== "lost") {
+            network = new vis.Network(container, localData, options);
+        }
+    }
+
+    function close_modal_login(){
+        $("#modal").hide();
+        $("#lean_overlay").hide();
+
+        $(".user_login").show();
+        $(".user_register").hide();
+
+        $(".header_title").html("Login");
+    }
+
+
+</script>
+</body>
+</html>

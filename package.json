@@ -1,0 +1,18 @@
+{
+  "name": "SDLsimulationInterface",
+  "version": "1.0.0",
+  "description": "SDL control app by using Crossbar.io with Node.js",
+  "main": "node/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "crossbario",
+    "wamp"
+  ],
+  "author": "Xiao DENG",
+  "license": "",
+  "dependencies": {
+    "autobahn": "^0.9.5"
+  }
+}
