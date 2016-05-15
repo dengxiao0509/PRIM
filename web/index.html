@@ -485,6 +485,8 @@
             <input type="button" class="btn_obj" value="Cancel" id="cancelbt"/>
         </div>
     </div>
+    <div id="nodeInfo">
+    </div>
 
 </div>
 
@@ -832,6 +834,9 @@
             $(".user_register").hide();
 
             $(".header_title").html("Login");
+            $("#register_msg").html("");
+            $("#login_msg").html("");
+
 
         });
 
@@ -1283,6 +1288,9 @@
                     localData = data;
                     console.log('getdata then draw');
                     network = new vis.Network(container, localData, options);
+                    network.on("hoverNode", function (params) {
+                        hoverNodeHandler(params);
+                    });
                 },
                 //// ????????  if get data error?  sychronous ?
                 function (err) {
@@ -1295,6 +1303,9 @@
                         console.log("event", event, "prop", properties);
                     });
                     network = new vis.Network(container, localData, options);
+                    network.on("hoverNode", function (params) {
+                        hoverNodeHandler(params);
+                    });
                 }
         );
 
@@ -1309,6 +1320,19 @@
 
     }
 
+    //params is an object which contains the id of hovered node
+    function hoverNodeHandler(params) {
+        var hoveredNodeId = params.node;
+        var hoveredNodeObj = localData.nodes.get(hoveredNodeId);
+//        console.log(hoveredNodeObj);
+        var graphW = $("#graph").css("width");
+        var graphH = $("#graph").css("height");
+        $("#nodeInfo").show()
+                .css("top",hoveredNodeObj.x+graphW)
+                .css("left",hoveredNodeObj.y+graphH);
+
+    }
+
     // fired when connection was lost (or could not be established)
     //
 
@@ -1316,6 +1340,9 @@
         console.log("Connection lost: " + reason);
         if (reason !== "lost") {
             network = new vis.Network(container, localData, options);
+            network.on("hoverNode", function (params) {
+                hoverNodeHandler(params);
+            });
         }
     }
 

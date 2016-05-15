@@ -142,7 +142,7 @@
 	 },
 	 {
 	    "type": "guest",
-            "executable": "node",
+            "executable": "nodejs",
             "arguments": [
                 "authenticator.js",
 	        "ws://127.0.0.1:9000",
