@@ -24,14 +24,17 @@
     <script type="text/javascript" src="lib/jquery.leanModal.min.js"></script>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
 
+    <script src="lib/jquery.tagsinput.js"></script>
+    <link rel="stylesheet" href="css/jquery.tagsinput.css" />
+
     <style>
         #header {
             width: 100%;
-            height: 70px;
-            margin: 10px auto;
+            height: 60px;
+            margin: 7px auto;
             padding: 15px 0;
             min-width: 860px;
-            border-bottom: 1px solid lightgray;
+            /*border-bottom: 1px solid lightgray;*/
         }
 
         #header .bigtitle {
@@ -46,10 +49,33 @@
             min-width: 860px;
         }
 
-        #graph {
-            float: left;
+        #adminMenu{
+            width:120px;
+            height:570px;
+            position:absolute;
+            border: lightblue 2px solid;
+            display: none;
+        }
+
+        #rightDiv{
+            margin-left:120px;
+            height: 570px;
+            border-top:2px lightblue solid;
+            padding-left: 5px;
+            overflow: hidden;
+        }
+
+        #topMenu{
+            height: 40px;
             width: 100%;
-            height: 100%;
+            border-bottom: 1px solid gainsboro;
+            overflow: hidden;
+            padding-left: 10px;
+        }
+
+        #graph {
+            width: 100%;
+            height: 528px;
         }
 
         #footer {
@@ -64,10 +90,12 @@
             clear: both;
         }
 
-        #addNodePopup {
+        #addObjPopup,
+        #newNodeNamePopup,
+        #addRulePopup{
             position: absolute;
             left: 400px;
-            top: 200px;
+            top: 120px;
             border: 3px solid lightskyblue;
             padding: 10px;
             width: 300px;
@@ -76,6 +104,11 @@
             background-color: #f9f9f9;
             text-align: center;
             display: none;
+        }
+
+        #addRulePopup{
+            /*display: block;*/
+            width: 270px;
         }
 
         #NodeShapeBts {
@@ -98,7 +131,8 @@
         .row {
             clear: both;
             display: block;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            height:20px;
         }
 
         .cell{
@@ -108,6 +142,7 @@
 
         .row_textarea {
             margin-top: 30px;
+            height: 35px;
         }
 
         .celllabel {
@@ -116,7 +151,7 @@
             float: left;
         }
 
-        #AMFields, #userFields {
+        #userFields {
             display: none;
         }
 
@@ -223,11 +258,13 @@
             background: #F4F4F2;
             cursor: pointer;
             border: none;
-            margin-right: 25px ;
+            margin-right: 15px ;
         }
 
-        #btns_obj {
+        .btns_obj {
             padding-left: 50px;
+            margin-top: 24px;
+            clear: both;
         }
 
         .btn:hover,
@@ -243,6 +280,11 @@
 
         .btn_blue:hover  {
             background:  lightseagreen;
+        }
+
+        .btn_red {
+            color: red;
+            float:left;
         }
 
         a.btn {
@@ -330,13 +372,215 @@
             margin-bottom: 10px;
         }
 
-        /*SDL server connection buttons*/
-        #btns_SDL {
-            padding-left: 10px;
-            padding-top: 10px;
+
+        .menuDiv{
             width: 100%;
+            /*border-bottom: 1px solid lightgrey;*/
+            /*margin:10px 0 ;*/
+            position:relative;
+        }
+
+        .menuContent {
+            padding: 10px 0;
+        }
+
+        .btn_sdl{
+            margin: 5px 0 5px 5px;
+            width: 80px;
+        }
+        
+        .btn_sdl:hover{
+            cursor: pointer;
+        }
+
+        .menuTitle {
+            text-align: left;
+            padding: 5px 5px;
+            font-weight: bold;
+            background: lightblue;
+        }
+
+        #existingObj,
+        #existingRules{
+            height: 150px;
+            overflow: auto;
+        }
+
+        .fix .btn_obj{
+            margin: 10px auto;
+        }
+
+        #addObjClassIcon {
+            position: absolute;
+            left: 65px;
+            top: 6px;
+            cursor: pointer;
+        }
+
+        #addObjClassIcon:hover,
+        #addVarIcon:hover,
+        #deleteVarIcon:hover{
+            opacity: 0.8;
+        }
+
+        #newVar{
             clear: both;
+            height:auto;
+        }
+
+        #addVarIcon{
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        #newVar .row{
+
+        }
+   
+        #newVar .row input[type="text"]{
+            width: 80px;
+            float: left;
+            margin-right: 10px;
+        }
+
+        #deleteVarIcon{
+            float: left;
+        }
+
+        .newVarLabel{
+
+        }
+
+        .objClassDiv {
+            margin: 5px 5px;
+            display: inline-block;
+            border: 1px solid gainsboro;
+        }
+
+        .objClassDiv:hover {
+            cursor: pointer;
+        }
+
+        /*add rule form*/
+        #sensors,
+        #actors{
+            margin-bottom: 20px;
+            clear: both;
+        }
+
+        .sensorDiv,
+        .actorDiv{
+            clear:both;
+            margin-top: 10px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nameDiv {
+            float:left;
+        }
+        
+        .blockTitle{
+            display: block;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .valInput {
+            width: 100px;
+            margin-left: 5px;
+        }
+        
+        .varRow {
+            height: 30px;
+        }
+
+        .checkedShow {
+            display: inline-block;
+            float: right;
             display: none;
+        }
+
+        .remindText {
+            font-size: small;
+            display: none;
+            padding-top:17px;
+        }
+
+        #addruleEndIcon,
+        #addruleCancelIcon{
+            display: none;
+            padding: 2px 5px;
+            color: #f4f4f4;
+            background: #f47e7e;
+            font-weight: bold;
+            border-radius: 4px;
+            border: solid 0 #e3edf4;
+            -moz-border-radius: 4px;
+            -webkit-border-radius: 4px;
+            margin-top: 6px;
+            height: 26px;
+        }
+
+        #addruleCancelIcon{
+            background: #F4F4F2;
+            color: black;
+            font-weight: normal;
+        }
+
+        #addruleBeginIcon{
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: solid 1 #e3edf4;
+            -moz-border-radius: 4px;
+            -webkit-border-radius: 4px;
+            width: 90px;
+            margin-top: 6px;
+            display: inline-block;
+            vertical-align:middle
+        }
+
+        #deleteSelectedIcon{
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: solid 1 #e3edf4;
+            -moz-border-radius: 4px;
+            -webkit-border-radius: 4px;
+            display: none;
+            float:none;
+            margin-left: 30px;
+            width: 125px;
+            margin-top: 6px;
+            vertical-align:middle
+        }
+
+        #addruleBeginIcon img,
+        #deleteSelectedIcon img,
+        .btn_lable{
+            vertical-align: middle;
+        }
+        
+        #addruleEndIcon:hover,
+        #addruleBeginIcon:hover,
+        #deleteSelectedIcon:hover{
+            cursor: pointer;
+        }
+
+        #addruleEndIcon:hover{
+            background: #e76969;
+        }
+
+        #addruleCancelIcon:hover{
+            background: #e3edf4;
+        }
+
+
+        #ruleColor {
+            background: none;
+            height: 20px;
+            width: 30px;
+            border: none;
+            padding: 0;
         }
 
     </style>
@@ -351,14 +595,58 @@
             <a id="logout_btn" class="btn">Log out</a>
             <a id="modal_trigger" href="#modal" class="btn">Log in or Register</a>
         </div>
-        <div id="btns_SDL">
-            <input type="button" class="btn_obj" id="btn_connect" value="Connect" />
-            <input type="button" class="btn_obj" id="btn_go" value="Go" />
-        </div>
     </div>
     <div id="body" class="clearfix">
+        <div id="adminMenu">
+            <div class="menuDiv" id="serverSDLMenu">
+                <div class="menuTitle">SDL Server</div>
+                <div class="menuContent">
+                    <input type="button" class="btn_sdl" id="btn_connect" value="Connect" /><br/>
+                    <input type="button" class="btn_sdl" id="btn_go" value="Go" />
+                </div>
+            </div>
+            <div class="menuDiv" id="objClassMenu">
+                <div class="menuTitle"><span>Objects</span>
+                    <img id="addObjClassIcon" src="image/plus.png" width="15px"/>
+                </div>
+                <div class="menuContent">
+                    <div id="existingObj"></div>
+                </div>
+            </div>
+            <div class="menuDiv" id="ruleMenu">
+                <div class="menuTitle"><span>Rules</span>
+                    <!--<img id="addruleEndIcon" src="image/stop.png" width="15px"/>-->
+                </div>
+                <div class="menuContent">
+                  <div id="userFilter">
+                      <select id="userList">
 
-        <div id="graph"></div>
+                      </select>
+                  </div>
+                  <div id="existingRules"></div>
+                </div>
+            </div>
+
+
+        </div>
+        <div id="rightDiv">
+            <div id="topMenu">
+                <div id="addruleBeginIcon">
+                    <img  src="image/plus.png" width="20px"/>
+                    <span class="btn_lable">Add Rule</span>
+                </div>
+                <div id="deleteSelectedIcon">
+                    <!--<input id="deleteSelectedIcon" type="button" class="btn_obj btn_red" value="Delete Selected"/>-->
+                    <img  src="image/delete.png" width="20px"/>
+                    <span class="btn_lable">Delete Selected</span>
+                </div>
+                <input id="addruleCancelIcon" type="button" class="btn_obj" width="50px" value="Cancel"/>
+                <input id="addruleEndIcon" type="button" class="btn_obj" width="50px" value="Done"/>
+                <span class="remindText">Click on a sensor and drag the edge to an actor to connect them by a rule. Click "Done" in the menu to finish.</span>
+            </div>
+            <div id="graph" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+        </div>
         <div id="modal" class="popupContainer" style="display: none;">
             <header class="popupHeader">
                 <span class="header_title">Login</span>
@@ -405,7 +693,7 @@
         </div>
     </div>
     <div id="footer" class="clearfix"></div>
-    <div id="addNodePopup">
+    <div id="addObjPopup">
         <div class="header_obj">
             <span id="nodeFormTitle" class="header_title">Add an Object</span>
         </div>
@@ -416,9 +704,8 @@
                     <div class="celllabel">Type *</div>
                     <div class="cell">
                         <div id="NodeShapeBts">
-                            <input type="radio" id="circle" name="nodeShapes" value="circle" checked/><label class="btn_radio"
-                                for="circle">EM</label>
-                            <input type="radio" id="triangle" name="nodeShapes" value="triangle"/><label class="btn_radio" for="triangle">AM</label>
+                            <input type="radio" id="dot" name="nodeShapes" value="dot" checked/><label class="btn_radio"
+                                for="dot">AE</label>
                             <input type="radio" id="square" name="nodeShapes" value="square"/><label class="btn_radio"
                                 for="square">User</label>
                         </div>
@@ -428,6 +715,22 @@
                     <div class="celllabel">Name *</div>
                     <div class="cell"><input type="text" id="nodeName" name="nodeName" /></div>
                 </div>
+                <!--<div class="row">-->
+                    <!--<div class="celllabel">Icon *</div>-->
+                    <!--<div class="cell">-->
+                        <!--<div id="nodeIcons">-->
+                            <!--<input type="radio" name="nodeIcon" value="dot" checked/><img src="image/plus.png" width="15px"/>-->
+                            <!--<input type="radio" name="nodeIcon" value="square"> <img src="image/delete.png" width="15px"/>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                <!--</div>-->
+                <!--<div class="row">-->
+                    <!--<div class="celllabel">Color *</div>-->
+                    <!--<div class="cell">-->
+                        <!--<input type="color" name="favcolor">-->
+                    <!--</div>-->
+                <!--</div>-->
             </div>
             <div id="EMFields">
                 <div class="row">
@@ -454,19 +757,17 @@
                         <textarea id='EMdes' rows="2" cols="19"></textarea>
                     </div>
                 </div>
-            </div>
-            <div id="AMFields">
-                <div class="row ">
-                    <div class="celllabel">Hierarchy Level</div>
-                    <div class="cell">
-                        <input type="number" id="hlVal"/>
-                    </div>
+                <!--<div class="row">-->
+                    <!--<div class="celllabel">Variables</div>-->
+                    <!--<div class="cell">-->
+                        <!--<input name='var_tags' id="var_tags" />-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="row newVarLabel">
+                    <div class="celllabel">Variables<img id="addVarIcon" title="add a variable" src="image/plus.png" width="16px"/></div>
                 </div>
-                <div class="row row_textarea">
-                    <div class="celllabel">Description</div>
-                    <div class="cell">
-                        <textarea id='AMdes' rows="2" cols="19"></textarea>
-                    </div>
+                <div id="newVar">
+
                 </div>
             </div>
             <div id="userFields">
@@ -477,17 +778,62 @@
                     </div>
                 </div>
             </div>
-
         </div>
+
         <br/>
-        <div id="btns_obj">
-            <input type="button" class="btn_blue btn_obj" value="Save" id="savebt"/>
+        <div class="btns_obj">
+            <input type="button" id="deleteThis" class="btn_red btn_obj" value="Delete"/>
             <input type="button" class="btn_obj" value="Cancel" id="cancelbt"/>
+            <input type="button" class="btn_blue btn_obj" value="Save" id="savebt"/>
+        </div>
+        <input type="hidden" id="nodeId"/>
+    </div>
+    <div id="newNodeNamePopup">
+        <div class="header_obj">
+            <span id="NewNodeFormTitle" class="header_title">Add an Object</span>
+        </div>
+        <p id="newNodeFormMsg" class="err_msg"></p>
+        <div class="row">
+            <div class="celllabel">Object Name :</div>
+            <div class="cell"><input type="text" name="newNodeName" id="newNodeName"/></div>
+        </div>
+        <div class="btns_obj">
+            <input type="button" class="btn_obj" value="Cancel" id="cancelNewNode"/>
+            <input type="button" class="btn_blue btn_obj" value="Save" id="saveNewNode"/>
+        </div>
+        <input type="hidden" id="nodeClassId"/>
+        <input type="hidden" id="thisNodeID"/>
+    </div>
+    <div id="addRulePopup">
+        <div class="header_obj">
+            <span id="ruleFormTitle" class="header_title">Add a rule</span>
+        </div>
+        <p id="ruleFormMsg" class="err_msg"></p>
+        <div class="table">
+            <div class="row">
+                <div class="celllabel">Name *</div>
+                <div class="cell">
+                    <input type="text" id="ruleName"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="celllabel">Color *</div>
+                <div class="cell">
+                    <input type="color" id="ruleColor" value="#848484"/>
+                </div>
+            </div>
+            <span class="blockTitle"> ---------   Sensors   --------</span>
+            <div id="sensors"></div>
+            <span class="blockTitle">---------   Actors   ---------</span>
+            <div id="actors"></div>
+            <div class="btns_obj">
+                <input type="button" id="deleteThisRule" class="btn_red btn_obj" value="Delete"/>
+                <input type="button" class="btn_obj" value="Cancel" id="ruleCancelbt"/>
+                <input type="button" class="btn_blue btn_obj" value="Save" id="ruleSavebt"/>
+            </div>
+            <input type="hidden" id="ruleId"/>
         </div>
     </div>
-    <div id="nodeInfo">
-    </div>
-
 </div>
 
 <script>
@@ -496,53 +842,1154 @@
 
     $("#modal_trigger").leanModal({top:200,overlay:0.3,closeButton: ".modal_close"});
 
-    $("#register_form").click(function(){
-        $(".user_register").show();
-        $(".user_login").hide();
-        $(".header_title").text('Register');
+
+    //predefine network and session
+    var network = null;
+    var session_global = null;
+
+    function destroy(){
+        if(network !== null){
+            network.destroy();
+            network = null;
+        }
+    }
+
+
+    /////////////////////////////////   Manage Nodes(Objects) ////////////////////////////////////////////////////////
+
+    //add new variable button
+    $("#addVarIcon").click(function(){
+
+        var container = document.getElementById("newVar");
+        var nodeDiv = document.createElement("div");
+        nodeDiv.setAttribute("class","row");
+
+        var nodeInput1 = document.createElement("input");
+        nodeInput1.setAttribute("placeholder","Name");
+        nodeInput1.setAttribute("type","text");
+
+        var nodeInput2 = document.createElement("input");
+        nodeInput2.setAttribute("placeholder","Value");
+        nodeInput2.setAttribute("type","text");
+
+        var nodeImg = document.createElement("img");
+        nodeImg.setAttribute("id","deleteVarIcon");
+        nodeImg.setAttribute("onclick","deleteNewVar(this)");
+        nodeImg.setAttribute("src",'image/delete.png');
+        nodeImg.setAttribute("width",'16px');
+        nodeImg.setAttribute("title",'delete this variable');
+
+        nodeDiv.appendChild(nodeInput1);
+        nodeDiv.appendChild(nodeInput2);
+        nodeDiv.appendChild(nodeImg);
+
+        container.appendChild(nodeDiv);
+
     });
 
-    $("#back_btn").click(function(){
-        $(".user_login").show();
-        $(".user_register").hide();
-        $(".header_title").text('Login');
+    function deleteNewVar(node){
+        var p = node.parentNode;
+        p.parentNode.removeChild(p);
+    }
 
-        //clear register form
-        $("#newUsername").val("");
-        $("#newPw").val("");
-        $("#newPwConfirm").val("");
+    //save button in the addNewNodePopup
+    $("#saveNewNode").click(function(){
+
+        if($("#NewNodeFormTitle").html() == "Add an Object") {
+            var newN_label = $("#newNodeName").val();
+
+            if ($('#newNodeName').val().replace(/ /g, '') == "") {
+                $("#newNodeFormMsg").html("Please give it a name...");
+            }
+            else {
+
+                var data = $("#nodeClassId").val();
+                var newNC = localData.nodeClasses[data];
+                var newN = {};
+                var htmlContent = " <div>";
+                newN.label = newN_label;
+                htmlContent += "<div>" + "label" + ": " + newN_label + "</div>";
+
+                newN.id = (Math.random() * 1e7).toString(32);
+                newN.id = newN.id.replace(/\./g,"0");
+
+
+                for (var key in newNC) {
+                    if (key == "label" || key =="id") continue;
+                    if (newNC[key]) {
+                        newN[key] = newNC[key];
+                        if (key == "devicestate" || key == "consumption" || key == "prioritylevel" || key == "description" || key == "variables") {
+                            if (key == "variables") {
+                                htmlContent += "<div> --- " + key + " --- </div>";
+                                for (var k in newNC["variables"]) {
+                                    htmlContent += "<div>" + k + " : " + newNC["variables"][k] + "</div>";
+                                }
+                            }
+                            else {
+                                htmlContent += "<div>" + key + " : " + newNC[key] + "</div>";
+                            }
+                        }
+                    }
+                }
+                htmlContent += "</div>";
+
+                newN.title = htmlContent;
+
+                newN.x = -400;
+                newN.y = -200;
+
+                localData.nodes.add(newN);
+                var select = [];
+                select[0] = newN.id;
+                network.selectNodes(select);
+
+                //change data in server, call remote function
+
+                session_global.call('sdlSCI.data.changeData', ['node', 'add', newN]).then(
+                        function (res) {
+                            $("#nodeClassId").val("");
+                            console.log(res);
+                        }, session.log);
+
+            }
+        }
+        else if($("#NewNodeFormTitle").html() == "Edit an object"){
+            var newN_label = $("#newNodeName").val();
+            console.log(newN_label);
+            if ($('#newNodeName').val().replace(/ /g, '') == ""){
+                $("#newNodeFormMsg").html("Please give it a name...");
+            }
+            else {
+                var nodeId = $("#thisNodeID").val();
+                console.log(nodeId);
+                data = localData.nodes.get(nodeId);
+                data.label = newN_label;
+                var htmlContent = " <div>";
+
+                for (var key in data) {
+
+                    if (data[key]) {
+                        if (key =="label" || key == "devicestate" || key == "consumption" || key == "prioritylevel" || key == "description" || key == "variables") {
+                            if (key == "variables") {
+                                htmlContent += "<div> --- "+ key+" --- </div>";
+                                for(var k in data["variables"]) {
+                                    htmlContent += "<div>" + k + " : " + data["variables"][k] + "</div>";
+                                }
+                            }
+                            else {
+                                htmlContent += "<div>" + key + " : " + data[key] + "</div>";
+                            }
+                        }
+                    }
+                }
+                htmlContent += "</div>";
+
+
+                data.title = htmlContent;
+                data.shadow = false;
+
+                localData.nodes.update(data);
+                var select = [];
+                select[0] = data.id;
+                network.selectNodes(select);
+
+                //change data in server, call remote function
+
+                session_global.call('sdlSCI.data.changeData', ['node', 'update', data]).then(
+                        function (res) {
+                            ("#thisNodeID").val("");
+                            console.log(res);
+                        }, session.log);
+
+            }
+
+        }
+        else{
+            console.log("no save handler found");
+        }
+        $("#newNodeNamePopup").hide();
+
     });
 
-
+    //cancel button
+    $('#cancelbt').click(function () {
+        $('#addObjPopup').css("display", "none");
+    });
 
     //change node type in the addNode form
     $('input[name=nodeShapes]:radio').change(updateNodeFormByShape);
-
 
     function updateNodeFormByShape() {
         resetAddNodeForm(true);
         var newShape = $('input:radio[name=nodeShapes]:checked').val();
 
-        if (newShape == 'circle') {
-            $('#AMFields').css('display', 'none');
+        if (newShape == 'dot') {
             $('#userFields').css('display', 'none');
             $('#EMFields').css('display', 'block');
         }
-        else if (newShape == 'triangle') {
-            $('#AMFields').css('display', 'block');
-            $('#userFields').css('display', 'none');
-            $('#EMFields').css('display', 'none');
-        }
         else if (newShape == 'square') {
-            $('#AMFields').css('display', 'none');
             $('#userFields').css('display', 'block');
             $('#EMFields').css('display', 'none');
         }
     }
 
-    //graph
+    function resetAddNodeForm(isEdit) {
+    //isEdit =  false : clear all fields
+    //true : clear all fields except Name and Shape
+    if (!isEdit) {
+        $('#nodeName').val('');
+        $('#dot').prop("checked", true);
+        $('#userFields').css('display', 'none');
+        $('#EMFields').css('display', 'block');
+    }
+
+    $('#dsVal').val('');
+    $('#cVal').val('');
+    $('#plVal').val('');
+    $('#EMdes').val('');
+    $('#alVal').val('');
+    $('#newVar').html();
+    var container = document.getElementById("newVar");
+
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+}
+
+    //edit node class
+    function dblclickObjClass(target) {
+
+    var ncId = target.id;
+    var data = localData.nodeClasses[ncId];
+
+    resetAddNodeForm(false);
+    $('#nodeFormTitle').html('Edit an object class');
+    $('#addObjPopup').show();
+    $('#nodeName').val(data.label);
+    var shape = data.shape;
+
+    $('#nodeId').val(ncId);
+
+    //doesn't trigger change event
+    $('#' + shape).prop("checked", true);
+
+    updateNodeFormByShape();
+
+    //EM
+    if (shape == 'dot') {
+        $('#dsVal').val(data.devicestate);
+        $('#cVal').val(data.consumption);
+        $('#plVal').val(data.prioritylevel);
+        $('#EMdes').val(data.description);
+
+        var container = document.getElementById("newVar");
+
+
+        for(var vName in data.variables) {
+
+            var nodeDiv = document.createElement("div");
+            nodeDiv.setAttribute("class","row");
+
+            var nodeInput1 = document.createElement("input");
+            nodeInput1.setAttribute("placeholder","Name");
+            nodeInput1.setAttribute("type","text");
+            nodeInput1.setAttribute("value",vName);
+
+            var nodeInput2 = document.createElement("input");
+            nodeInput2.setAttribute("placeholder","Value");
+            nodeInput2.setAttribute("type","text");
+            nodeInput2.setAttribute("value",data.variables[vName]);
+
+            var nodeImg = document.createElement("img");
+            nodeImg.setAttribute("id","deleteVarIcon");
+            nodeImg.setAttribute("onclick","deleteNewVar(this)");
+            nodeImg.setAttribute("src",'image/delete.png');
+            nodeImg.setAttribute("width",'16px');
+            nodeImg.setAttribute("title",'delete this variable');
+
+            nodeDiv.appendChild(nodeInput1);
+            nodeDiv.appendChild(nodeInput2);
+            nodeDiv.appendChild(nodeImg);
+
+            container.appendChild(nodeDiv);
+        }
+    }
+    //user
+    else if (shape == 'square') {
+        $('#alVal').val(data.authoritylevel);
+    }
+    else {
+        console.log('no shape info got');
+    }
+
+    $("#deleteThis").show();
+
+}
+    //update node class
+    function updateExistingObj(){
+    var htmlContent = "";
+    for(var k in localData.nodeClasses){
+        var nodeName = localData.nodeClasses[k]["label"];
+        htmlContent += "<div class='objClassDiv' ondblclick='dblclickObjClass(this)' id='"+k+"' draggable='true' ondragstart='dragObj(event)'>"+ nodeName +"</div>";
+    }
+    $("#existingObj").html(htmlContent);
+}
+
+    ///////////////////  Functions used to handle drag and drop event for creating nodes //////////////////////////////
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function dragObj(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+    //        ev.target.appendChild(document.getElementById(data));
+
+        $("#nodeClassId").val(data);
+
+        //create a new object
+        $("#newNodeFormMsg").html();
+        $('#newNodeName').val("");
+
+        $("#newNodeNamePopup").show();
+        $("#NewNodeFormTitle").html("Add an Object");
+
+
+    }
+
+    $("#cancelNewNode").click(function(){
+        $("#newNodeNamePopup").hide();
+        $("#nodeClassId").val("");
+        $("#thisNodeID").val("");
+    });
+
+    function getNodeInputData() {
+
+        //if label is empty or contains only spaces
+        if ($('#nodeName').val().replace(/ /g, '') == "") {
+            $("#nodeFormMsg").html("You must fill all the fields with * ");
+            return null;
+        }
+        else {
+            var data = {};
+            data.id = (Math.random() * 1e7).toString(32);
+            data.id = data.id.replace(/\./g,"0");
+            data.label = $('#nodeName').val();
+            var newShape = $('input:radio[name=nodeShapes]:checked').val();
+            data.shape = newShape;
+            data.size = 20;
+            //AE
+            if (newShape == 'dot') {
+                data.devicestate = $('#dsVal').val();
+                data.consumption = $('#cVal').val();
+                data.prioritylevel = $('#plVal').val();
+                data.description = $('#EMdes').val();
+
+                data.variables = {};
+                var varRows = document.getElementById("newVar").getElementsByTagName('div');
+                for (var i = 0; i < varRows.length; i++) {
+                    var vName = varRows[i].getElementsByTagName('input')[0].value;
+                    var vValue = varRows[i].getElementsByTagName('input')[1].value;
+                    data.variables[vName] = vValue;
+                    console.log(vName);
+                }
+
+                var htmlContent = " <div>";
+                for (var key in data) {
+                    if (key !== "label" && key !== "devicestate" && key !== "consumption" && key !== "prioritylevel" && key !== "description" && key !== "variables") continue;
+                    if (data[key]) {
+                        htmlContent += "<div>" + key + " : " + data[key] + "</div>";
+                    }
+                }
+                htmlContent += "</div>";
+                data.title = htmlContent;
+            }
+            //user
+            else if (newShape == 'square') {
+                data.authoritylevel = $('#alVal').val();
+
+                var htmlContent = " <div>";
+                for (var key in data) {
+                    if (key !== "label" && key !== "authoritylevel") continue;
+                    if (data[key]) {
+                        htmlContent += "<div>" + key + " : " + data[key] + "</div>";
+                    }
+                }
+                htmlContent += "</div>";
+
+                data.title = htmlContent;
+            }
+            else {
+                console.log('no node shape detected');
+            }
+
+            $("#addObjPopup").hide();
+
+            return data;
+        }
+    }
+
+    //open new node class form
+    $("#addObjClassIcon").click(function(){
+        $("#addObjPopup").show();
+        resetAddNodeForm(false);
+        $('#nodeFormTitle').html('Add an object class');
+        $('#nodeId').val("");
+        $("#deleteThis").hide();
+    });
+
+    //save button in the addNodeClassPopup
+    $("#savebt").click(function () {
+
+        var data = getNodeInputData();
+
+        if($('#nodeId').val() != ""){
+            data.id = $('#nodeId').val();
+        }
+
+        if($("#nodeFormTitle").html().includes("Add")) {
+            //add node class in server, call remote function
+            session_global.call('sdlSCI.data.changeNodeClass', ["add", data]);
+        }
+        else if($("#nodeFormTitle").html().includes("Edit")) {
+
+            session_global.call('sdlSCI.data.changeNodeClass', ['update', data]).then(
+                    function (res) {
+    //                            console.log(res);
+                    }, session_global.log);
+        }
+        else {
+            console.log($("#nodeFormTitle").html());
+        }
+    });
+
+    //delete button in the addNodeClassPopup
+    $("#deleteThis").click(function(){
+
+        var ncId = $("#nodeId").val();
+
+        if(confirm("Are you sure that you want to delete this node class?") && ncId != ""){
+
+
+            delete localData.nodeClasses[ncId];
+
+            var data = {};
+            data.id = ncId;
+
+            session_global.call('sdlSCI.data.changeNodeClass', ['delete', data]).then(
+                    function (res) {
+                        $("#addObjPopup").hide();
+                        //TODO
+                    }, session_global.log);
+        }
+
+    });
+
+    /////////////////////////////////   Manage Rules  /////////////////////////////////////////////////////////
+
+    var ruleEdges = [];
+
+    var isAddingRule = false;
+
+    //begin to choose edges
+    $("#addruleBeginIcon").click(function(){
+        network.addEdgeMode();
+        $("#addruleEndIcon").show();
+        $("#addruleCancelIcon").show();
+
+        $(".remindText").css("display","inline-block");
+        $("#addruleBeginIcon").hide();
+
+        $("#deleteSelectedIcon").hide();
+        isAddingRule = true;
+    });
+
+    function addEdgesDone(){
+        network.disableEditMode();
+
+        //create a rule
+        var sensors = [];
+        var actors = [];
+        for(var i in ruleEdges){
+            var edgeItem = localData.edges.get(ruleEdges[i]);
+            if(edgeItem){
+                if(sensors.indexOf(edgeItem.from) == '-1') {
+                    sensors.push(edgeItem.from);
+                }
+                if(actors.indexOf(edgeItem.to) == '-1') {
+                    actors.push(edgeItem.to);
+                }
+            }
+        }
+
+        if(sensors.length > 0 && actors.length > 0) {
+
+            $("#addRulePopup").show();
+            $('#ruleFormTitle').html('Add a rule');
+
+            resetRuleForm();
+            var sensorsDiv = document.getElementById("sensors");
+            var actorsDiv = document.getElementById("actors");
+
+            for(var i in sensors){
+
+                var sensorItem = localData.nodes.get(sensors[i]);
+                var sensorName = sensorItem.label;
+                var sensorVars = sensorItem.variables;
+                var sensorId = sensorItem.id;
+
+                var sensorDiv = document.createElement("div");
+                sensorDiv.setAttribute("class","sensorDiv");
+                sensorDiv.id = i;
+
+                var snDiv = document.createElement("div");
+                snDiv.appendChild(document.createTextNode(sensorName));
+                snDiv.setAttribute("class","NameDiv");
+                sensorDiv.appendChild(snDiv);
+
+                var varDiv = document.createElement("div");
+                varDiv.setAttribute("class","varDiv");
+                for(var j in sensorVars){
+                    var varRow = document.createElement("div");
+                    varRow.setAttribute("class","varRow");
+
+                    //variable name and checkbox
+                    var varName = document.createElement("input");
+                    varName.type = "checkbox";
+                    varName.id = sensorId+"_"+j+'_s';
+                    varName.value = j;
+                    varName.setAttribute("class","varName");
+
+
+                    var label = document.createElement('label')
+                    label.htmlFor =  sensorId+"_"+j+'_s';
+                    label.appendChild(document.createTextNode(j));
+
+                    varRow.appendChild(varName);
+                    varRow.appendChild(label);
+
+                    //when checkbox is checked, show this part
+                    var checkedShowDiv = document.createElement("div");
+                    checkedShowDiv.setAttribute("class","checkedShow");
+
+                    //compare operator
+                    var compSelect = document.createElement("select");
+                    var opt = document.createElement("option");
+                    opt.value = "=";
+                    opt.innerHTML = "=";
+                    compSelect.appendChild(opt);
+                    var opt = document.createElement("option");
+                    opt.value = "!=";
+                    opt.innerHTML = "!=";
+                    compSelect.appendChild(opt);
+                    var opt = document.createElement("option");
+                    opt.value = ">";
+                    opt.innerHTML = ">";
+                    compSelect.appendChild(opt); var opt = document.createElement("option");
+                    opt.value = "<";
+                    opt.innerHTML = "<";
+                    compSelect.appendChild(opt);
+
+                    checkedShowDiv.appendChild(compSelect);
+
+                    //input text
+                    var val = document.createElement("input");
+                    val.type = "text";
+                    val.setAttribute("class","valInput");
+
+                    checkedShowDiv.appendChild(val);
+
+                    varRow.appendChild(checkedShowDiv);
+
+
+                    varDiv.appendChild(varRow);
+                }
+
+                sensorDiv.appendChild(varDiv);
+
+                sensorsDiv.appendChild(sensorDiv);
+
+
+            }
+
+            for(var i in actors){
+
+                var actorItem = localData.nodes.get(actors[i]);
+                var actorName = actorItem.label;
+                var actorVars = actorItem.variables;
+                var actorId = actorItem.id;
+
+                var actorDiv = document.createElement("div");
+                actorDiv.setAttribute("class","actorDiv");
+
+                var anDiv = document.createElement("div");
+                anDiv.appendChild(document.createTextNode(actorName));
+                anDiv.setAttribute("class","NameDiv");
+                actorDiv.appendChild(anDiv);
+
+                var varDiv = document.createElement("div");
+                varDiv.setAttribute("class","varDiv");
+                for(var j in actorVars){
+                    var varRow = document.createElement("div");
+                    varRow.setAttribute("class","varRow");
+                    var varName = document.createElement("input");
+                    varName.type = "checkbox";
+                    varName.id = actorId+"_"+j+"_";
+                    varName.setAttribute("class","varName");
+
+                    var label = document.createElement('label')
+                    label.htmlFor = actorId+"_"+j+"_";
+                    label.appendChild(document.createTextNode(j));
+
+
+                    varRow.appendChild(varName);
+                    varRow.appendChild(label);
+
+                    //when checkbox is checked, show this part
+                    var checkedShowDiv = document.createElement("div");
+                    checkedShowDiv.setAttribute("class","checkedShow");
+
+                    //equal operator
+                    //                    var equal = document.createElement("div");
+                    //                    equal.appendChild(document.createTextNode("="));
+                    checkedShowDiv.appendChild(document.createTextNode("="));
+
+                    //input text
+                    var val = document.createElement("input");
+                    val.type = "text";
+                    val.setAttribute("class","valInput");
+
+                    checkedShowDiv.appendChild(val);
+
+                    varRow.appendChild(checkedShowDiv);
+
+                    varDiv.appendChild(varRow);
+                }
+
+
+                actorDiv.appendChild(varDiv);
+
+                actorsDiv.appendChild(actorDiv);
+
+
+            }
+
+            $(".varName").change(function(){
+
+                if($(this).prop("checked") == true) {
+                    $(this).siblings(".checkedShow").show();
+                }
+                else {
+                    $(this).siblings(".checkedShow").hide();
+                }
+
+            });
+
+        }
+        else{
+            alert("You need to choose at least one sensor and one actor ...");
+        }
+
+        $("#addruleBeginIcon").show();
+        $("#addruleEndIcon").hide();
+        $("#addruleCancelIcon").hide();
+        $(".remindText").hide();
+        isAddingRule = false;
+
+    }
+
+
+    //finish choosing edges and show new rule form
+    $("#addruleEndIcon").click(addEdgesDone);
+
+    $("#addruleCancelIcon").click(function(){
+        //delete edges added
+        localData.edges.remove(ruleEdges);
+        ruleEdges = [];
+
+        $("#addruleBeginIcon").show();
+        $("#addruleEndIcon").hide();
+        $("#addruleCancelIcon").hide();
+        $(".remindText").hide();
+        isAddingRule = false;
+    });
+
+    ////new or edit rule form buttons
+    //save button
+    $("#ruleSavebt").click(function () {
+
+        var isEdit;
+        if($("#ruleFormTitle").html().includes("Add")){
+            isEdit = false;
+        }
+        else if($("#ruleFormTitle").html().includes("Edit")){
+            isEdit = true;
+        }
+
+        var ruleName = $("#ruleName").val();
+
+        var sensorVals = $("#sensors .varName:checked");
+        var actorVals = $("#actors .varName:checked");
+
+        if (ruleName.replace(/ /g, '') == "") {
+            $("#ruleFormMsg").html("You must give it a name...");
+        }
+        else if (sensorVals.length == 0 || actorVals.length == 0) {
+            $("#ruleFormMsg").html("You must choose at least one variable of sensors and one of actors.");
+        }
+        else {
+            var newRule = {};
+            if(isEdit) {
+                newRule.id = $("#ruleId").val();
+            }
+            else {
+                newRule.id = (Math.random() * 1e7).toString(32);
+                newRule.id = newRule.id.replace(/\./g, "0");
+            }
+
+            newRule.name = ruleName;
+
+            if(!isEdit) {
+                newRule.edges = ruleEdges.slice();
+            }
+            else{
+                newRule.edges = localData.rules[newRule.id].edges.slice();
+            }
+
+            newRule.color = $("#ruleColor").val();
+            newRule.user = user;
+
+            newRule.if = {};
+            newRule.then = {};
+
+            var checkedSensor = [];
+
+            for (var i = 0; i < sensorVals.length; i++) {
+
+                var temp_id = sensorVals[i].id;
+                var t = temp_id.split("_");
+                var s = t[0];  //sensor id
+                var v = t[1];   // variable name
+
+                if(checkedSensor.indexOf(s) == "-1") {
+                    checkedSensor.push(s);
+                }
+
+                //get input value
+                var val = $("#" + temp_id).siblings(".checkedShow").children("input").val();
+                if (val.replace(/ /g, '') == "") {
+                    $("#ruleFormMsg").html("You must set a value for checked variables.");
+                    return;
+                }
+
+                //get logical operator
+                var lop = $("#" + temp_id).siblings(".checkedShow").children("select").val();
+
+
+                if (newRule.if[s] == undefined) {
+                    newRule.if[s] = [];
+                }
+                newRule.if[s].push([v, lop, val]);
+
+            }
+
+            //check all sensors are checked
+            var sensorNum = document.getElementsByClassName("sensorDiv").length;
+            if(checkedSensor.length != sensorNum) {
+                $("#ruleFormMsg").html("You must check at least 1 value for every sensor.");
+                return;
+            }
+
+            var checkedActor = [];
+
+            for (var i = 0; i < actorVals.length; i++) {
+
+                var temp_id = actorVals[i].id;
+                var t = temp_id.split("_");
+                var a = t[0];  //actor id
+                var v = t[1];   // variable name
+
+                if(checkedActor.indexOf(s) == "-1") {
+                    checkedActor.push(s);
+                }
+
+                //get input value
+                var val = $("#" + temp_id).siblings(".checkedShow").children("input").val();
+                if (val.replace(/ /g, '') == "") {
+                    $("#ruleFormMsg").html("You must set a value for checked variables.");
+                    return;
+                }
+
+                if (newRule.then[a] == undefined) {
+                    newRule.then[a] = [];
+                }
+                newRule.then[a].push([v, "=", val]);
+
+            }
+
+            //check all actors are checked
+            var actorNum = document.getElementsByClassName("actorDiv").length;
+            if(checkedActor.length != actorNum) {
+                $("#ruleFormMsg").html("You must check at least 1 value for every actor.");
+                return;
+            }
+
+            localData.rules[newRule.id] = newRule;
+
+            //change data in server
+            if(!isEdit) {
+                var newEdges = [];
+                for (var i in ruleEdges) {
+                    var e = localData.edges.get(ruleEdges[i]);
+                    e.color = newRule.color;
+                    e.title = newRule.name;
+                    localData.edges.update(e);
+                    newEdges.push(e);
+                }
+
+                if (session_global) {
+                    session_global.call('sdlSCI.data.changeRule', ['add', newRule, newEdges]).then(
+                            function (res) {
+                                $("#addRulePopup").hide();
+                                ruleEdges = [];
+                            }, session_global.log);
+
+                }
+                else {
+                    console.log("failed: no sesion");
+                }
+            }
+            else {
+                //change edge color and title
+                for (var i in ruleEdges) {
+                    var e = localData.edges.get(ruleEdges[i]);
+                    e.color = newRule.color;
+                    e.title = newRule.name;
+                    localData.edges.update(e);
+                }
+
+                if (session_global) {
+                    session_global.call('sdlSCI.data.changeRule', ['update', newRule, null]).then(
+                            function (res) {
+                                $("#addRulePopup").hide();
+                                ruleEdges = [];
+                            }, session_global.log);
+
+                }
+                else {
+                    console.log("failed: no sesion");
+                }
+            }
+
+        }
+
+
+    });
+
+    //cancel button
+    $("#ruleCancelbt").click(function(){
+        //delete edges added
+        localData.edges.remove(ruleEdges);
+        ruleEdges = [];
+        $("#addRulePopup").hide();
+    });
+
+    //delete button
+    $("#deleteThisRule").click(function () {
+
+        var ruleId = $("#ruleId").val();
+        data = localData.rules[ruleId];
+
+        if (confirm("Are you sure that you want to delete this rule ?") && ruleId != "") {
+
+            delete localData.rules[ruleId];
+
+            var deleteRule = {};
+            deleteRule.id = ruleId;
+
+            var deleteEdges = [];
+            for (var i in data.edges) {
+                deleteEdges.push(localData.edges.get(data.edges[i]).id);
+
+            }
+            console.log(deleteEdges);
+
+            session_global.call('sdlSCI.data.changeRule', ['delete', deleteRule, deleteEdges]).then(
+                    function (res) {
+                        $("#addRulePopup").hide();
+                    }, session_global.log);
+        }
+
+    });
+
+    function resetRuleForm() {
+        $("#ruleFormMsg").html("");
+        $("#ruleName").val("");
+
+        var sensorsDiv = document.getElementById("sensors");
+        while (sensorsDiv.firstChild) {
+            sensorsDiv.removeChild(sensorsDiv.firstChild);
+        }
+
+        var actorsDiv = document.getElementById("actors");
+        while (actorsDiv.firstChild) {
+            actorsDiv.removeChild(actorsDiv.firstChild);
+        }
+
+        $("#deleteThisRule").hide();
+        $("#ruleId").val("");
+
+        $("#ruleColor").val("#2B7CE9");
+
+
+    }
+
+    //show edit rule form
+    function dblclickRule(target) {
+
+    var ruleId = target.id;
+    var data = localData.rules[ruleId];
+
+    resetRuleForm();
+    $("#ruleId").val(ruleId);
+
+
+    $('#ruleFormTitle').html('Edit a rule');
+    $('#addRulePopup').show();
+
+    $('#ruleName').val(data.name);
+    $("#ruleColor").val(data.color)
+
+
+    var sensorsDiv = document.getElementById("sensors");
+    var actorsDiv = document.getElementById("actors");
+
+    for (var i in data.if) {
+
+        //i is the id of sensor
+
+        var sensorItem = localData.nodes.get(i);
+        var sensorName = sensorItem.label;
+        var sensorVars = sensorItem.variables;
+
+        var sensorDiv = document.createElement("div");
+        sensorDiv.setAttribute("class", "sensorDiv");
+        sensorDiv.id = i;
+
+        var snDiv = document.createElement("div");
+        snDiv.appendChild(document.createTextNode(sensorName));
+        snDiv.setAttribute("class", "NameDiv");
+        sensorDiv.appendChild(snDiv);
+
+        var varDiv = document.createElement("div");
+        varDiv.setAttribute("class", "varDiv");
+        for (var j in sensorVars) {
+            var varRow = document.createElement("div");
+            varRow.setAttribute("class", "varRow");
+
+            //variable name and checkbox
+            var varName = document.createElement("input");
+            varName.type = "checkbox";
+            varName.id = i + "_" + j + "_s";
+            varName.value = j;
+            varName.setAttribute("class", "varName");
+
+
+            var label = document.createElement('label')
+            label.htmlFor = i + "_" + j + "_s";
+            label.appendChild(document.createTextNode(j));
+
+            varRow.appendChild(varName);
+            varRow.appendChild(label);
+
+            //when checkbox is checked, show this part
+            var checkedShowDiv = document.createElement("div");
+            checkedShowDiv.setAttribute("class", "checkedShow");
+
+            //compare operator
+            var compSelect = document.createElement("select");
+            var opt = document.createElement("option");
+            opt.value = "=";
+            opt.innerHTML = "=";
+            compSelect.appendChild(opt);
+            var opt = document.createElement("option");
+            opt.value = "!=";
+            opt.innerHTML = "!=";
+            compSelect.appendChild(opt);
+            var opt = document.createElement("option");
+            opt.value = ">";
+            opt.innerHTML = ">";
+            compSelect.appendChild(opt);
+            var opt = document.createElement("option");
+            opt.value = "<";
+            opt.innerHTML = "<";
+            compSelect.appendChild(opt);
+
+            checkedShowDiv.appendChild(compSelect);
+
+            //input text
+            var val = document.createElement("input");
+            val.type = "text";
+            val.setAttribute("class", "valInput");
+
+            checkedShowDiv.appendChild(val);
+
+            varRow.appendChild(checkedShowDiv);
+
+
+            varDiv.appendChild(varRow);
+
+        }
+
+        sensorDiv.appendChild(varDiv);
+
+        sensorsDiv.appendChild(sensorDiv);
+
+
+    }
+
+    for (var i in data.then) {
+
+        //i is the id of actor
+
+        var actorItem = localData.nodes.get(i);
+        var actorName = actorItem.label;
+        var actorVars = actorItem.variables;
+        var actorId = actorItem.id;
+
+        var actorDiv = document.createElement("div");
+        actorDiv.setAttribute("class", "actorDiv");
+
+        var anDiv = document.createElement("div");
+        anDiv.appendChild(document.createTextNode(actorName));
+        anDiv.setAttribute("class", "NameDiv");
+        actorDiv.appendChild(anDiv);
+
+        var varDiv = document.createElement("div");
+        varDiv.setAttribute("class", "varDiv");
+        for (var j in actorVars) {
+            var varRow = document.createElement("div");
+            varRow.setAttribute("class", "varRow");
+            var varName = document.createElement("input");
+            varName.type = "checkbox";
+            varName.id = actorId + "_" + j + "_a";
+            varName.setAttribute("class", "varName");
+
+            var label = document.createElement('label')
+            label.htmlFor = actorId + "_" + j + "_a";
+            label.appendChild(document.createTextNode(j));
+
+
+            varRow.appendChild(varName);
+            varRow.appendChild(label);
+
+            //when checkbox is checked, show this part
+            var checkedShowDiv = document.createElement("div");
+            checkedShowDiv.setAttribute("class", "checkedShow");
+
+            //equal operator
+            checkedShowDiv.appendChild(document.createTextNode("="));
+
+            //input text
+            var val = document.createElement("input");
+            val.type = "text";
+            val.setAttribute("class", "valInput");
+
+            checkedShowDiv.appendChild(val);
+
+            varRow.appendChild(checkedShowDiv);
+
+            varDiv.appendChild(varRow);
+        }
+
+
+        actorDiv.appendChild(varDiv);
+
+        actorsDiv.appendChild(actorDiv);
+
+
+    }
+
+    $(".varName").change(function () {
+
+        if ($(this).prop("checked") == true) {
+            $(this).siblings(".checkedShow").show();
+        }
+        else {
+            $(this).siblings(".checkedShow").hide();
+        }
+
+    });
+
+    //check defined variables
+    for (var sId in data.if) {
+        for (var temp in data.if[sId]) {
+            var v = data.if[sId][temp][0];
+            var opt = data.if[sId][temp][1];
+            var val = data.if[sId][temp][2];
+
+            var targetId = sId + "_" + v + "_s";
+
+            $(".varName[id='" + targetId + "']").prop("checked", true);
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").show();
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("input").val(val);
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("select").val(opt);
+
+        }
+    }
+
+    for (var aId in data.then) {
+        for (var temp in data.then[aId]) {
+            var v = data.then[aId][temp][0];
+            var opt = data.then[aId][temp][1];
+            var val = data.then[aId][temp][2];
+
+            var targetId = aId + "_" + v + "_a";
+
+            $(".varName[id='" + targetId + "']").prop("checked", true);
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").show();
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("input").val(val);
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("select").val(opt);
+
+        }
+    }
+
+
+    $("#deleteThisRule").show();
+
+
+}
+
+    function updateExistingRules(){
+    var htmlContent = "";
+    for(var k in localData.rules){
+        var ruleName = localData.rules[k]["name"];
+        htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' id='"+k+"'>"+ ruleName +"</div>";
+    }
+    $("#existingRules").html(htmlContent);
+}
+
+    function updateExistingUsers {
+        var htmlContent ="";
+        for(var k in localUsers){
+            if(k !== "admin" && k !== "registerUser"){
+                htmlContent += "<option value='"+ k +"'>"+k+"</option>";
+            }
+        }
+        $("#userList").html(htmlContent);
+    }
+
+    $(".vis-connect").hide();
+
+
+    /////////////////// graph /////////////////////////////////////////////////
     //define local data
     //define nodes
+/*
     var localNodes = new vis.DataSet([
         {id: 1, label: '1'},
         {id: 2, label: '2'},
@@ -563,170 +2010,14 @@
         nodes: localNodes,
         edges: localEdges
     };
+*/
 
-    var seed = 2;
+//    var seed = 2;
 
     var container = document.getElementById('graph');
 
-    //    var options = {
-    ////        layout: {
-    ////          randomSeed:seed
-    ////        },
-    //        manipulation: {
-    //            addNode: function (data, callback) {
-    //                resetAddNodeForm(false);
-    //                $('#nodeFormTitle').html('Add an object');
-    //                $('#addNodePopup').css("display", "block");
-    //
-    //                //save button
-    //                data.id = -1;
-    ////                $('#savebt').click(saveNodeData.bind(func_this, data, callback));  Wrong, functions will be added not replaced!!!
-    //                document.getElementById('savebt').onclick = saveNodeData.bind(this, data, callback);
-    //
-    //                //cancel button
-    //                document.getElementById('cancelbt').onclick = function () {
-    //                    $('#addNodePopup').css("display", "none");
-    //                }
-    //
-    //            },
-    //            editNode: function (data, callback) {
-    //                resetAddNodeForm(false);
-    //                $('#nodeFormTitle').html('Edit an object');
-    //                $('#addNodePopup').css("display", "block");
-    //                $('#nodeName').val(data.label);
-    //                console.log('before edit:',data);
-    //                var shape = data.shape;
-    //
-    //                //doesn't trigger change event
-    //                $('#'+shape).prop("checked",true);
-    //
-    //                updateNodeFormByShape();
-    //
-    //                //EM
-    //                if (shape == 'circle') {
-    //                    $('#dsVal').val(data.devicestate);
-    //                    $('#cVal').val(data.consumption);
-    //                    $('#plVal').val(data.prioritylever);
-    //                    $('#EMdes').val(data.description);
-    //                }
-    //                //AM
-    //                else if (shape == 'triangle') {
-    //                    $('#hlVal').val(data.hierarchylevel);
-    //                    $('#AMdes').val(data.description);
-    //                }
-    //                //user
-    //                else if (shape == 'square') {
-    //                    $('#alVal').val(data.authoritylevel);
-    //                }
-    //                else {
-    //                    console.log('no shape info got');
-    //                }
-    //
-    //                //save button
-    ////                $('#savebt').click(saveNodeData.bind(this,data, callback));
-    //                document.getElementById('savebt').onclick = saveNodeData.bind(this, data, callback);
-    //
-    //                //cancel button
-    //                document.getElementById('cancelbt').onclick = function () {
-    //                    $('#addNodePopup').css("display", "none");
-    //                    callback(null);
-    //                }
-    //            },
-    //            addEdge: function (data, callback) {
-    //                if (data.from == data.to) {
-    //                    var r = confirm("Do you want to connect this object to itself?");
-    //                    if (r) {
-    //                        callback(data);
-    //                    }
-    //                }
-    //                else {
-    //                    callback(data);
-    //                }
-    //            },
-    //            deleteNode: function(data,callback) {
-    //                if(confirm("Are you sure that you want to delete this node?")) {
-    //                    callback(data);
-    //                }
-    //                else {
-    //                    callback(null);
-    //                }
-    //            },
-    //            deleteEdge: function(data,callback) {
-    //                if(confirm("Are you sure that you want to delete this edge?")) {
-    //                    callback(data);
-    //                }
-    //                else {
-    //                    callback(null);
-    //                }
-    //            }
-    //        }
-    //
-    //    };
-
-
-    //    var network = new vis.Network(container, data, options);
-
-    function resetAddNodeForm(isEdit) {
-        //isEdit =  false : clear all fields
-        //true : clear all fields except Name and Shape
-        if (!isEdit) {
-            $('#nodeName').val('');
-            $('#circle').prop("checked", true);
-        }
-
-        $('#dsVal').val('');
-        $('#cVal').val('');
-        $('#plVal').val('');
-        $('#EMdes').val('');
-        $('#hlVal').val('');
-        $('#AMdes').val('');
-        $('#alVal').val('');
-    }
-
-
-    function saveNodeData(data, callback) {
-        if (data.id == '-1') {
-            data.id = (Math.random() * 1e7).toString(32);
-        }
-
-        data.label = $('#nodeName').val();
-
-        //if label is empty or contains only spaces
-        if(data.label.replace(/ /g,'') == "") {
-            return null;
-        }
-
-        var newShape = $('input:radio[name=nodeShapes]:checked').val();
-        data.shape = newShape;
-        if (newShape == 'circle') {
-            data.devicestate = $('#dsVal').val();
-            data.consumption = $('#cVal').val();
-            data.prioritylever = $('#plVal').val();
-            data.description = $('#EMdes').val();
-        }
-        //AM
-        else if (newShape == 'triangle') {
-            data.hierarchylevel = $('#hlVal').val();
-            data.description = $('#AMdes').val();
-        }
-        //user
-        else if (newShape == 'square') {
-            data.authoritylevel = $('#alVal').val();
-        }
-        else {
-            console.log('no node shape detected');
-        }
-
-        $('#addNodePopup').css("display", "none");
-        callback(data);
-        return data;
-    }
-    //    }
-
     function onchallenge(session, method, extra) {
-//        console.log('onchallenge',method,extra);
         if (method === 'wampcra') {
-//            console.log("authenticating via '" + method + "' and challenge '" + extra.challenge + "'");
             return autobahn.auth_cra.sign(key, extra.challenge);
         } else {
             throw "don't know how to authenticate using '" + method + "'";
@@ -735,7 +2026,6 @@
 
     // the URL of the WAMP Router (Crossbar.io)
     //
-
     var wsuri;
     if (document.location.origin == "file://") {
         wsuri = "ws://127.0.0.1:8080/ws";
@@ -744,6 +2034,25 @@
         wsuri = (document.location.protocol === "http:" ? "ws:" : "wss:") + "//" +
                 document.location.host + "/ws";
     }
+
+    //////////////////////////      Register and Login   ////////////////////////////////////////
+
+    $("#register_form").click(function(){
+        $(".user_register").show();
+        $(".user_login").hide();
+        $(".header_title").text('Register');
+    });
+
+    $("#back_btn").click(function(){
+        $(".user_login").show();
+        $(".user_register").hide();
+        $(".header_title").text('Login');
+
+        //clear register form
+        $("#newUsername").val("");
+        $("#newPw").val("");
+        $("#newPwConfirm").val("");
+    });
 
     // CALL a remote procedure: when user registering
     //
@@ -837,7 +2146,6 @@
             $("#register_msg").html("");
             $("#login_msg").html("");
 
-
         });
 
         // check whether there exists saved username and password
@@ -868,9 +2176,11 @@
                 $("#modal_trigger").hide();
                 $("#logout_btn").show();
 
-                $("#btns_SDL").show();
+                $("#rightDiv").show();
 
-                main(session, details);
+                session_global = session;
+
+                main(session, details,user);
             }
             connection.onclose = function (reason, details) {
                 if(details.reason === "wamp.error.authentication_failed") {
@@ -880,18 +2190,18 @@
             }
 
             //define log out event handler
-//            $("#logout_btn").click(function(e){
             document.getElementById("logout_btn").onclick = function(){
 
                 console.log('logout');
-
 
                 $("#welcome_msg").html('');
                 $("#welcome_msg").hide();
                 $("#modal_trigger").show();
                 $("#logout_btn").hide();
 
-                $("#btns_SDL").hide();
+                $("#rightDiv").hide();
+                $("#adminMenu").hide();
+
 
 
                 if(localStorage.remember == "false") {
@@ -906,7 +2216,8 @@
                 }
 
                 connection.close('User Loged out.');
-                network.destroy();
+
+                destroy();
             }
 
             // now actually open the connection
@@ -916,10 +2227,14 @@
         }
         //no login saved
         else {
+            console.log("no login");
             $("#welcome_msg").html('');
             $("#welcome_msg").hide();
             $("#modal_trigger").show();
             $("#logout_btn").hide();
+
+            $("#adminMenu").hide();
+            $("#rightDiv").hide();
 
 //            alert("please log in first...");
         }
@@ -927,11 +2242,19 @@
     }
     else {
         console.log('Sorry, no web storage support.');
+        console.log("no login");
+        $("#welcome_msg").html('');
+        $("#welcome_msg").hide();
+        $("#modal_trigger").show();
+
+        $("#logout_btn").hide();
+        $("#rightDiv").hide();
+        $("#adminMenu").hide();
+//        $("#rightDiv").css("margin-left","0");
     }
 
 
     $("#loginSubmit").click(function () {
-        console.log("log in");
 
         $("#login_msg").html("");
 
@@ -960,9 +2283,13 @@
         }
 
         connection.onopen = function (session, details) {
-            main(session, details);
+
+            session_global = session;
+
+            main(session, details,user);
 
             close_modal_login();
+
 
             //change Login/Register Button to Welcome Username
             $("#welcome_msg").html("Welcome "+user);
@@ -970,8 +2297,7 @@
             $("#modal_trigger").hide();
             $("#logout_btn").show();
 
-            //show SDL server connection buttons
-            $("#btns_SDL").show();
+
 
             if (typeof (Storage) !== "undefined") {
                 localStorage.username = user;
@@ -987,16 +2313,16 @@
 
                 //define log out event handler
 
-//                $("#logout_btn").click(function(){
                   document.getElementById("logout_btn").onclick = function(){
-                    console.log('logout');
+//                    console.log('logout');
 
                     $("#welcome_msg").html('');
                     $("#welcome_msg").hide();
                     $("#modal_trigger").show();
                     $("#logout_btn").hide();
 
-                    $("#btns_SDL").hide();
+                    $("#rightDiv").hide();
+                    $("#adminMenu").hide();
 
                     //remember me not checked
                     if(localStorage.remember == "false") {
@@ -1009,7 +2335,7 @@
                         localStorage.isLogin = "false";
                     }
                     connection.close('User Loged out.');
-                    network.destroy();
+                    destroy();
                 }
             }
             else {
@@ -1023,14 +2349,16 @@
         connection.open();
     });
 
+
+
     // fired when connection is established and session attached
     //
-    function main(session, details) {
+    function main(session, details,user) {
 
-        console.log("Connected");
-        console.log("connected session with ID " + session.id);
-        console.log("authenticated using method '" + details.authmethod + "' and provider '" + details.authprovider + "'");
-        console.log("authenticated with authid '" + details.authid + "' and authrole '" + details.authrole + "'");
+//        console.log("Connected");
+//        console.log("connected session with ID " + session.id);
+//        console.log("authenticated using method '" + details.authmethod + "' and provider '" + details.authprovider + "'");
+//        console.log("authenticated with authid '" + details.authid + "' and authrole '" + details.authrole + "'");
 
         // subscribe to future change data event
         session.subscribe("sdlSCI.data.onChange",
@@ -1095,127 +2423,113 @@
                     }
                 });
 
+        session.subscribe("sdlSCI.data.onUpdatePos",
+                function(args){
+                    var nodePos = args[0];
+                    if(args) {
+                        for (var k in nodePos) {
+
+                            console.log(localData.nodes[k]);
+                            localData.nodes.update({id:k,x:nodePos[k]["x"],y:nodePos[k]["y"]});
+
+                        }
+                    }
+
+                });
+
+        session.subscribe("sdlSCI.data.onchangeNodeClass",
+                function(args){
+                    var type = args[0];
+                    var affectedNodeClass = args[1];
+
+                    if(type == "add") {
+                        localData.nodeClasses[affectedNodeClass.id] = affectedNodeClass;
+                    }
+                    else if(type == 'update') {
+                        localData.nodeClasses[affectedNodeClass.id] = affectedNodeClass;
+                    }
+                    else if(type == "delete"){
+                        delete localData.nodeClasses[affectedNodeClass.id];
+                    }
+                    updateExistingObj();
+
+                });
+
+        session.subscribe("sdlSCI.data.onChangeRule",
+                function(args){
+                    var type = args[0];
+                    var affectedRule = args[1];
+                    var affectedEdges = args[2];
+
+                    if(type == "add") {
+                        //add Edges
+                        for(var i in affectedEdges){
+                            if (localData.edges.get(affectedEdges[i].id) == null) {
+                                localData.edges.add(affectedEdges[i]);
+                            }
+                        }
+                        //add Rule
+                        localData.rules[affectedRule.id]  = affectedRule;
+                    }
+                    else if(type == 'update') {
+                        localData.rules[affectedRule.id] = affectedRule;
+                        for(var i in affectedRule.edges){
+                            var eId = affectedRule.edges[i];
+                            var e = localData.edges.get(eId);
+                            e.color = affectedRule.color;
+                            e.title = affectedRule.name;
+                            localData.edges.update(e);
+                        }
+                    }
+                    else if(type == "delete"){
+                        delete localData.rules[affectedRule.id];
+                        for(var i in affectedEdges){
+                            localData.edges.remove(affectedEdges[i]);
+                        }
+                    }
+
+                    updateExistingRules();
+
+                });
+
+
 
         //define options for Network
         /***********************************************************/
+        /*
+        var locales = {
+            en_dx: {
+                edit: 'Edit',
+                del: 'Delete selected',
+                back: 'Done',
+                addNode: 'Add Node',
+                addEdge: 'Add Rule',
+                editEdge: 'Edit Edge',
+                addDescription: 'Click in an empty space to place a new node.',
+                edgeDescription: 'Click on a sensor and drag the edge to an actor to connect them by a rule. Click "Done" in the menu to finish.',
+                editEdgeDescription: 'Click on the control points and drag them to a node to connect to it.',
+                createEdgeError: 'Cannot link edges to a cluster.',
+                deleteClusterError: 'Clusters cannot be deleted.',
+                editClusterError: 'Clusters cannot be edited.'
+            }
+        }
+        */
         var options = {
-            //        layout: {
-            //          randomSeed:seed
-            //        },
+//            locale : 'en_dx',
+//            locales : locales,
+            physics:{
+                stabilization: true,
+                timestep: 0.3
+            },
             manipulation: {
-                addNode: function (data, callback) {
-                    resetAddNodeForm(false);
-                    $('#nodeFormTitle').html('Add an object');
-                    $('#addNodePopup').css("display", "block");
-
-                    //save button
-                    data.id = -1;
-//                $('#savebt').click(saveNodeData.bind(func_this, data, callback));  Wrong, functions will be added not replaced!!!
-                    document.getElementById('savebt').onclick = function () {
-
-                        var affectedItem = saveNodeData.bind(this, data, callback)();
-
-                        if(affectedItem == null) {
-                            $("#nodeFormMsg").html("You must fill all the fields with * ");
-                        }
-
-                        else {
-                            //change data in server, call remote function
-                            session.call('sdlSCI.data.changeData', ['node', 'add', affectedItem]).then(
-                                    function (res) {
-                                        console.log(res);
-                                    }, session.log);
-
-                            //publish to server, tell it send SDL cmd to SDL server
-                            if (affectedItem.shape == "circle") {
-                                session.call('sdlSCI.data.create_EM', [affectedItem.label, '0']);
-                            }
-                            else if (affectedItem.shape == "square") {
-
-                            }
-                            else if (affectedItem.shape == "triangle") {
-
-                            }
-                        }
-                    }
-
-                    //cancel button
-                    document.getElementById('cancelbt').onclick = function () {
-                        $('#addNodePopup').css("display", "none");
-                    }
-
-                },
-                editNode: function (data, callback) {
-                    resetAddNodeForm(false);
-                    $('#nodeFormTitle').html('Edit an object');
-                    $('#addNodePopup').css("display", "block");
-                    $('#nodeName').val(data.label);
-                    var shape = data.shape;
-
-                    //doesn't trigger change event
-                    $('#' + shape).prop("checked", true);
-
-                    updateNodeFormByShape();
-
-                    //EM
-                    if (shape == 'circle') {
-                        $('#dsVal').val(data.devicestate);
-                        $('#cVal').val(data.consumption);
-                        $('#plVal').val(data.prioritylever);
-                        $('#EMdes').val(data.description);
-                    }
-                    //AM
-                    else if (shape == 'triangle') {
-                        $('#hlVal').val(data.hierarchylevel);
-                        $('#AMdes').val(data.description);
-                    }
-                    //user
-                    else if (shape == 'square') {
-                        $('#alVal').val(data.authoritylevel);
-                    }
-                    else {
-                        console.log('no shape info got');
-                    }
-
-                    //remove shadow
-                    data.shadow = false;
-
-                    //save button
-//                $('#savebt').click(saveNodeData.bind(this,data, callback));
-                    document.getElementById('savebt').onclick = function () {
-                        saveNodeData.bind(this, data, callback)();
-                        session.call('sdlSCI.data.changeData', ['node', 'update', data]).then(
-                                function (res) {
-                                    console.log(res);
-                                }, session.log);
-                    }
-
-                    //cancel button
-                    document.getElementById('cancelbt').onclick = function () {
-                        $('#addNodePopup').css("display", "none");
-                        callback(null);
-                    }
-                },
+                enabled: false,
+                addNode: false,
                 addEdge: function (data, callback) {
-                    if (data.from == data.to) {
-                        var r = confirm("Do you want to connect this object to itself?");
-                        if (r) {
-                            callback(data);
-                            session.call('sdlSCI.data.changeData', ['edge', 'add', data]).then(
-                                    function (res) {
-                                        console.log(res);
-                                    }, session.log);
-                        }
-                    }
-                    else {
-                        callback(data);
-                        session.call('sdlSCI.data.changeData', ['edge', 'add', data]).then(
-                                function (res) {
-                                    console.log(res);
-                                }, session.log);
-                    }
+                    setTimeout(function () {network.addEdgeMode();},0);
+                    callback(data);
                 },
-                editEdge: function (data, callback) {
+                editEdge: false,
+                        /*function (data, callback) {
                     if (data.from == data.to) {
                         var r = confirm("Do you want to connect this object to itself?");
                         if (r) {
@@ -1236,7 +2550,7 @@
                                     console.log(res);
                                 }, session.log);
                     }
-                },
+                },*/
                 deleteNode: function (data, callback) {
 
                     if (confirm("Are you sure that you want to delete this node?")) {
@@ -1251,7 +2565,8 @@
                         callback(null);
                     }
                 },
-                deleteEdge: function (data, callback) {
+                deleteEdge: false
+                        /*function (data, callback) {
                     if (confirm("Are you sure that you want to delete this edge?")) {
                         callback(data);
                         session.call('sdlSCI.data.changeData', ['edge', 'remove', data]).then(
@@ -1262,88 +2577,317 @@
                     else {
                         callback(null);
                     }
-                }
+                }*/
             },
             interaction: {
                 hover: true,
                 multiselect: true
+//                dragView: false,
+//                zoomView: false
+            },
+            nodes:{
+                physics:false
+            },
+            edges: {
+                arrows: {
+                    to: {enabled: true, scaleFactor: 0.5},
+                    middle: {enabled: false, scaleFactor: 1},
+                    from: {enabled: false, scaleFactor: 1}
+                },
             }
-
         };
+
 
         /***********************************************************/
 
+        //show admin Menu for admin user, if not, hide it
+        $("#adminMenu").show();
+        $("#rightDiv").css("margin-left","120px");
+
+        if(user === "admin") {
+//                $("#objClassMenu").show();
+//                $("#serverSDLMenu").show();
+                $("#rightDiv").show();
+            }
+            else {
+                $("#objClassMenu").hide();
+                $("#serverSDLMenu").hide();
+                $("#rightDiv").show();
+//                options.manipulation.addNode = false;
+//                delete options.manipulation.editNode;
+                options.manipulation.deleteNode = false;
+//                console.log(options);
+            }
+
         // CALL a remote procedure: get initial data
         //
-        session.call('sdlSCI.data.getData').then(
+        session_global.call('sdlSCI.data.getData').then(
                 function (res) {
                     var nodesArray = Object.keys(res.nodes).map(key => res.nodes[key]);
                     var edgesArray = Object.keys(res.edges).map(key => res.edges[key]);
+                    var nodeClassesArray = res.nodeClasses;
+                    var rulesArray = res.rules;
                     var nodesDataSet = new vis.DataSet(nodesArray);
                     var edgesDataSet = new vis.DataSet(edgesArray);
                     var data = {
                         nodes: nodesDataSet,
-                        edges: edgesDataSet
+                        edges: edgesDataSet,
+                        nodeClasses: nodeClassesArray,
+                        rules: rulesArray
                     }
                     localData = data;
-                    console.log('getdata then draw');
-                    network = new vis.Network(container, localData, options);
-                    network.on("hoverNode", function (params) {
-                        hoverNodeHandler(params);
+
+                    localData.edges.on("add",function(event,prop,senderId){
+                        var newEdgeId = prop.items[0];
+                        ruleEdges.push(newEdgeId);
                     });
+
+                    network = new vis.Network(container, localData, options);
+
+                    network.on("dragEnd", function (params) {
+                        dragEndEventHandler(params);
+                    });
+
+                    network.on("doubleClick",function(params){
+                        if(user == "admin") {
+                            //double click on nodes to edit their labels
+                            var nodeId = params.nodes[0];
+                            if(nodeId != undefined){
+                                $("#NewNodeFormTitle").html('Edit an object');
+                                $("#newNodeNamePopup").show();
+                                $("#thisNodeID").val(nodeId);
+                                var label = localData.nodes.get(nodeId).label;
+                                $("#newNodeName").val(label);
+                            }
+                        }
+                        else{
+                            alert("Only administrator can edit nodes ...");
+                        }
+                    });
+
+
+                    updateExistingObj();
+                    updateExistingRules();
+                    updateExistingUsers();
+
+
+                    function dragEndEventHandler(params) {
+                        var dragedNodeIDs = params.nodes;
+                        if(dragedNodeIDs.length > 0) {
+                            var dragedNodePos =  network.getPositions(dragedNodeIDs);
+                            session.call('sdlSCI.data.updateNodePosition', [dragedNodePos]).then(
+                                    session.log, session.log);
+                        }
+
+                    }
+
+                    network.on("selectNode",function(params){
+                        //show delete selected button
+                        if(!isAddingRule) {
+                            $("#deleteSelectedIcon").css("display","inline-block");
+
+                            var nodes = params.nodes;
+                            document.getElementById("deleteSelectedIcon").onclick = function (nodes) {
+
+                                if (confirm("Are you sure that you want to delete selected nodes?")) {
+
+                                    localData.nodes.remove(nodes);
+                                    //data is an array of selected Nodes and Edges
+                                    session_global.call('sdlSCI.data.changeData', ['node', 'remove', params]).then(
+                                            function (res) {
+                                                console.log(res);
+                                            }, session_global.log);
+                                }
+
+                            }
+                        }
+                    });
+
+                    network.on("deselectNode",function(params){
+                        $("#deleteSelectedIcon").hide();
+                    });
+
                 },
                 //// ????????  if get data error?  sychronous ?
                 function (err) {
                     console.log("getData() error:", err);
-                    //listen on changes of localData
-                    localData.nodes.on("*", function (event, properties) {
-                        console.log("event", event, "prop", properties);
-                    });
-                    localData.edges.on("*", function (event, properties) {
-                        console.log("event", event, "prop", properties);
-                    });
+
+                    /*
                     network = new vis.Network(container, localData, options);
-                    network.on("hoverNode", function (params) {
-                        hoverNodeHandler(params);
+
+                    network.on("dragEnd", function (params) {
+                        console.log("dragEnd!", params);
+                        dragEndEventHandler(params);
                     });
+
+                    function dragEndEventHandler(params) {
+                        var dragedNodeIDs = params.nodes;
+                        if(dragedNodeIDs.length > 0) {
+                            var dragedNodePos =  network.getPositions(dragedNodeIDs);
+                            session.call('sdlSCI.data.updateNodePosition', [dragedNodePos]).then(
+                                    session.log, session.log);
+                        }
+
+                    }
+                    */
                 }
         );
 
+        session_global.call('sdlSCI.data.getUsers').then(
+                function (res) {
+                    localUsers = res;
+
+                },session_global.log
+        );
+
+
         $("#btn_go").click(function(){
-            session.call('sdlSCI.data.SendCMD_Go');
+            session_global.call('sdlSCI.data.SendCMD_Go');
 
         });
 
         $("#btn_connect").click(function(){
-            session.call('sdlSCI.data.connectSDL');
+            session_global.call('sdlSCI.data.connectSDL');
         });
 
+
+        /*
+        $("#addRule").click(function(){
+
+            $("#addRuleCancel").show();
+            $("#addRule").hide();
+            $("#addRuleMsg").html("Please select the actor...");
+
+
+            var action,condition,rule;
+
+            network.once("select",function(params){
+
+                if(params.nodes.length == 0){
+                    alert("You must select an object...");
+                    return;
+                }
+                var actorId = params.nodes[0];
+
+                var nodeVars = localData.nodes.get(actorId).variables;
+
+                console.log(actorId + "\n" +nodeVars);
+
+                $("#set_action").show();
+                $("#set_action .vars").html("<div>"+nodeVars+"</div><div><input id='actionInput' type='text'/></div>");
+                $("#action_ok").unbind("click");
+                $("#action_ok").click(function(){
+                    action = $("#actionInput").val();
+                    $("#set_action").hide();
+                    $("#addRuleMsg").html("Now, select the trigger...");
+
+                    network.once("select",function(params){
+                        if(params.nodes.length == 0){
+                            alert("You must select an object...");
+                            return;
+                        }
+                        var triggerId = params.nodes[0];
+                        var nodeVars = localData.nodes.get(triggerId).variables;
+                        console.log(triggerId);
+
+                        $("#set_condition").show();
+                        $("#set_condition .vars").html("<div>"+nodeVars+"</div><div><input id='conditionInput' type='text'/></div>")
+                        $("#condition_ok").unbind("click");
+                        $("#condition_ok").click(function () {
+
+                            condition = $("#conditionInput").val();
+
+                            $("#addRuleMsg").html("");
+                            $("#addRuleCancel").hide();
+                            $("#addRule").show();
+
+                            $("#set_condition").hide();
+
+//                        $("#addRuleDone").show();
+//                        $("#addRuleDone").click(function () {
+                            rule = {actor:actorId,action:action,trigger:triggerId,condition:condition};
+                            condition = "";
+                            action = "";
+                            //add an edge
+                            var newEdgeId = (Math.random() * 1e7).toString(32);
+
+                            var newEdgeObj = {id:newEdgeId,from:actorId,to:triggerId,rule:rule};
+
+                            var htmlContent = " <div>";
+                            for(var key in newEdgeObj){
+                                if(key !== "from" && key!== "to" && key!== "rule" ) continue;
+                                var val = newEdgeObj[key];
+
+                                if(val) {
+
+                                    if(key == "from" || key == "to"){
+
+                                        val = localData.nodes.get(val).label;
+                                    }
+
+                                    if(key == "rule") {
+                                        htmlContent += "<br/><div>------- rule ------- </div>";
+                                        for(var k in val){
+                                            var sub_val = val[k];
+                                            if(k == "actor" || k == "trigger") {
+                                                sub_val = localData.nodes.get(sub_val).label;
+                                            }
+                                            htmlContent += "<div>" + k + " : " + sub_val + "</div>";
+                                        }
+                                    }
+                                    else {
+                                        htmlContent += "<div>" + key + " : " + val + "</div>";
+                                    }
+                                }
+                            }
+                            htmlContent += "</div>";
+
+                            newEdgeObj["title"] = htmlContent;
+
+                            localData.edges.add(newEdgeObj);
+
+                            //update rules and edges
+                            session.call('sdlSCI.data.changeData', ['edge', 'add', newEdgeObj]).then(
+                                    function (res) {
+                                        console.log(res);
+                                    }, session.log);
+
+//                        });
+
+
+
+                        });
+                        $("#condition_cancel").unbind("click");
+                        $("#condition_cancel").click(function () {
+                            $("#set_condition").hide();
+                            action = "";
+                            condition = "";
+                        });
+
+                    });
+                });
+                $("#action_cancel").unbind("click");
+                $("#action_cancel").click(function () {
+                    $("#set_action").hide();
+                    action = "";
+                });
+
+
+            });
+
+        });
+        */
     }
 
-    //params is an object which contains the id of hovered node
-    function hoverNodeHandler(params) {
-        var hoveredNodeId = params.node;
-        var hoveredNodeObj = localData.nodes.get(hoveredNodeId);
-//        console.log(hoveredNodeObj);
-        var graphW = $("#graph").css("width");
-        var graphH = $("#graph").css("height");
-        $("#nodeInfo").show()
-                .css("top",hoveredNodeObj.x+graphW)
-                .css("left",hoveredNodeObj.y+graphH);
-
-    }
 
     // fired when connection was lost (or could not be established)
     //
 
     function onclose(reason, details) {
         console.log("Connection lost: " + reason);
-        if (reason !== "lost") {
-            network = new vis.Network(container, localData, options);
-            network.on("hoverNode", function (params) {
-                hoverNodeHandler(params);
-            });
-        }
+//        if (reason !== "lost") {
+//            network = new vis.Network(container, localData, options);
+//        }
     }
 
     function close_modal_login(){

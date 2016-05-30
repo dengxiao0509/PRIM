@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-. ~/bin/ibmRationalSDL/bin/telelogic.profile
+. ~/Documents/apps/ibmRationalSDL/bin/telelogic.profile
 ./SmartHome_smw.sct

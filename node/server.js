@@ -9,6 +9,8 @@ var spawn = require('child_process').spawn;
 var process_child;
 
 var file_path = "/tmp/data.txt";
+// var rules_path = "/tmp/rules.txt";
+var users_path = "/tmp/users.txt";
 
 var connection = new autobahn.Connection({
         url: process.argv[2],   //127.0.0.1:9000
@@ -141,23 +143,34 @@ var data = {
 };*/
 
 
-
-/*
 if(fs.existsSync(file_path)) {
     var data_json = fs.readFileSync(file_path, 'utf8');
     if(data_json == "") {
-        var data = {nodes:{},edges:{}};
+        var data = {nodeClasses:{},nodes:{},edges:{},rules:{}};
     }
     else {
-
         var data = JSON.parse(data_json);
     }
 }
 else {
-    var data = {nodes:{},edges:{}};
+    var data = {nodeClasses:{},nodes:{},edges:{},rules:{}};
 }
-*/
 
+if(fs.existsSync(users_path)) {
+    var users_json = fs.readFileSync(users_path, 'utf8');
+    if(users_json == "") {
+        var users = {};
+    }
+    else {
+        var users = JSON.parse(users_json);
+    }
+}
+else {
+    var users = {};
+}
+
+
+/*
 ////  clear the file data.txt every time   ////
 if(fs.existsSync(file_path)) {
     fs.writeFile(file_path, '', function (err) {
@@ -167,8 +180,10 @@ if(fs.existsSync(file_path)) {
     });
 
 }
+*/
+// var data = {nodes: {}, edges: {}};
 
-var data = {nodes: {}, edges: {}};
+
 
 //////////////////////////////////////////////
 
@@ -185,6 +200,10 @@ connection.onopen = function (session) {
         return data;
     }
 
+    function  getUsers() {
+        return users;
+    }
+
     session.register('sdlSCI.data.getData', getData).then(
         function (reg) {
             console.log("procedure getData() registered");
@@ -194,11 +213,20 @@ connection.onopen = function (session) {
         }
     );
 
+    session.register('sdlSCI.data.getUsers', getUsers).then(
+        function (reg) {
+            console.log("procedure getUsers() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure getUsers: " + err);
+        }
+    );
+
     // REGISTER a procedure for remote calling
     //
     //args : type(node or edge),event[,array of affected objects]
     function changeData(args) {
-        console.log("change data called");
+        // console.log("change data called");
         if(args.length >= 3){
             var type = args[0];
             var event = args[1];
@@ -239,13 +267,10 @@ connection.onopen = function (session) {
                 }
             }
 
-            // publish the change data event
-            var res = [type,event,affectedItem];
-
-            session.publish("sdlSCI.data.onChange", res);
+            //publish the change data event
+            session.publish("sdlSCI.data.onChange", args);
 
             //write data to external file .txt
-
             var data_json = JSON.stringify(data);
 
             //clear file content
@@ -270,12 +295,171 @@ connection.onopen = function (session) {
     }
     
 
+    function updateNodePosition(args){
+        var nodePos = args[0];
+
+        //update positions of all nodes in data
+        if(nodePos) {
+            console.log(nodePos);
+            for (var k in nodePos) {
+                data.nodes[k]["x"] = nodePos[k]["x"];
+                data.nodes[k]["y"] = nodePos[k]["y"];
+            }
+
+
+        //update file data.txt
+        //write data to external file .txt
+
+        var data_json = JSON.stringify(data);
+
+        //clear file content
+        fs.writeFile(file_path, '', function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        });
+
+        fs.writeFile(file_path, data_json, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        });
+        }
+
+        //publish the update
+        session.publish("sdlSCI.data.onUpdatePos", args);
+    }
+
+    function changeNodeClass(args){
+        // console.log("changeNodeClass ");
+        var type = args[0];
+        var affectedNodeClass = args[1];
+        if(type == "add") {
+            data.nodeClasses[affectedNodeClass.id] = affectedNodeClass;
+        }
+        else if(type == "update") {
+            data.nodeClasses[affectedNodeClass.id] = affectedNodeClass;
+        }
+        else if(type == "delete"){
+            delete  data.nodeClasses[affectedNodeClass.id];
+        }
+
+        // publish the add new node class event
+        session.publish("sdlSCI.data.onchangeNodeClass", args);
+
+        //write data to external file .txt
+        var data_json = JSON.stringify(data);
+
+        //clear file content
+        fs.writeFile(file_path, '', function(err) {
+            if(err) {
+                return console.log(err);
+            }
+            // console.log("The file was cleared!");
+        });
+
+        fs.writeFile(file_path, data_json, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+            // console.log("The file was saved!");
+        });
+    }
+
+    function changeRule(args){
+
+        if(args.length >= 3){
+            var event = args[0];
+            var affectedItem = args[1];
+            var affectedEdges = args[2];
+
+            if (event === 'add') {
+                //add rule
+                data.rules[affectedItem.id] = affectedItem;
+                //add edges
+                for(var i in affectedEdges) {
+                    data.edges[affectedEdges[i].id] = affectedEdges[i];
+                }
+            }
+            else if (event === 'delete') {
+
+                delete  data.rules[affectedItem.id];
+                for(var i in affectedEdges) {
+                    console.log(affectedEdges[i]);
+                    delete data.edges[affectedEdges[i]];
+                }
+
+            }
+            else if (event === 'update') {
+                data.rules[affectedItem.id] = affectedItem;
+                for(var i in affectedItem.edges){
+                    var eId = affectedItem.edges[i];
+                    data.edges[eId].color = affectedItem.color;
+                    data.edges[eId].title = affectedItem.name;
+                }
+            }
+
+            //publish the change data event
+            session.publish("sdlSCI.data.onChangeRule", args);
+
+            //write data to external file .txt
+            var data_json = JSON.stringify(data);
+
+            //clear file content
+            fs.writeFile(file_path, '', function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                // console.log("The file was cleared!");
+            });
+
+            fs.writeFile(file_path, data_json, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                // console.log("The file was saved!");
+            });
+
+        }
+        else {
+            console.log('3 args needed for function changeRule');
+        }
+
+    }
+
     session.register('sdlSCI.data.changeData', changeData).then(
         function (reg) {
             console.log("procedure changeData() registered");
         },
         function (err) {
             console.log("failed to register procedure: " + err);
+        }
+    );
+
+    session.register('sdlSCI.data.updateNodePosition', updateNodePosition).then(
+        function (reg) {
+            console.log("procedure updateNodePosition() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure updateNodePosition: " + err);
+        }
+    );
+
+    session.register('sdlSCI.data.changeNodeClass', changeNodeClass).then(
+        function (reg) {
+            console.log("procedure changeNodeClass() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure changeNodeClass: " + err);
+        }
+    );
+
+    session.register('sdlSCI.data.changeRule', changeRule).then(
+        function (reg) {
+            console.log("procedure changeRule() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure changeRule: " + err);
         }
     );
 
@@ -310,7 +494,7 @@ connection.onopen = function (session) {
         }
     );
 
-
+ //function used to change rules file
 
 };
 
