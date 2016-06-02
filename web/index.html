@@ -28,6 +28,12 @@
     <link rel="stylesheet" href="css/jquery.tagsinput.css" />
 
     <style>
+
+        body{
+            font-size: 16px;
+            font-family:Times New Roman;
+        }
+
         #header {
             width: 100%;
             height: 60px;
@@ -59,10 +65,20 @@
 
         #rightDiv{
             margin-left:120px;
+            margin-right: 115px;
             height: 570px;
             border-top:2px lightblue solid;
             padding-left: 5px;
             overflow: hidden;
+        }
+
+        #rightMenu {
+            width: 120px;
+            height: 570px;
+            position: absolute;
+            border: lightblue 2px solid;
+            right: 0;
+            top: 105px;
         }
 
         #topMenu{
@@ -92,7 +108,9 @@
 
         #addObjPopup,
         #newNodeNamePopup,
-        #addRulePopup{
+        #addRulePopup,
+        #addEnvPopup,
+        #editEnvPopup{
             position: absolute;
             left: 400px;
             top: 120px;
@@ -110,7 +128,7 @@
             /*display: block;*/
             width: 270px;
         }
-
+        
         #NodeShapeBts {
             display: inline;
         }
@@ -419,8 +437,9 @@
 
         #addObjClassIcon:hover,
         #addVarIcon:hover,
-        #deleteVarIcon:hover{
+        .deleteVarIcon:hover{
             opacity: 0.8;
+            cursor: pointer;
         }
 
         #newVar{
@@ -433,17 +452,15 @@
             cursor: pointer;
         }
 
-        #newVar .row{
-
-        }
    
-        #newVar .row input[type="text"]{
+        #newVar .row input[type="text"],
+        #newEnvVar .row input[type="text"]{
             width: 80px;
             float: left;
             margin-right: 10px;
         }
 
-        #deleteVarIcon{
+        .deleteVarIcon{
             float: left;
         }
 
@@ -583,6 +600,15 @@
             padding: 0;
         }
 
+        #userFilter{
+            margin-left:5px;
+            margin-bottom: 10px;
+        }
+
+        #userList {
+            width:60px;
+        }
+
     </style>
 </head>
 
@@ -619,6 +645,7 @@
                 </div>
                 <div class="menuContent">
                   <div id="userFilter">
+                      <span>User: </span>
                       <select id="userList">
 
                       </select>
@@ -626,8 +653,6 @@
                   <div id="existingRules"></div>
                 </div>
             </div>
-
-
         </div>
         <div id="rightDiv">
             <div id="topMenu">
@@ -645,7 +670,18 @@
                 <span class="remindText">Click on a sensor and drag the edge to an actor to connect them by a rule. Click "Done" in the menu to finish.</span>
             </div>
             <div id="graph" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+        <div id="rightMenu">
+            <div class="menuDiv">
+                <div class="menuTitle"><span>Environment</span>
+                    <img id="addEnvIcon" src="image/plus.png" width="15px"/>
+                </div>
+                <div class="menuContent">
+                    <div id="envVars">
 
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="modal" class="popupContainer" style="display: none;">
             <header class="popupHeader">
@@ -763,6 +799,7 @@
                         <!--<input name='var_tags' id="var_tags" />-->
                     <!--</div>-->
                 <!--</div>-->
+                
                 <div class="row newVarLabel">
                     <div class="celllabel">Variables<img id="addVarIcon" title="add a variable" src="image/plus.png" width="16px"/></div>
                 </div>
@@ -834,6 +871,39 @@
             <input type="hidden" id="ruleId"/>
         </div>
     </div>
+    <div id="addEnvPopup">
+        <div class="header_obj">
+            <span id="envFormtitle" class="header_title">Add Environment Values</span>
+        </div>
+        <p id="envFormMsg" class="err_msg"></p>
+        <div class="row newVarLabel">
+            <div class="celllabel">Variables<img id="addEnvVarIcon" title="add a variable" src="image/plus.png" width="16px"/></div>
+        </div>
+        <div id="newEnvVar">
+
+        </div>
+        <div class="btns_obj">
+            <!--<input type="button" id="deleteThisEnv" class="btn_red btn_obj" value="Delete"/>-->
+            <input type="button" class="btn_obj" value="Cancel" id="cancelEnvbt"/>
+            <input type="button" class="btn_blue btn_obj" value="Save" id="saveEnvbt"/>
+        </div>
+    </div>
+    <div id="editEnvPopup">
+        <div class="header_obj">
+            <span class="header_title">Edit Environment Value</span>
+        </div>
+        <p id="envEditFormMsg" class="err_msg"></p>
+        <div class="row">
+            <div class="celllabel" id="vname"></div>
+            <div class="cell"><input type="text" name="vvar" id="vvar"/></div>
+        </div>
+        <div class="btns_obj">
+            <input type="button" id="deleteThisEnv" class="btn_red btn_obj" value="Delete"/>
+            <input type="button" class="btn_obj" value="Cancel" id="cancelEnvEditbt"/>
+            <input type="button" class="btn_blue btn_obj" value="Save" id="saveEnvEditbt"/>
+        </div>
+        <input type="hidden" />
+    </div>
 </div>
 
 <script>
@@ -846,6 +916,7 @@
     //predefine network and session
     var network = null;
     var session_global = null;
+    var localUsers = null;
 
     function destroy(){
         if(network !== null){
@@ -854,13 +925,14 @@
         }
     }
 
+    /////////////////////////////////   Environment //////////////////////////////////////////////////////////////////
 
-    /////////////////////////////////   Manage Nodes(Objects) ////////////////////////////////////////////////////////
+    function deleteNewVar(node){
+        var p = node.parentNode;
+        p.parentNode.removeChild(p);
+    }
 
-    //add new variable button
-    $("#addVarIcon").click(function(){
-
-        var container = document.getElementById("newVar");
+    function newVarRow() {
         var nodeDiv = document.createElement("div");
         nodeDiv.setAttribute("class","row");
 
@@ -873,7 +945,7 @@
         nodeInput2.setAttribute("type","text");
 
         var nodeImg = document.createElement("img");
-        nodeImg.setAttribute("id","deleteVarIcon");
+        nodeImg.setAttribute("class","deleteVarIcon");
         nodeImg.setAttribute("onclick","deleteNewVar(this)");
         nodeImg.setAttribute("src",'image/delete.png');
         nodeImg.setAttribute("width",'16px');
@@ -883,14 +955,102 @@
         nodeDiv.appendChild(nodeInput2);
         nodeDiv.appendChild(nodeImg);
 
+        return nodeDiv;
+    }
+
+    $("#addEnvIcon").click(function(){
+        $("#addEnvPopup").show();
+        var div = document.getElementById("newEnvVar");
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+    });
+
+    $("#addEnvVarIcon").click(function(){
+        var container = document.getElementById("newEnvVar");
+        var nodeDiv = newVarRow();
         container.appendChild(nodeDiv);
+    });
+
+    //savebt
+    $("#saveEnvbt").click(function () {
+        envVariables = {};
+        var varRows = document.getElementById("newEnvVar").getElementsByTagName('div');
+        for (var i = 0; i < varRows.length; i++) {
+            var vName = varRows[i].getElementsByTagName('input')[0].value;
+            var vValue = varRows[i].getElementsByTagName('input')[1].value;
+            envVariables[vName] = vValue;
+        }
+        console.log(envVariables);
+
+        //change data in server, call remote function
+        session_global.call('sdlSCI.data.changeEnv', ['add', envVariables]).then(
+                function (res) {
+                    $("#addEnvPopup").hide();
+                }, session_global.log);
+    });
+
+    //cancel
+    $("#cancelEnvbt").click(function(){
+        $("#addEnvPopup").hide();
+    });
+
+    function updateEnv(){
+        var htmlContent = "";
+        for(var k in localData.env){
+            var VName = k;
+            htmlContent += "<div class='objClassDiv' ondblclick='dblclickEnv(this)' id='env_"+k+"'>"+ VName +"</div>";
+        }
+        $("#envVars").html(htmlContent);
+    }
+
+    function dblclickEnv(target){
+        $("#editEnvPopup").show();
+        var VName = target.id.split("_")[1];
+        var vVar = localData.env[VName];
+        $("#vname").html(VName);
+        $("#vvar").val(vVar);
+        $("#editEnvPopup input[type='hidden']").val(VName);
+    }
+
+    $("#saveEnvEditbt").click(function(){
+        var vName = $("#editEnvPopup input[type='hidden']").val();
+        var vVar = $("#vvar").val();
+
+        var res = {};
+        res[vName] = vVar;
+
+        session_global.call('sdlSCI.data.changeEnv', ['update', res]).then(
+                function (res) {
+                    $("#editEnvPopup").hide();
+                }, session_global.log);
 
     });
 
-    function deleteNewVar(node){
-        var p = node.parentNode;
-        p.parentNode.removeChild(p);
-    }
+    $("#cancelEnvEditbt").click(function(){
+        $("#editEnvPopup").hide();
+    });
+
+    $("#deleteThisEnv").click(function(){
+        var vName = $("#editEnvPopup input[type='hidden']").val();
+
+        //delete this variable in server
+        session_global.call('sdlSCI.data.changeEnv', ['delete', vName]).then(
+                function (res) {
+                    $("#editEnvPopup").hide();
+                }, session_global.log);
+
+    });
+
+    /////////////////////////////////   Manage Nodes(Objects) ////////////////////////////////////////////////////////
+
+    //add new variable button
+
+    $("#addVarIcon").click(function(){
+        var container = document.getElementById("newVar");
+        var nodeDiv = newVarRow();
+        container.appendChild(nodeDiv);
+    });
 
     //save button in the addNewNodePopup
     $("#saveNewNode").click(function(){
@@ -944,18 +1104,15 @@
                 network.selectNodes(select);
 
                 //change data in server, call remote function
-
                 session_global.call('sdlSCI.data.changeData', ['node', 'add', newN]).then(
                         function (res) {
                             $("#nodeClassId").val("");
-                            console.log(res);
-                        }, session.log);
+                        }, session_global.log);
 
             }
         }
         else if($("#NewNodeFormTitle").html() == "Edit an object"){
             var newN_label = $("#newNodeName").val();
-            console.log(newN_label);
             if ($('#newNodeName').val().replace(/ /g, '') == ""){
                 $("#newNodeFormMsg").html("Please give it a name...");
             }
@@ -998,8 +1155,7 @@
                 session_global.call('sdlSCI.data.changeData', ['node', 'update', data]).then(
                         function (res) {
                             ("#thisNodeID").val("");
-                            console.log(res);
-                        }, session.log);
+                        }, session_global.log);
 
             }
 
@@ -1101,7 +1257,7 @@
             nodeInput2.setAttribute("value",data.variables[vName]);
 
             var nodeImg = document.createElement("img");
-            nodeImg.setAttribute("id","deleteVarIcon");
+            nodeImg.setAttribute("class","deleteVarIcon");
             nodeImg.setAttribute("onclick","deleteNewVar(this)");
             nodeImg.setAttribute("src",'image/delete.png');
             nodeImg.setAttribute("width",'16px');
@@ -1127,13 +1283,13 @@
 }
     //update node class
     function updateExistingObj(){
-    var htmlContent = "";
-    for(var k in localData.nodeClasses){
-        var nodeName = localData.nodeClasses[k]["label"];
-        htmlContent += "<div class='objClassDiv' ondblclick='dblclickObjClass(this)' id='"+k+"' draggable='true' ondragstart='dragObj(event)'>"+ nodeName +"</div>";
+        var htmlContent = "";
+        for(var k in localData.nodeClasses){
+            var nodeName = localData.nodeClasses[k]["label"];
+            htmlContent += "<div class='objClassDiv' ondblclick='dblclickObjClass(this)' id='"+k+"' draggable='true' ondragstart='dragObj(event)'>"+ nodeName +"</div>";
+        }
+        $("#existingObj").html(htmlContent);
     }
-    $("#existingObj").html(htmlContent);
-}
 
     ///////////////////  Functions used to handle drag and drop event for creating nodes //////////////////////////////
     function allowDrop(ev) {
@@ -1195,7 +1351,7 @@
                     var vName = varRows[i].getElementsByTagName('input')[0].value;
                     var vValue = varRows[i].getElementsByTagName('input')[1].value;
                     data.variables[vName] = vValue;
-                    console.log(vName);
+//                    console.log(vName);
                 }
 
                 var htmlContent = " <div>";
@@ -1516,6 +1672,7 @@
         $("#addruleCancelIcon").hide();
         $(".remindText").hide();
         isAddingRule = false;
+        network.disableEditMode();
     });
 
     ////new or edit rule form buttons
@@ -1545,10 +1702,12 @@
             var newRule = {};
             if(isEdit) {
                 newRule.id = $("#ruleId").val();
+                newRule.user = localData.rules[newRule.id].user;
             }
             else {
                 newRule.id = (Math.random() * 1e7).toString(32);
                 newRule.id = newRule.id.replace(/\./g, "0");
+                newRule.user = user;
             }
 
             newRule.name = ruleName;
@@ -1561,7 +1720,6 @@
             }
 
             newRule.color = $("#ruleColor").val();
-            newRule.user = user;
 
             newRule.if = {};
             newRule.then = {};
@@ -1613,8 +1771,8 @@
                 var a = t[0];  //actor id
                 var v = t[1];   // variable name
 
-                if(checkedActor.indexOf(s) == "-1") {
-                    checkedActor.push(s);
+                if(checkedActor.indexOf(a) == "-1") {
+                    checkedActor.push(a);
                 }
 
                 //get input value
@@ -1692,10 +1850,12 @@
 
     //cancel button
     $("#ruleCancelbt").click(function(){
+
         //delete edges added
         localData.edges.remove(ruleEdges);
         ruleEdges = [];
         $("#addRulePopup").hide();
+
     });
 
     //delete button
@@ -1965,23 +2125,79 @@
 }
 
     function updateExistingRules(){
-    var htmlContent = "";
-    for(var k in localData.rules){
-        var ruleName = localData.rules[k]["name"];
-        htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' id='"+k+"'>"+ ruleName +"</div>";
-    }
-    $("#existingRules").html(htmlContent);
+        var htmlContent = "";
+        var targetUser = $("#userList").val();
+
+        //show rules belonging to the selected user(s)
+        if(targetUser == "all"){
+            for(var k in localData.rules){
+                var ruleName = localData.rules[k]["name"];
+                htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' id='" + k + "'>" + ruleName + "</div>";
+            }
+            localData.edges.clear();
+            localData.edges.add(localData.allEdges.get());
+        }
+        else if(targetUser == "allUsers"){
+            var ruleGroup = [];
+
+            for(var k in localData.rules){
+                var ruleItem = localData.rules[k];
+                if(ruleItem.user !== "admin") {
+                    var ruleName = ruleItem.name;
+                    htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' id='" + k + "'>" + ruleName + "</div>";
+                    //get all edges of this user's rules
+                    for(var e in ruleItem.edges){
+                        var eId = ruleItem.edges[e];
+                        if(ruleGroup.indexOf(eId) == '-1'){
+                            ruleGroup.push(eId);
+                        }
+                    }
+                }
+            }
+
+            localData.edges.clear();
+            localData.edges.add(localData.allEdges.get(ruleGroup));
+        }
+        else {
+            var ruleGroup = [];
+            for(var k in localData.rules){
+                var ruleItem = localData.rules[k];
+
+                if(ruleItem.user == targetUser) {
+                    var ruleName = ruleItem.name;
+                    htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' id='" + k + "'>" + ruleName + "</div>";
+
+                    //get all edges of this user's rules
+                    for (var e in ruleItem.edges) {
+                        var eId = ruleItem.edges[e];
+                        if (ruleGroup.indexOf(eId) == '-1') {
+                            ruleGroup.push(eId);
+                        }
+                    }
+                }
+            }
+            localData.edges.clear();
+            localData.edges.add(localData.allEdges.get(ruleGroup));
+        }
+
+        $("#existingRules").html(htmlContent);
 }
 
-    function updateExistingUsers {
+    function updateExistingUsers() {
         var htmlContent ="";
-        for(var k in localUsers){
-            if(k !== "admin" && k !== "registerUser"){
-                htmlContent += "<option value='"+ k +"'>"+k+"</option>";
+        htmlContent += "<option value='all' selected='selected'>All</option><option value='admin'>admin</option><option value='allUsers'>All users</option>";
+        for(var k in localData.users){
+            var u = localData.users[k];
+            if(u !== "admin" && u !== "registerUser"){
+                htmlContent += "<option value='"+ u +"'>"+u+"</option>";
             }
         }
         $("#userList").html(htmlContent);
     }
+
+    $("#userList").change(function(){
+        updateExistingRules();
+    });
 
     $(".vis-connect").hide();
 
@@ -2363,7 +2579,6 @@
         // subscribe to future change data event
         session.subscribe("sdlSCI.data.onChange",
                 function (args) {
-//                 console.log(args);
                     var type = args[0];
                     var event = args[1];
                     var affectedItem = args[2];
@@ -2381,10 +2596,16 @@
                                 }
                             }
                             for (itemId in affectedItem.edges) {
-                                if (localData.edges.get(affectedItem.edges[itemId])) {
-                                    localData.edges.remove(affectedItem.edges[itemId]);
+                                if (localData.allEdges.get(affectedItem.edges[itemId])) {
+                                    localData.allEdges.remove(affectedItem.edges[itemId]);
                                 }
                             }
+                            for(i in affectedItem.rules){
+                                if(localData.rules.hasOwnProperty(affectedItem.rules[i])){
+                                    delete localData.rules[affectedItem.rules[i]];
+                                }
+                            }
+                            updateExistingRules();
                         }
                         else if (event === 'update') {
                             if (localData.nodes.get(affectedItem.id)) {
@@ -2395,6 +2616,7 @@
                             console.log('event unknown :', event);
                         }
                     }
+                            /*
                     else if (type === 'edge') {
                         if (event === 'add') {
                             if (localData.edges.get(affectedItem.id) == null) {
@@ -2418,6 +2640,7 @@
                             console.log('event unknown:', event);
                         }
                     }
+                    */
                     else {
                         console.log('Type of affected item unknown');
                     }
@@ -2464,8 +2687,8 @@
                     if(type == "add") {
                         //add Edges
                         for(var i in affectedEdges){
-                            if (localData.edges.get(affectedEdges[i].id) == null) {
-                                localData.edges.add(affectedEdges[i]);
+                            if (localData.allEdges.get(affectedEdges[i].id) == null) {
+                                localData.allEdges.add(affectedEdges[i]);
                             }
                         }
                         //add Rule
@@ -2475,16 +2698,16 @@
                         localData.rules[affectedRule.id] = affectedRule;
                         for(var i in affectedRule.edges){
                             var eId = affectedRule.edges[i];
-                            var e = localData.edges.get(eId);
+                            var e = localData.allEdges.get(eId);
                             e.color = affectedRule.color;
                             e.title = affectedRule.name;
-                            localData.edges.update(e);
+                            localData.allEdges.update(e);
                         }
                     }
                     else if(type == "delete"){
                         delete localData.rules[affectedRule.id];
                         for(var i in affectedEdges){
-                            localData.edges.remove(affectedEdges[i]);
+                            localData.allEdges.remove(affectedEdges[i]);
                         }
                     }
 
@@ -2492,7 +2715,30 @@
 
                 });
 
+        session.subscribe("sdlSCI.data.onChangeEnv",
+                function(args){
+                    var type = args[0];
+                    var affectedEnv = args[1];
 
+                    if(type == "add") {
+                        if(localData.env == undefined){
+                            localData.env = {};
+                        }
+                        for(var i in affectedEnv){
+                            localData.env[i] = affectedEnv[i];
+                        }
+                    }
+                    else if(type == "delete"){
+                         delete localData.env[affectedEnv];
+                    }
+                    else if(type == "update"){
+                        for(var i in affectedEnv){
+                            localData.env[i] = affectedEnv[i];
+                        }
+                    }
+
+                    updateEnv();
+                });
 
         //define options for Network
         /***********************************************************/
@@ -2604,19 +2850,16 @@
         $("#adminMenu").show();
         $("#rightDiv").css("margin-left","120px");
 
-        if(user === "admin") {
-//                $("#objClassMenu").show();
-//                $("#serverSDLMenu").show();
+            if(user === "admin") {
                 $("#rightDiv").show();
+                $("#objClassMenu").show();
+                $("#serverSDLMenu").show();
             }
             else {
                 $("#objClassMenu").hide();
                 $("#serverSDLMenu").hide();
                 $("#rightDiv").show();
-//                options.manipulation.addNode = false;
-//                delete options.manipulation.editNode;
-                options.manipulation.deleteNode = false;
-//                console.log(options);
+//                options.manipulation.deleteNode = false;
             }
 
         // CALL a remote procedure: get initial data
@@ -2625,15 +2868,22 @@
                 function (res) {
                     var nodesArray = Object.keys(res.nodes).map(key => res.nodes[key]);
                     var edgesArray = Object.keys(res.edges).map(key => res.edges[key]);
+                    var usersArray = Object.keys(res.users);
                     var nodeClassesArray = res.nodeClasses;
                     var rulesArray = res.rules;
+                    var envArray = res.env;
+
                     var nodesDataSet = new vis.DataSet(nodesArray);
                     var edgesDataSet = new vis.DataSet(edgesArray);
+                    var allEdgesDataSet = new vis.DataSet(edgesArray);
                     var data = {
                         nodes: nodesDataSet,
                         edges: edgesDataSet,
                         nodeClasses: nodeClassesArray,
-                        rules: rulesArray
+                        rules: rulesArray,
+                        users: usersArray,
+                        allEdges : allEdgesDataSet,
+                        env: envArray
                     }
                     localData = data;
 
@@ -2648,28 +2898,25 @@
                         dragEndEventHandler(params);
                     });
 
-                    network.on("doubleClick",function(params){
-                        if(user == "admin") {
-                            //double click on nodes to edit their labels
-                            var nodeId = params.nodes[0];
-                            if(nodeId != undefined){
+                    network.on("doubleClick", function (params) {
+                        var nodeId = params.nodes[0];
+                        //double click on nodes to edit their labels
+                        if (nodeId != undefined) {
+                            if (user == "admin") {
                                 $("#NewNodeFormTitle").html('Edit an object');
                                 $("#newNodeNamePopup").show();
                                 $("#thisNodeID").val(nodeId);
                                 var label = localData.nodes.get(nodeId).label;
                                 $("#newNodeName").val(label);
+
                             }
-                        }
-                        else{
-                            alert("Only administrator can edit nodes ...");
+                            else {
+                                alert("Only administrator can edit nodes ...");
+                            }
                         }
                     });
 
-
-                    updateExistingObj();
-                    updateExistingRules();
                     updateExistingUsers();
-
 
                     function dragEndEventHandler(params) {
                         var dragedNodeIDs = params.nodes;
@@ -2681,27 +2928,77 @@
 
                     }
 
-                    network.on("selectNode",function(params){
-                        //show delete selected button
-                        if(!isAddingRule) {
-                            $("#deleteSelectedIcon").css("display","inline-block");
+                    if(user == "admin"){
+                        network.on("selectNode",function(params){
+                            //show delete selected button
+                            if(!isAddingRule) {
+                                $("#deleteSelectedIcon").css("display","inline-block");
 
-                            var nodes = params.nodes;
-                            document.getElementById("deleteSelectedIcon").onclick = function (nodes) {
+                                var nodes = params.nodes;
+                                var edges = params.edges;
+                                var args = {};
+                                args.nodes = nodes;
+                                args.edges = edges;
+                                args.rules = [];
 
-                                if (confirm("Are you sure that you want to delete selected nodes?")) {
+                                document.getElementById("deleteSelectedIcon").onclick = function () {
 
-                                    localData.nodes.remove(nodes);
-                                    //data is an array of selected Nodes and Edges
-                                    session_global.call('sdlSCI.data.changeData', ['node', 'remove', params]).then(
-                                            function (res) {
-                                                console.log(res);
-                                            }, session_global.log);
+                                    if (confirm("Are you sure that you want to delete selected nodes?")) {
+
+//                                        localData.nodes.remove(nodes);
+                                        for(var n in nodes) {
+
+                                            //delete referring edges and rules
+                                            var group_del = localData.allEdges.get({
+                                                filter: function (item) {
+                                                    console.log(item.from+";;"+item.to);
+                                                    return (item.from == nodes[n] || item.to == nodes[n]);
+                                                }
+                                            });
+
+                                            var edges_del = [];  //ids of edges connecting this node
+
+                                            for(var j in group_del){
+                                                edges_del.push(group_del[j].id);
+                                            }
+
+                                            for(var i in localData.rules){
+                                                var ruleItem = localData.rules[i];
+                                                for(var j in edges_del){
+                                                    if(ruleItem.edges.indexOf(edges_del[j]) !== -1){
+                                                        //delete this rule
+                                                        if(args.rules.indexOf(i) == "-1") {
+                                                            args.rules.push(i);
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        //data is an array of selected Nodes and Edges
+                                        session_global.call('sdlSCI.data.changeData', ['node', 'remove', args]).then(
+                                                function (res) {
+                                                    console.log(res);
+                                                }, session_global.log);
+                                    }
+
                                 }
-
                             }
-                        }
-                    });
+                        });
+                    }
+                    //hide user filter and only show logging user's rules
+                    else{
+                        $("#userList option[value='"+user+"']").prop("selected",true);
+                        $("#userList").change();
+                        $("#userFilter").hide();
+                    }
+
+                    updateExistingObj();
+
+                    updateExistingRules();
+
+                    updateEnv();
 
                     network.on("deselectNode",function(params){
                         $("#deleteSelectedIcon").hide();
@@ -2731,13 +3028,6 @@
                     }
                     */
                 }
-        );
-
-        session_global.call('sdlSCI.data.getUsers').then(
-                function (res) {
-                    localUsers = res;
-
-                },session_global.log
         );
 
 

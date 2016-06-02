@@ -143,19 +143,6 @@ var data = {
 };*/
 
 
-if(fs.existsSync(file_path)) {
-    var data_json = fs.readFileSync(file_path, 'utf8');
-    if(data_json == "") {
-        var data = {nodeClasses:{},nodes:{},edges:{},rules:{}};
-    }
-    else {
-        var data = JSON.parse(data_json);
-    }
-}
-else {
-    var data = {nodeClasses:{},nodes:{},edges:{},rules:{}};
-}
-
 if(fs.existsSync(users_path)) {
     var users_json = fs.readFileSync(users_path, 'utf8');
     if(users_json == "") {
@@ -169,6 +156,18 @@ else {
     var users = {};
 }
 
+if(fs.existsSync(file_path)) {
+    var data_json = fs.readFileSync(file_path, 'utf8');
+    if(data_json == "") {
+        var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
+    }
+    else {
+        var data = JSON.parse(data_json);
+    }
+}
+else {
+    var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
+}
 
 /*
 ////  clear the file data.txt every time   ////
@@ -196,12 +195,9 @@ connection.onopen = function (session) {
     // REGISTER a procedure for remote calling
     //
     function getData() {
-        console.log("getData() called");
+        // console.log("getData() called");
+        data.users = users;
         return data;
-    }
-
-    function  getUsers() {
-        return users;
     }
 
     session.register('sdlSCI.data.getData', getData).then(
@@ -213,14 +209,6 @@ connection.onopen = function (session) {
         }
     );
 
-    session.register('sdlSCI.data.getUsers', getUsers).then(
-        function (reg) {
-            console.log("procedure getUsers() registered");
-        },
-        function (err) {
-            console.log("failed to register procedure getUsers: " + err);
-        }
-    );
 
     // REGISTER a procedure for remote calling
     //
@@ -236,7 +224,7 @@ connection.onopen = function (session) {
                     data.nodes[affectedItem.id] = affectedItem;     //change the data
                 }
                 else if(event === 'remove'){
-                    //affectedItem is an array of selected nodes and edges
+                    //affectedItem is an array of selected nodes, and referring edges and rules
                     var itemId;
                     for(itemId in affectedItem.nodes)
                     {
@@ -245,11 +233,15 @@ connection.onopen = function (session) {
                     for(itemId in affectedItem.edges){
                         delete  data.edges[affectedItem.edges[itemId]];
                     }
+                    for(itemId in affectedItem.rules){
+                        delete data.rules[affectedItem.rules[itemId]];
+                    }
                 }
                 else if(event === 'update'){
                     data.nodes[affectedItem.id] = affectedItem;
                 }
             }
+                /*
             else if(type === 'edge'){
                 if(event === 'add'){
                     data.edges[affectedItem.id] = affectedItem;
@@ -266,6 +258,7 @@ connection.onopen = function (session) {
                     data.edges[affectedItem.id] = affectedItem;
                 }
             }
+            */
 
             //publish the change data event
             session.publish("sdlSCI.data.onChange", args);
@@ -293,7 +286,6 @@ connection.onopen = function (session) {
             console.log('3 args needed for function changeDate');
         }
     }
-    
 
     function updateNodePosition(args){
         var nodePos = args[0];
@@ -427,6 +419,54 @@ connection.onopen = function (session) {
 
     }
 
+    function changeEnv(args) {
+        if(args.length >= 2){
+            var event = args[0];
+            var affectedEnv = args[1];
+
+            if (event === 'add') {
+                if(data.env == undefined){
+                    data.env = {};
+                }
+                //add env vars
+                for(var i in affectedEnv){
+                    data.env[i] = affectedEnv[i];
+                }
+            }
+            else if (event === 'delete') {
+                delete  data.env[affectedEnv];
+            }
+            else if (event === 'update') {
+                for(var i in affectedEnv){
+                    data.env[i] = affectedEnv[i];
+                }
+            }
+
+            //publish the change data event
+            session.publish("sdlSCI.data.onChangeEnv", args);
+
+            //write data to external file .txt
+            var data_json = JSON.stringify(data);
+
+            //clear file content
+            fs.writeFile(file_path, '', function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+            });
+
+            fs.writeFile(file_path, data_json, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+            });
+
+        }
+        else {
+            console.log('2 args needed for function changeEnv');
+        }
+    }
+
     session.register('sdlSCI.data.changeData', changeData).then(
         function (reg) {
             console.log("procedure changeData() registered");
@@ -460,6 +500,15 @@ connection.onopen = function (session) {
         },
         function (err) {
             console.log("failed to register procedure changeRule: " + err);
+        }
+    );
+
+    session.register('sdlSCI.data.changeEnv', changeEnv).then(
+        function (reg) {
+            console.log("procedure changeEnv() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure changeEnv: " + err);
         }
     );
 
