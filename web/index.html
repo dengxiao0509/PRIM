@@ -1553,11 +1553,11 @@
                     checkedShowDiv.appendChild(compSelect);
 
                     //input text
-                    var val = document.createElement("input");
-                    val.type = "text";
-                    val.setAttribute("class","valInput");
+                    var val1 = document.createElement("input");
+                    val1.type = "text";
+                    val1.setAttribute("class","valInput");
 
-                    checkedShowDiv.appendChild(val);
+                    checkedShowDiv.appendChild(val1);
 
                     varRow.appendChild(checkedShowDiv);
 
@@ -1615,11 +1615,11 @@
                     checkedShowDiv.appendChild(document.createTextNode("="));
 
                     //input text
-                    var val = document.createElement("input");
-                    val.type = "text";
-                    val.setAttribute("class","valInput");
+                    var val1 = document.createElement("input");
+                    val1.type = "text";
+                    val1.setAttribute("class","valInput");
 
-                    checkedShowDiv.appendChild(val);
+                    checkedShowDiv.appendChild(val1);
 
                     varRow.appendChild(checkedShowDiv);
 
@@ -1738,8 +1738,8 @@
                 }
 
                 //get input value
-                var val = $("#" + temp_id).siblings(".checkedShow").children("input").val();
-                if (val.replace(/ /g, '') == "") {
+                var val1 = $("#" + temp_id).siblings(".checkedShow").children("input").val();
+                if (val1.replace(/ /g, '') == "") {
                     $("#ruleFormMsg").html("You must set a value for checked variables.");
                     return;
                 }
@@ -1751,7 +1751,7 @@
                 if (newRule.if[s] == undefined) {
                     newRule.if[s] = [];
                 }
-                newRule.if[s].push([v, lop, val]);
+                newRule.if[s].push([v, lop, val1]);
 
             }
 
@@ -1776,8 +1776,8 @@
                 }
 
                 //get input value
-                var val = $("#" + temp_id).siblings(".checkedShow").children("input").val();
-                if (val.replace(/ /g, '') == "") {
+                var val1 = $("#" + temp_id).siblings(".checkedShow").children("input").val();
+                if (val1.replace(/ /g, '') == "") {
                     $("#ruleFormMsg").html("You must set a value for checked variables.");
                     return;
                 }
@@ -1785,7 +1785,7 @@
                 if (newRule.then[a] == undefined) {
                     newRule.then[a] = [];
                 }
-                newRule.then[a].push([v, "=", val]);
+                newRule.then[a].push([v, "=", val1]);
 
             }
 
@@ -1992,11 +1992,11 @@
             checkedShowDiv.appendChild(compSelect);
 
             //input text
-            var val = document.createElement("input");
-            val.type = "text";
-            val.setAttribute("class", "valInput");
+            var val1 = document.createElement("input");
+            val1.type = "text";
+            val1.setAttribute("class", "valInput");
 
-            checkedShowDiv.appendChild(val);
+            checkedShowDiv.appendChild(val1);
 
             varRow.appendChild(checkedShowDiv);
 
@@ -2055,11 +2055,11 @@
             checkedShowDiv.appendChild(document.createTextNode("="));
 
             //input text
-            var val = document.createElement("input");
-            val.type = "text";
-            val.setAttribute("class", "valInput");
+            var val1 = document.createElement("input");
+            val1.type = "text";
+            val1.setAttribute("class", "valInput");
 
-            checkedShowDiv.appendChild(val);
+            checkedShowDiv.appendChild(val1);
 
             varRow.appendChild(checkedShowDiv);
 
@@ -2090,13 +2090,13 @@
         for (var temp in data.if[sId]) {
             var v = data.if[sId][temp][0];
             var opt = data.if[sId][temp][1];
-            var val = data.if[sId][temp][2];
+            var val1 = data.if[sId][temp][2];
 
             var targetId = sId + "_" + v + "_s";
 
             $(".varName[id='" + targetId + "']").prop("checked", true);
             $(".varName[id='" + targetId + "']").siblings(".checkedShow").show();
-            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("input").val(val);
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("input").val(val1);
             $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("select").val(opt);
 
         }
@@ -2106,13 +2106,13 @@
         for (var temp in data.then[aId]) {
             var v = data.then[aId][temp][0];
             var opt = data.then[aId][temp][1];
-            var val = data.then[aId][temp][2];
+            var val1 = data.then[aId][temp][2];
 
             var targetId = aId + "_" + v + "_a";
 
             $(".varName[id='" + targetId + "']").prop("checked", true);
             $(".varName[id='" + targetId + "']").siblings(".checkedShow").show();
-            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("input").val(val);
+            $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("input").val(val1);
             $(".varName[id='" + targetId + "']").siblings(".checkedShow").children("select").val(opt);
 
         }
