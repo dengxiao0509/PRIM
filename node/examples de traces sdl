@@ -1,0 +1,49 @@
+Connected with the Postmaster.
+
+Welcome to the SDL SIMULATOR. Simulating system SmartHome01.
+
+Command : Output-To Create_AE('Objet1','le premier objet',0,0) Builder
+Signal Create_AE was sent to Builder:1 from env:1
+
+Command : go
+
+*** TRANSITION START
+*      PId    : Builder:1
+*      State  : start state 
+*      Now    : 0.0000
+*** NEXTSTATE  Wait
+
+*** TRANSITION START
+*      PId    : Builder:1
+*      State  : Wait 
+*      Input  : Create_AE
+*      Sender : env:1
+*      Now    : 0.0000
+*   CREATE AE:1
+*   ASSIGN  Current_AE... := 
+*   ASSIGN  Current_AE... := 
+*   ASSIGN  Current_AE... := 
+*   ASSIGN  Current_AE... := 
+*   ASSIGN  Current_AE... := 
+*   ASSIGN  list_AE := 
+*** NEXTSTATE  Wait
+
+*** TRANSITION START
+*      PId    : AE:1
+*      State  : start state 
+*      Now    : 0.0000
+*   Start service Configuration
+
+*** TRANSITION START
+*      PId    : AE:1
+*      Service: Configuration
+*      State  : start state 
+*      Now    : 0.0000
+*   ASSIGN  SelfDescription... := 
+*   ASSIGN  SelfDescription... := 
+*   ASSIGN  SelfDescription... := 
+*   ASSIGN  SelfDescription... := 
+*   ASSIGN  SelfDescription... := 
+*** NEXTSTATE  WaitConf
+
+Command : 
