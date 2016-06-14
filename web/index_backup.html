@@ -666,9 +666,8 @@
             <div class="menuDiv" id="serverSDLMenu">
                 <div class="menuTitle">SDL Server</div>
                 <div class="menuContent">
-                    <div id="connectSDLBtn">
-                        <input type="button" class="btn_sdl" id="btn_connect" value="Connect" /><br/>
-                    </div>
+                    <input type="button" class="btn_sdl" id="btn_connect" value="Connect" /><br/>
+                    <input type="button" class="btn_sdl" id="btn_go" value="Go" />
                 </div>
             </div>
             <div class="menuDiv" id="objClassMenu">
@@ -1038,7 +1037,6 @@
     var localUsers = null;
 
     var leftMenuWidth = "200px";
-    var isConnectSDL = false;
 
     function destroy(){
         if(network !== null){
@@ -1231,220 +1229,96 @@
     }
 
     //edit node class
-//    function dblclickObjClass(target) {
-//
-//        var ncId = target.id;
-//        var data = localData.nodeClasses[ncId];
-//
-//        resetAddNodeClassForm(false);
-//        $('#nodeFormTitle').html('Edit an object class');
-//        $('#addObjClassPopup').show();
-//        $('#nodeName').val(data.label);
-//        var shape = data.shape;
-//
-//        $('#nodeId').val(ncId);
-//
-//        //doesn't trigger change event
-//        $('#' + shape).prop("checked", true);
-//
-//        //updateNodeFormByShape();
-//
-//        //EM
-//        if (shape == 'dot') {
-////            $('#dsVal').val(data.devicestate);
-////            $('#cVal').val(data.consumption);
-////            $('#plVal').val(data.prioritylevel);
-//            $('#EMdes').val(data.description);
-//
-//            var container = document.getElementById("newVar");
-//
-//            for(var vName in data.variables) {
-//
-//                if(vName == "env"){
-//                    for(var t in data.variables["env"]){
-//                     $("#nodeEnvVars option[value='"+data.variables["env"][t]+"']").prop("selected",true);
-//                    }
-//                }
-//                else
-//                {
-//                    var nodeDiv = document.createElement("div");
-//                    nodeDiv.setAttribute("class","row");
-//
-//                    var nodeInput1 = document.createElement("input");
-//                    nodeInput1.setAttribute("placeholder","Name");
-//                    nodeInput1.setAttribute("type","text");
-//                    nodeInput1.setAttribute("value",vName);
-//
-//                    var nodeInput2 = document.createElement("input");
-//                    nodeInput2.setAttribute("placeholder","Value");
-//                    nodeInput2.setAttribute("type","text");
-//                    nodeInput2.setAttribute("value",data.variables[vName]);
-//
-//                    var nodeImg = document.createElement("img");
-//                    nodeImg.setAttribute("class","deleteVarIcon");
-//                    nodeImg.setAttribute("onclick","deleteNewVar(this)");
-//                    nodeImg.setAttribute("src",'image/delete.png');
-//                    nodeImg.setAttribute("width",'16px');
-//                    nodeImg.setAttribute("title",'delete this variable');
-//
-//                    nodeDiv.appendChild(nodeInput1);
-//                    nodeDiv.appendChild(nodeInput2);
-//                    nodeDiv.appendChild(nodeImg);
-//
-//                    container.appendChild(nodeDiv);
-//                }
-//            }
-//
-//        }
-//        //user
-////        else if (shape == 'square') {
-////            $('#alVal').val(data.authoritylevel);
-////        }
-//        else {
-//            console.log('no shape info got');
-//        }
-//
-//        $("#deleteThis").show();
-//
-////    }
+    function dblclickObjClass(target) {
 
-    function dblclickObjClass(target){
-        return false;
-    }
+        var ncId = target.id;
+        var data = localData.nodeClasses[ncId];
 
-    //click on node class to create a new node
-//    function clickObjClass(target) {
-//
-//        if(isConnectSDL) {
-//            var ncId = target.id;
-//
-//            $("#nodeClassId").val(ncId);
-//
-//            //create a new object
-//            $("#newNodeFormMsg").html("");
-//            $('#newNodeName').val("");
-//            $('#newNodeDS').val("");
-//
-//            $("#newNodePopup").show();
-////        $("#NewNodeFormTitle").html("Add an Object");
-//        }
-//        else {
-//            alert("To create nodes, please connect to SDL server first...");
-//        }
-//    }
+        resetAddNodeClassForm(false);
+        $('#nodeFormTitle').html('Edit an object class');
+        $('#addObjClassPopup').show();
+        $('#nodeName').val(data.label);
+        var shape = data.shape;
 
+        $('#nodeId').val(ncId);
 
-    var clicks = 0;
-    var timer = null;
-    //click object class label
-    function clickObjClassLabel(target) {
-        var DELAY = 700;
+        //doesn't trigger change event
+        $('#' + shape).prop("checked", true);
 
-        clicks++;  //count clicks
+        //updateNodeFormByShape();
 
-        if (clicks === 1) {
-
-            timer = setTimeout(function () {
-
-//                alert("Single Click");  //perform single-click action
-                clicks = 0;             //after action performed, reset counter
-
-                if(isConnectSDL) {
-                    var ncId = target.id;
-
-                    $("#nodeClassId").val(ncId);
-
-                    //create a new object
-                    $("#newNodeFormMsg").html("");
-                    $('#newNodeName').val("");
-                    $('#newNodeDS').val("");
-                    $("#newNodePopup").show();
-                }
-                else {
-                    alert("To create nodes, please connect to SDL server first...");
-                }
-            }, DELAY);
-
-        } else {
-
-            clearTimeout(timer);    //prevent single-click action
-//            alert("Double Click");  //perform double-click action
-            clicks = 0;             //after action performed, reset counter
-
-            var ncId = target.id;
-            var data = localData.nodeClasses[ncId];
-
-            resetAddNodeClassForm(false);
-            $('#nodeFormTitle').html('Edit an object class');
-            $('#addObjClassPopup').show();
-            $('#nodeName').val(data.label);
-            var shape = data.shape;
-
-            $('#nodeId').val(ncId);
-
-            //doesn't trigger change event
-            $('#' + shape).prop("checked", true);
-
-            //updateNodeFormByShape();
-
-            //EM
-            if (shape == 'dot') {
+        //EM
+        if (shape == 'dot') {
 //            $('#dsVal').val(data.devicestate);
 //            $('#cVal').val(data.consumption);
 //            $('#plVal').val(data.prioritylevel);
-                $('#EMdes').val(data.description);
+            $('#EMdes').val(data.description);
 
-                var container = document.getElementById("newVar");
+            var container = document.getElementById("newVar");
 
-                for(var vName in data.variables) {
+            for(var vName in data.variables) {
 
-                    if(vName == "env"){
-                        for(var t in data.variables["env"]){
-                            $("#nodeEnvVars option[value='"+data.variables["env"][t]+"']").prop("selected",true);
-                        }
-                    }
-                    else
-                    {
-                        var nodeDiv = document.createElement("div");
-                        nodeDiv.setAttribute("class","row");
-
-                        var nodeInput1 = document.createElement("input");
-                        nodeInput1.setAttribute("placeholder","Name");
-                        nodeInput1.setAttribute("type","text");
-                        nodeInput1.setAttribute("value",vName);
-
-                        var nodeInput2 = document.createElement("input");
-                        nodeInput2.setAttribute("placeholder","Value");
-                        nodeInput2.setAttribute("type","text");
-                        nodeInput2.setAttribute("value",data.variables[vName]);
-
-                        var nodeImg = document.createElement("img");
-                        nodeImg.setAttribute("class","deleteVarIcon");
-                        nodeImg.setAttribute("onclick","deleteNewVar(this)");
-                        nodeImg.setAttribute("src",'image/delete.png');
-                        nodeImg.setAttribute("width",'16px');
-                        nodeImg.setAttribute("title",'delete this variable');
-
-                        nodeDiv.appendChild(nodeInput1);
-                        nodeDiv.appendChild(nodeInput2);
-                        nodeDiv.appendChild(nodeImg);
-
-                        container.appendChild(nodeDiv);
+                if(vName == "env"){
+                    for(var t in data.variables["env"]){
+                     $("#nodeEnvVars option[value='"+data.variables["env"][t]+"']").prop("selected",true);
                     }
                 }
+                else
+                {
+                    var nodeDiv = document.createElement("div");
+                    nodeDiv.setAttribute("class","row");
 
+                    var nodeInput1 = document.createElement("input");
+                    nodeInput1.setAttribute("placeholder","Name");
+                    nodeInput1.setAttribute("type","text");
+                    nodeInput1.setAttribute("value",vName);
+
+                    var nodeInput2 = document.createElement("input");
+                    nodeInput2.setAttribute("placeholder","Value");
+                    nodeInput2.setAttribute("type","text");
+                    nodeInput2.setAttribute("value",data.variables[vName]);
+
+                    var nodeImg = document.createElement("img");
+                    nodeImg.setAttribute("class","deleteVarIcon");
+                    nodeImg.setAttribute("onclick","deleteNewVar(this)");
+                    nodeImg.setAttribute("src",'image/delete.png');
+                    nodeImg.setAttribute("width",'16px');
+                    nodeImg.setAttribute("title",'delete this variable');
+
+                    nodeDiv.appendChild(nodeInput1);
+                    nodeDiv.appendChild(nodeInput2);
+                    nodeDiv.appendChild(nodeImg);
+
+                    container.appendChild(nodeDiv);
+                }
             }
-            //user
+
+        }
+        //user
 //        else if (shape == 'square') {
 //            $('#alVal').val(data.authoritylevel);
 //        }
-            else {
-                console.log('no shape info got');
-            }
-
-            $("#deleteThis").show();
-
+        else {
+            console.log('no shape info got');
         }
+
+        $("#deleteThis").show();
+
+    }
+
+    //click on node class to create a new node
+    function clickObjClass(target) {
+        var ncId = target.id;
+
+        $("#nodeClassId").val(ncId);
+
+        //create a new object
+        $("#newNodeFormMsg").html("");
+        $('#newNodeName').val("");
+        $('#newNodeDS').val("");
+
+        $("#newNodePopup").show();
+//        $("#NewNodeFormTitle").html("Add an Object");
     }
 
     //save button in the addNewNodePopup
@@ -1493,10 +1367,10 @@
 //            newN.x = -400;
 //            newN.y = -200;
 
-           // localData.nodes.add(newN);
-           // var select = [];
-            //select[0] = newN.id;
-            //network.selectNodes(select);
+            localData.nodes.add(newN);
+            var select = [];
+            select[0] = newN.id;
+            network.selectNodes(select);
 
 
             // msg: waitting....
@@ -1505,53 +1379,39 @@
             $("#saveNewNode").val("Processing...");
             $("#cancelNewNode").hide();
 
-            //send create AE cmd to SDL server
-            session_global.call('sdlSCI.data.create_AE', [newN]).then(
-                    function (res) {
-
-                    }, session_global.log);
-
-            /*
             //change data in server, call remote function
-            session_global.call('sdlSCI.data.changeData', ['node', 'add', newN]).then(
+
+
+
+
+            //send create AE cmd to SDL server
+            session_global.call('sdlSCI.data.create_AE', [newN.label,newN.id,newN.description]).then(
                     function (res) {
-                        console.log("res = "+res);
-                        if(res == 'error'){
-                            //TODO
-                            console.log("failed creating nodes");
-                            $("#newNodeFormMsg").val("Failed creating node in SDL server.");
-                            $("#saveNewNode").prop("disabled",false);
-                            $("#saveNewNode").val("Save");
-                            $("#cancelNewNode").show();
-                        }
-                        else if(res == 'ok'){
-                            $("#nodeClassId").val("");
-                            updateObjList();
-                            $("#newNodePopup").hide();
-                            $("#saveNewNode").prop("disabled",false);
-                            $("#saveNewNode").val("Save");
-                            $("#cancelNewNode").show();
-                        }
+                      if(res=='error'){
+                          //show error message
+
+                      }
+                      else {
+                          //success, hide popup and change data in SDL server
+                          console.log("success");
+                          session_global.call('sdlSCI.data.changeData', ['node', 'add', newN]).then(
+                                  function (res) {
+                                      console.log("res = " + res);
+
+                                      $("#nodeClassId").val("");
+                                      updateObjList();
+                                      $("#newNodePopup").hide();
+                                      $("#saveNewNode").prop("disabled", false);
+                                      $("#saveNewNode").val("Save");
+                                      $("#cancelNewNode").show();
+
+                                  }, session_global.log);
+                      }
+
                     }, session_global.log);
-                    */
 
         }
 
-
-//            //send create AE cmd to SDL server
-//            session_global.call('sdlSCI.data.create_AE', [newN.label,newN.id,newN.description]).then(
-//                    function (res) {
-//                      if(res=='error'){
-//                          //show error message
-//
-//                      }
-//                      else{
-//                          //success, hide popup
-//                          console.log("success");
-//
-//                    }, session_global.log);
-
-//        }
     });
 
     $("#cancelNewNode").click(function(){
@@ -1637,7 +1497,7 @@
         var htmlContent = "";
         for(var k in localData.nodeClasses){
             var nodeName = localData.nodeClasses[k]["label"];
-            htmlContent += "<div class='objClassDiv' ondblclick='dblclickObjClass(this)' onclick='clickObjClassLabel(this)' id='"+k+"'>"+ nodeName +"</div>";
+            htmlContent += "<div class='objClassDiv' ondblclick='dblclickObjClass(this)' onclick='clickObjClass(this)' id='"+k+"' draggable='true' ondragstart='dragObj(event)'>"+ nodeName +"</div>";
         }
         $("#existingObj").html(htmlContent);
     }
@@ -1843,200 +1703,200 @@
         ruleEdges = [];
     });
 
-//    function addEdgesDone(){
-//        network.disableEditMode();
-//
-//        //create a rule
-//        var sensors = [];
-//        var actors = [];
-//        for(var i in ruleEdges){
-//            var edgeItem = localData.edges.get(ruleEdges[i]);
-//            if(edgeItem){
-//                if(sensors.indexOf(edgeItem.from) == '-1') {
-//                    sensors.push(edgeItem.from);
-//                }
-//                if(actors.indexOf(edgeItem.to) == '-1') {
-//                    actors.push(edgeItem.to);
-//                }
-//            }
-//        }
-//
-//        if(sensors.length > 0 && actors.length > 0) {
-//
-//            $("#addRulePopup").show();
-//            $('#ruleFormTitle').html('Add a rule');
-//
-//            resetRuleForm();
-//            var sensorsDiv = document.getElementById("sensors");
-//            var actorsDiv = document.getElementById("actors");
-//
-//            for(var i in sensors){
-//
-//                var sensorItem = localData.nodes.get(sensors[i]);
-//                var sensorName = sensorItem.label;
-//                var sensorVars = sensorItem.variables;
-//                var sensorId = sensorItem.id;
-//
-//                var sensorDiv = document.createElement("div");
-//                sensorDiv.setAttribute("class","sensorDiv");
-//                sensorDiv.id = i;
-//
-//                var snDiv = document.createElement("div");
-//                snDiv.appendChild(document.createTextNode(sensorName));
-//                snDiv.setAttribute("class","NameDiv");
-//                sensorDiv.appendChild(snDiv);
-//
-//                var varDiv = document.createElement("div");
-//                varDiv.setAttribute("class","varDiv");
-//                var temp = 0;
-//                for(var j in sensorVars){
-//                    var varRow = document.createElement("div");
-//                    varRow.setAttribute("class","varRow");
-//
-//                    //variable name and checkbox
-//                    var varName = document.createElement("input");
-//                    varName.type = "checkbox";
-//                    temp++;
-//                    varName.id = sensorId+"_"+temp;
-//                    varName.value = j;
-//                    varName.setAttribute("class","varName");
-//
-//
-//                    var label = document.createElement('label')
-//                    label.htmlFor =  sensorId+"_"+temp;
-//                    label.appendChild(document.createTextNode(j));
-//
-//                    varRow.appendChild(varName);
-//                    varRow.appendChild(label);
-//
-//                    //when checkbox is checked, show this part
-//                    var checkedShowDiv = document.createElement("div");
-//                    checkedShowDiv.setAttribute("class","checkedShow");
-//
-//                    //compare operator
-//                    var compSelect = document.createElement("select");
-//                    var opt = document.createElement("option");
-//                    opt.value = "=";
-//                    opt.innerHTML = "=";
-//                    compSelect.appendChild(opt);
-//                    var opt = document.createElement("option");
-//                    opt.value = "!=";
-//                    opt.innerHTML = "!=";
-//                    compSelect.appendChild(opt);
-//                    var opt = document.createElement("option");
-//                    opt.value = ">";
-//                    opt.innerHTML = ">";
-//                    compSelect.appendChild(opt); var opt = document.createElement("option");
-//                    opt.value = "<";
-//                    opt.innerHTML = "<";
-//                    compSelect.appendChild(opt);
-//
-//                    checkedShowDiv.appendChild(compSelect);
-//
-//                    //input text
-//                    var val = document.createElement("input");
-//                    val.type = "text";
-//                    val.setAttribute("class","valInput");
-//
-//                    checkedShowDiv.appendChild(val);
-//
-//                    varRow.appendChild(checkedShowDiv);
-//
-//
-//                    varDiv.appendChild(varRow);
-//                }
-//
-//                sensorDiv.appendChild(varDiv);
-//
-//                sensorsDiv.appendChild(sensorDiv);
-//
-//
-//            }
-//
-//            for(var i in actors){
-//
-//                var actorItem = localData.nodes.get(actors[i]);
-//                var actorName = actorItem.label;
-//                var actorVars = actorItem.variables;
-//                var actorId = actorItem.id;
-//
-//                var actorDiv = document.createElement("div");
-//                actorDiv.setAttribute("class","actorDiv");
-//
-//                var anDiv = document.createElement("div");
-//                anDiv.appendChild(document.createTextNode(actorName));
-//                anDiv.setAttribute("class","NameDiv");
-//                actorDiv.appendChild(anDiv);
-//
-//                var varDiv = document.createElement("div");
-//                varDiv.setAttribute("class","varDiv");
-//                var temp=0;
-//                for(var j in actorVars){
-//                    var varRow = document.createElement("div");
-//                    varRow.setAttribute("class","varRow");
-//                    var varName = document.createElement("input");
-//                    varName.type = "checkbox";
-//                    temp++;
-//                    varName.id = actorId+"_"+temp;
-//                    varName.setAttribute("class","varName");
-//
-//                    var label = document.createElement('label')
-//                    label.htmlFor = actorId+"_"+temp;
-//                    label.appendChild(document.createTextNode(j));
-//
-//
-//                    varRow.appendChild(varName);
-//                    varRow.appendChild(label);
-//
-//                    //when checkbox is checked, show this part
-//                    var checkedShowDiv = document.createElement("div");
-//                    checkedShowDiv.setAttribute("class","checkedShow");
-//
-//                    //equal operator
-//                    //                    var equal = document.createElement("div");
-//                    //                    equal.appendChild(document.createTextNode("="));
-//                    checkedShowDiv.appendChild(document.createTextNode("="));
-//
-//                    //input text
-//                    var val = document.createElement("input");
-//                    val.type = "text";
-//                    val.setAttribute("class","valInput");
-//
-//                    checkedShowDiv.appendChild(val);
-//
-//                    varRow.appendChild(checkedShowDiv);
-//                    varDiv.appendChild(varRow);
-//                }
-//
-//                actorDiv.appendChild(varDiv);
-//                actorsDiv.appendChild(actorDiv);
-//            }
-//
-//            $(".varName").change(function(){
-//
-//                if($(this).prop("checked") == true) {
-//                    $(this).siblings(".checkedShow").show();
-//                }
-//                else {
-//                    $(this).siblings(".checkedShow").hide();
-//                }
-//
-//            });
-//
-//        }
-//        else{
-//            alert("You need to choose at least one sensor and one actor ...");
-//        }
-//
-//        $("#addruleBeginIcon").show();
-//        $("#addruleEndIcon").hide();
-//        $("#addruleCancelIcon").hide();
-//        $(".remindText").hide();
-//        isAddingRule = false;
-//
-//    }
+    function addEdgesDone(){
+        network.disableEditMode();
 
-    //add rule icon click
+        //create a rule
+        var sensors = [];
+        var actors = [];
+        for(var i in ruleEdges){
+            var edgeItem = localData.edges.get(ruleEdges[i]);
+            if(edgeItem){
+                if(sensors.indexOf(edgeItem.from) == '-1') {
+                    sensors.push(edgeItem.from);
+                }
+                if(actors.indexOf(edgeItem.to) == '-1') {
+                    actors.push(edgeItem.to);
+                }
+            }
+        }
+
+        if(sensors.length > 0 && actors.length > 0) {
+
+            $("#addRulePopup").show();
+            $('#ruleFormTitle').html('Add a rule');
+
+            resetRuleForm();
+            var sensorsDiv = document.getElementById("sensors");
+            var actorsDiv = document.getElementById("actors");
+
+            for(var i in sensors){
+
+                var sensorItem = localData.nodes.get(sensors[i]);
+                var sensorName = sensorItem.label;
+                var sensorVars = sensorItem.variables;
+                var sensorId = sensorItem.id;
+
+                var sensorDiv = document.createElement("div");
+                sensorDiv.setAttribute("class","sensorDiv");
+                sensorDiv.id = i;
+
+                var snDiv = document.createElement("div");
+                snDiv.appendChild(document.createTextNode(sensorName));
+                snDiv.setAttribute("class","NameDiv");
+                sensorDiv.appendChild(snDiv);
+
+                var varDiv = document.createElement("div");
+                varDiv.setAttribute("class","varDiv");
+                var temp = 0;
+                for(var j in sensorVars){
+                    var varRow = document.createElement("div");
+                    varRow.setAttribute("class","varRow");
+
+                    //variable name and checkbox
+                    var varName = document.createElement("input");
+                    varName.type = "checkbox";
+                    temp++;
+                    varName.id = sensorId+"_"+temp;
+                    varName.value = j;
+                    varName.setAttribute("class","varName");
+
+
+                    var label = document.createElement('label')
+                    label.htmlFor =  sensorId+"_"+temp;
+                    label.appendChild(document.createTextNode(j));
+
+                    varRow.appendChild(varName);
+                    varRow.appendChild(label);
+
+                    //when checkbox is checked, show this part
+                    var checkedShowDiv = document.createElement("div");
+                    checkedShowDiv.setAttribute("class","checkedShow");
+
+                    //compare operator
+                    var compSelect = document.createElement("select");
+                    var opt = document.createElement("option");
+                    opt.value = "=";
+                    opt.innerHTML = "=";
+                    compSelect.appendChild(opt);
+                    var opt = document.createElement("option");
+                    opt.value = "!=";
+                    opt.innerHTML = "!=";
+                    compSelect.appendChild(opt);
+                    var opt = document.createElement("option");
+                    opt.value = ">";
+                    opt.innerHTML = ">";
+                    compSelect.appendChild(opt); var opt = document.createElement("option");
+                    opt.value = "<";
+                    opt.innerHTML = "<";
+                    compSelect.appendChild(opt);
+
+                    checkedShowDiv.appendChild(compSelect);
+
+                    //input text
+                    var val = document.createElement("input");
+                    val.type = "text";
+                    val.setAttribute("class","valInput");
+
+                    checkedShowDiv.appendChild(val);
+
+                    varRow.appendChild(checkedShowDiv);
+
+
+                    varDiv.appendChild(varRow);
+                }
+
+                sensorDiv.appendChild(varDiv);
+
+                sensorsDiv.appendChild(sensorDiv);
+
+
+            }
+
+            for(var i in actors){
+
+                var actorItem = localData.nodes.get(actors[i]);
+                var actorName = actorItem.label;
+                var actorVars = actorItem.variables;
+                var actorId = actorItem.id;
+
+                var actorDiv = document.createElement("div");
+                actorDiv.setAttribute("class","actorDiv");
+
+                var anDiv = document.createElement("div");
+                anDiv.appendChild(document.createTextNode(actorName));
+                anDiv.setAttribute("class","NameDiv");
+                actorDiv.appendChild(anDiv);
+
+                var varDiv = document.createElement("div");
+                varDiv.setAttribute("class","varDiv");
+                var temp=0;
+                for(var j in actorVars){
+                    var varRow = document.createElement("div");
+                    varRow.setAttribute("class","varRow");
+                    var varName = document.createElement("input");
+                    varName.type = "checkbox";
+                    temp++;
+                    varName.id = actorId+"_"+temp;
+                    varName.setAttribute("class","varName");
+
+                    var label = document.createElement('label')
+                    label.htmlFor = actorId+"_"+temp;
+                    label.appendChild(document.createTextNode(j));
+
+
+                    varRow.appendChild(varName);
+                    varRow.appendChild(label);
+
+                    //when checkbox is checked, show this part
+                    var checkedShowDiv = document.createElement("div");
+                    checkedShowDiv.setAttribute("class","checkedShow");
+
+                    //equal operator
+                    //                    var equal = document.createElement("div");
+                    //                    equal.appendChild(document.createTextNode("="));
+                    checkedShowDiv.appendChild(document.createTextNode("="));
+
+                    //input text
+                    var val = document.createElement("input");
+                    val.type = "text";
+                    val.setAttribute("class","valInput");
+
+                    checkedShowDiv.appendChild(val);
+
+                    varRow.appendChild(checkedShowDiv);
+                    varDiv.appendChild(varRow);
+                }
+
+                actorDiv.appendChild(varDiv);
+                actorsDiv.appendChild(actorDiv);
+            }
+
+            $(".varName").change(function(){
+
+                if($(this).prop("checked") == true) {
+                    $(this).siblings(".checkedShow").show();
+                }
+                else {
+                    $(this).siblings(".checkedShow").hide();
+                }
+
+            });
+
+        }
+        else{
+            alert("You need to choose at least one sensor and one actor ...");
+        }
+
+        $("#addruleBeginIcon").show();
+        $("#addruleEndIcon").hide();
+        $("#addruleCancelIcon").hide();
+        $(".remindText").hide();
+        isAddingRule = false;
+
+    }
+
+    //add rule icon
     $("#addRuleIcon").click(function(){
         $("#addRuleChooseSE").show();
         updateObjList();
@@ -2052,12 +1912,10 @@
         $("#effectorList").html(htmlContent);
     }
 
-    //cancel adding rule
     $("#cancelRuleSE").click(function(){
         $("#addRuleChooseSE").hide();
     });
 
-    //finish adding rule
     $("#doneRuleSE").click(function(){
         $("#addRuleChooseSE").hide();
         $("#addRulePopup").show();
@@ -2779,11 +2637,6 @@
 
     $(".vis-connect").hide();
 
-    ////////////////////////////////////////////  SDL Server //////////////////
-    function SDLFeedback(args){
-
-
-    }
 
     /////////////////// graph /////////////////////////////////////////////////
     //define local data
@@ -3164,36 +3017,11 @@
                     var type = args[0];
                     var event = args[1];
                     var affectedItem = args[2];
-                    var msgValide = args[3];
-
                     if (type === 'node') {
                         if (event === 'add') {
-                            if(msgValide == "ok"){
-                                //success
-
-                                if (localData.nodes.get(affectedItem.id) == null) {
-                                    localData.nodes.add(affectedItem);
-                                }
-                                updateObjList();
-                                if($("#newNodePopup").css("display") !== "none"){
-                                    $("#nodeClassId").val("");
-                                    $("#newNodePopup").hide();
-                                    $("#saveNewNode").prop("disabled",false);
-                                    $("#saveNewNode").val("Save");
-                                    $("#cancelNewNode").show();
-                                }
+                            if (localData.nodes.get(affectedItem.id) == null) {
+                                localData.nodes.add(affectedItem);
                             }
-                            else{
-                                //error
-                                if($("#newNodePopup").css("display") !== "none") {
-                                    console.log("failed creating nodes :"+msgValide);
-                                    $("#newNodeFormMsg").html("Failed creating node in SDL server.");
-                                    $("#saveNewNode").prop("disabled", false);
-                                    $("#saveNewNode").val("Save");
-                                    $("#cancelNewNode").show();
-                                }
-                            }
-
                         }
                         else if (event === 'remove') {
                             var itemId;
@@ -3346,7 +3174,6 @@
 
                     updateEnv();
                 });
-
 
         //define options for Network
         /***********************************************************/
@@ -3695,21 +3522,13 @@
         );
 
 
+        $("#btn_go").click(function(){
+            session_global.call('sdlSCI.data.SendCMD_Go');
+
+        });
+
         $("#btn_connect").click(function(){
-            session_global.call('sdlSCI.data.connectSDL').then(
-                    function(res){
-                        if(res == "ok"){
-                            console.log("connect SDL server successfully");
-                            isConnectSDL = true;
-                            $("#connectSDLBtn").html(" SDL Server Connected");
-                        }
-                        else {
-                            console.log("connect SDL server :"+res);
-                            var htmlContent = $("#connectSDLBtn").html();
-                            htmlContent += "<span class='err_msg'>"+res+"</span>";
-                            $("#connectSDLBtn").html(htmlContent);
-                        }
-                    },session_global.log);
+            session_global.call('sdlSCI.data.connectSDL');
         });
 
 

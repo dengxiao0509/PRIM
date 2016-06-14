@@ -10,6 +10,7 @@ var process_child;
 var fd;
 var currentSDLBytes = 0;
 var NodeId_Pid = {};
+var appendIsDone = false;
 
 var file_path = "/tmp/data.txt";
 // var rules_path = "/tmp/rules.txt";
@@ -73,56 +74,45 @@ function connectSDL(args) {
     //     }
     // });
 
-    if(process_child) {
-        //listen to stdout events of child process
-        process_child.stdout.on('data', function (data) {
-            // console.log(data.toString());
+    process_child.stdin.setRawMode(true);
+    process_child.stdin.on('readable', function () {
+        var key = String(process_child.stdin.read());
+        console.log(key);
+    });
 
-            //append child process stdout to external file
-            fs.appendFile(file_path_trace, data, function (err) {
-                if (err) {
-                    return console.log(err);
-                }
-                //get file size
-                var fileStat = fs.statSync(file_path_trace);
+    //listen to stdout events of child process
+    process_child.stdout.on('data',function(data){
+        // console.log(data.toString());
+
+        //append child process stdout to external file
+        fs.appendFile(file_path_trace, data, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+            //get file size
+            var fileStat = fs.statSync(file_path_trace);
                 // console.log(stats.size);
-                currentSDLBytes = fileStat.size;
+            currentSDLBytes = fileStat.size;
 
-                console.log("append file");
+            console.log("append file");
+            appendIsDone = true;
 
-                //get Pid
-
-
-                // 检测文件类型
-                // console.log("是否为文件(isFile) ? " + stats.isFile());
-                // console.log("是否为目录(isDirectory) ? " + stats.isDirectory());
-            });
+            //get Pid
 
 
+            // 检测文件类型
+            // console.log("是否为文件(isFile) ? " + stats.isFile());
+            // console.log("是否为目录(isDirectory) ? " + stats.isDirectory());
         });
 
 
-        //listen to stderr events of child process
-        process_child.stderr.on('data', function (data) {
-            console.log('stderr : ' + data);
-        });
-        
-        return "ok";
+    });
 
-    }
-    else {
-        return "error";
-    }
 
-    SendCmd_Go();
-}
-
-function wait() {
-    console.log("begin");
-    // setTimeout(function(){
-    //     console.log("end");
-    // },5000);
-    sleep(5000);
+    //listen to stderr events of child process
+    process_child.stderr.on('data', function(data){
+        console.log('stderr : '+data);
+    });
 }
 
 //send cmd "GO" to child process
@@ -138,6 +128,8 @@ function SendCMD_Go(args) {
     //write cmd "GO" to child process stdin
     process_child.stdin.write("GO \n");
     console.log("Go sent");
+    appendIsDone = false;
+
 
 }
 
@@ -172,64 +164,70 @@ function create_EM (args) {
 
 function check_SDL_output_Pid(text){
 
+
+
     //get Pid from text
+
      var re = /CREATE\s(.+)\n/;
      var found = text.match(re);
 
-     if(found == null) return null;
-     else return found[1];
+      if(found == null) return null;
+      else return found[1];
 
 }
 
-function sendCmd(cmd){
+function create_AE(args){
 
+    var name = args[0];
+    var nodeId = args[1];
+    var nodeDes = args[2];
+
+    var cmd = "Output-To Create_AE('"+name+"','"+nodeDes+"',0,0) Builder \n";
+
+    // fs.appendFile(file_path_trace, cmd, function(err) {
+    //     if(err) {
+    //         return console.log(err);
+    //     }
+    // });
+
+    console.log("before append");
     fs.appendFileSync(file_path_trace, cmd);
+    console.log("after append");
+
+    var bytesStart = currentSDLBytes;
+    // console.log("bytesStart :"+bytesStart);
+
+    console.log("before write");
+    appendIsDone = false;
 
     //write cmd to child process stdin
     process_child.stdin.write(cmd);
+    console.log("after write");
 
     //wait until the create AE command finished
     //TODO  write cmd Go
+    console.log("before Go");
     SendCMD_Go();
-}
+    console.log("after Go");
 
-function readTrace(){
-    var buf = new Buffer(1024 * 5);
+    var result;
 
-    fs.open(file_path_trace, 'r', function(err, fd) {
-        if (err) {
-            return console.error(err);
-        }
-        console.log("reading file begins ...：");
-        fs.read(fd, buf, 0, buf.length, bytesStart, function(err, bytes){
-            if (err){
-               return console.error(err);
-            }
-            console.log(bytes + "  bytes readed");
-
-            if(bytes > 0){
-                var text = buf.slice(0, bytes).toString();
-                console.log(text);
-                //get Pid
-                var Pid = check_SDL_output_Pid(text);
-                console.log("Pid ="+Pid);
-                if(Pid == null) {
-                    console.log("Couldn't get Pid");
-                    result = 'error';
-                }
-                else {
-                    NodeId_Pid[nodeId] = Pid;
-                    console.log(Pid);
-                    result = 'ok';
-                }
-
-                return result;
-            }
-        });
-    });
+    setTimeout(function() {
+        //get Pid
 
 
-    fs.open(file_path_trace, 'r',function(err,fd){
+        console.log("app = " + appendIsDone);
+        // while(!appendIsDone) {
+        //
+        // }
+        // sleep(5000);
+        var buf = new Buffer(1024 * 5);
+
+        //here, we need to wait until the trace.txt modified
+        //TODO
+        //sleep(5000);
+
+        var fd = fs.openSync(file_path_trace, 'r');
         console.log("reading file begins ...：");
         var bytes = fs.readSync(fd, buf, 0, buf.length, bytesStart);
         console.log(bytes + "  bytes readed");
@@ -238,15 +236,80 @@ function readTrace(){
             var text = buf.slice(0, bytes).toString();
             console.log(text);
             //get Pid
-            return text;
+            var Pid = check_SDL_output_Pid(text);
+            console.log("Pid =" + Pid);
+            if (Pid == null) {
+                console.log("Couldn't get Pid");
+                result = 'error';
+            }
+            else {
+                NodeId_Pid[nodeId] = Pid;
+                console.log(Pid);
+                result = 'ok';
+                return result;
+            }
+
+
         }
         else {
-            return null;
+            result = 'error';
         }
-    });
 
+        // });
+
+        // return result;
+
+        /*
+         fs.open(file_path_trace, 'r', function(err, fd) {
+         if (err) {
+         return console.error(err);
+         }
+         console.log("reading file begins ...：");
+         fs.read(fd, buf, 0, buf.length, bytesStart, function(err, bytes){
+         if (err){
+         console.log(err);
+         }
+         console.log(bytes + "  bytes readed");
+
+         if(bytes > 0){
+         var text = buf.slice(0, bytes).toString();
+         console.log(text);
+         //get Pid
+         var Pid = check_SDL_output_Pid(text);
+         console.log("Pid ="+Pid);
+         if(Pid == null) {
+         console.log("Couldn't get Pid");
+         result = 'error';
+         }
+         else {
+         NodeId_Pid[nodeId] = Pid;
+         console.log(Pid);
+         result = 'ok';
+         }
+
+         return result;
+         }
+         });
+         });
+         }, 2000);
+         */
+
+    }
+    // listProcess();
+    // examineVariable();
+
+
+    //successfully created and find a PID
+    // var Pid = check_SDL_output_Pid();
+    // if(Pid){
+    //
+    //     NodeId_Pid[nodeId] = Pid;
+    //     return 'ok';
+    // }
+    // else{
+    //     return 'error';
+    // }
 }
-
 
 function sleep(milliseconds) {
     console.log("sleeping...");
@@ -365,113 +428,6 @@ connection.onopen = function (session) {
     console.log("server connected");
 
 
-    function create_AE(args){
-
-        var newNode = args[0];
-        var name = newNode.label;
-        var nodeId = newNode.id;
-        var nodeDes = newNode.description;
-
-        var cmd = "Output-To Create_AE('"+name+"','"+nodeDes+"',0,0) Builder \n";
-
-        bytesStart = currentSDLBytes;
-
-        //solution 1: wait 2 seconds
-        // setTimeout(function() {
-        //
-        //     var result;
-        //     var msgValid;
-        //
-        //     // var text = readTrace();
-        //
-        //     fs.open(file_path_trace, 'r',function(err,fd){
-        //         console.log("reading file begins ...：");
-        //         var buf = new Buffer(1024 * 5);
-        //         var bytes = fs.readSync(fd, buf, 0, buf.length, bytesStart);
-        //         console.log(bytes + "  bytes readed");
-        //
-        //         if (bytes > 0) {
-        //             var text = buf.slice(0, bytes).toString();
-        //             console.log(text);
-        //             //get Pid
-        //             if (text) {
-        //                 var Pid = check_SDL_output_Pid(text);
-        //                 console.log("Pid =" + Pid);
-        //                 if (Pid == null) {
-        //                     console.log("Couldn't get Pid");
-        //                     msgValid = "no pid found";
-        //                 }
-        //                 else {
-        //                     NodeId_Pid[nodeId] = Pid;
-        //                     msgValid = "ok";
-        //                 }
-        //             }
-        //         }
-        //         else {
-        //             console.log("empty trace read");
-        //             msgValid = 'empty trace read';
-        //         }
-        //         var res = ["node","add",newNode,msgValid];
-        //         changeData(res);  //add node
-        //     });
-        // },2000);
-
-        //solution 2: listen on file change
-        var w = fs.watch(file_path_trace,function (event,filename) {
-            if(event == "change"){
-                var result;
-                var msgValid;
-
-                console.log("file changed");
-
-                fs.open(file_path_trace, 'r',function(err,fd){
-                    console.log("reading file begins ...：");
-                    var buf = new Buffer(1024 * 5);
-                    var bytes = fs.readSync(fd, buf, 0, buf.length, bytesStart);
-                    console.log(bytes + "  bytes readed");
-
-                    if (bytes > 0) {
-                        var text = buf.slice(0, bytes).toString();
-                        console.log(text);
-
-                        //check whether output is ready
-                        //TODO
-                        //if ready ,try to get Pid
-                        var Pid = check_SDL_output_Pid(text);
-                        console.log("Pid =" + Pid);
-                        if (Pid == null) {
-                           console.log("Couldn't get Pid");
-                           msgValid = "no pid found";
-                        }
-                        else {
-                           NodeId_Pid[nodeId] = Pid;
-                           msgValid = "ok";
-                            w.close();
-                            var res = ["node","add",newNode,msgValid];
-                            changeData(res);  //add node
-                        }
-
-                        //else, return
-                    }
-                    else {
-                        console.log("empty trace read");
-                        return;
-                    }
-
-                });
-            }
-        });
-
-
-        sendCmd(cmd);
-
-
-        // listProcess();
-        // examineVariable();
-        
-    }
-
-
     // REGISTER a procedure for remote calling
     //
     function getData() {
@@ -499,24 +455,21 @@ connection.onopen = function (session) {
             var type = args[0];
             var event = args[1];
             var affectedItem = args[2];
-            var msgValid = args[3];
             if(type === 'node') {
                 if(event === 'add'){
-
-                    // var result = create_AE([affectedItem.label,affectedItem.id,affectedItem.description]);
-                    // console.log("result = "+result);
-                    // if(result == 'ok'){
-                    if(msgValid == "ok") {
+                    console.log(affectedItem);
+                    var result = create_AE([affectedItem.label,affectedItem.id,affectedItem.description]);
+                    console.log("result = "+result);
+                    if(result == 'ok'){
                         data.nodes[affectedItem.id] = affectedItem;     //change the data
                     }
-                    // }
-                    // else if(result == 'error'){
-                    //     console.log("Cannot create AE in SDL Server.");
-                        // return "error";
-                    // }
-                    // else {
-                    //     console.log("no result defined");
-                    // }
+                    else if(result == 'error'){
+                        console.log("Cannot create AE in SDL Server.");
+                        return "error";
+                    }
+                    else {
+                        console.log("no result defined");
+                    }
                 }
                 else if(event === 'remove'){
                     //affectedItem is an array of selected nodes, and referring edges and rules
@@ -558,25 +511,23 @@ connection.onopen = function (session) {
             //publish the change data event
             session.publish("sdlSCI.data.onChange", args);
 
-            if(msgValid == "ok") {
-                //write data to external file .txt
-                var data_json = JSON.stringify(data);
+            //write data to external file .txt
+            var data_json = JSON.stringify(data);
 
-                //clear file content
-                fs.writeFile(file_path, '', function(err) {
-                    if(err) {
-                        return console.log(err);
-                    }
-                    // console.log("The file was cleared!");
-                });
+            //clear file content
+            fs.writeFile(file_path, '', function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                // console.log("The file was cleared!");
+            });
 
-                fs.writeFile(file_path, data_json, function(err) {
-                    if(err) {
-                        return console.log(err);
-                    }
-                    // console.log("The file was saved!");
-                });
-            }
+            fs.writeFile(file_path, data_json, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                // console.log("The file was saved!");
+            });
 
             return 'ok';
         }
@@ -841,14 +792,14 @@ connection.onopen = function (session) {
         }
     );
 
-    session.register('sdlSCI.data.create_AE', create_AE).then(
-        function (reg) {
-            console.log("procedure create_AE() registered");
-        },
-        function (err) {
-            console.log("failed to register procedure create_AE: " + err);
-        }
-    );
+    // session.register('sdlSCI.data.create_AE', create_AE).then(
+    //     function (reg) {
+    //         console.log("procedure create_AE() registered");
+    //     },
+    //     function (err) {
+    //         console.log("failed to register procedure create_AE: " + err);
+    //     }
+    // );
 
 };
 
