@@ -4,16 +4,20 @@
 
 var autobahn = require('autobahn');
 var fs = require('fs');
+var path = require('path');
 var cmd_createCP = './myscript.sh';
 var spawn = require('child_process').spawn;
 var process_child;
-var fd;
 var currentSDLBytes = 0;
-var NodeId_Pid = {};
+
 
 var file_path = "/tmp/data.txt";
 // var rules_path = "/tmp/rules.txt";
 var users_path = "/tmp/users.txt";
+var cmds_path = "/tmp/cmds.txt";
+var pidAndNodeId_path  = '/tmp/pid_nodeId.txt';
+var sessions_path = '/tmp/savedSessions';
+
 
 var connection = new autobahn.Connection({
         url: process.argv[2],   //127.0.0.1:9000
@@ -23,6 +27,50 @@ var connection = new autobahn.Connection({
         onchallenge: onchallenge
     }
 );
+
+//initialize variables from files
+if(fs.existsSync(users_path)) {
+    var users_json = fs.readFileSync(users_path, 'utf8');
+    if(users_json == "") {
+        var users = {};
+    }
+    else {
+        var users = JSON.parse(users_json);
+    }
+}
+else {
+    var users = {};
+}
+
+if(fs.existsSync(file_path)) {
+    var data_json = fs.readFileSync(file_path, 'utf8');
+    if(data_json == "") {
+        var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
+    }
+    else {
+        var data = JSON.parse(data_json);
+    }
+}
+else {
+    var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
+}
+
+if(fs.existsSync(pidAndNodeId_path)) {
+    var NodeId_Pid_json = fs.readFileSync(pidAndNodeId_path, 'utf8');
+    if(NodeId_Pid_json == "") {
+        var NodeId_Pid = {};
+    }
+    else {
+        var NodeId_Pid = JSON.parse(NodeId_Pid_json);
+    }
+}
+else {
+    var NodeId_Pid = {};
+}
+
+
+var sessions = (getSessions() == null) ? [] : getSessions();
+var currentSession = "untitled";
 
 function onchallenge(session,method,extra) {
     // console.log('onchallenge',method,extra);
@@ -40,17 +88,51 @@ function onchallenge(session,method,extra) {
 var file_path_trace = '/tmp/trace.txt';
 
 ////  clear the file trace.txt every time   ////
-if(fs.existsSync(file_path_trace)) {
+//if(fs.existsSync(file_path_trace)) {
     fs.writeFile(file_path_trace, '', function (err) {
         if (err) {
             return console.log(err);
         }
     });
+//}
+
+
+//if(fs.existsSync(cmds_path)) {
+    fs.writeFile(cmds_path, '', function (err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
+//}
+
+//if(fs.existsSync(file_path)) {
+    fs.writeFile(file_path, '', function (err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
+//}
+
+
+
+function updatePidAndNodeIdFile(){
+    if(fs.existsSync(pidAndNodeId_path)) {
+        fs.writeFile(pidAndNodeId_path, '', function (err) {
+            if (err) {
+                return console.log(err);
+            }
+        });
+    }
+    fs.writeFile(pidAndNodeId_path, JSON.stringify(NodeId_Pid), function (err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
+
 }
 
-
 //create a child process and listen to stdout and stderr events  => append them to an external file trace.txt
-function connectSDL(args) {
+function connectSDL() {
 
     //create a child process
 
@@ -60,23 +142,17 @@ function connectSDL(args) {
 
     process_child = spawn(cmd_createCP);
 
-
-    //open trace file
-    // fs.open(file_path_trace, 'r', function(err, fd_t) {
-    //     if (err) {
-    //         return console.error(err);
-    //     }
-    //
-    //     else {
-    //         console.log("open:"+fd_t);
-    //         fd = fd_t;
-    //     }
-    // });
+    var w = fs.watch(file_path_trace,function (event,filename) {
+        if (event == "change") {
+            //console.log("Go sent");
+            SendCMD_Go();
+            w.close();
+        }
+    });
 
     if(process_child) {
         //listen to stdout events of child process
         process_child.stdout.on('data', function (data) {
-            // console.log(data.toString());
 
             //append child process stdout to external file
             fs.appendFile(file_path_trace, data, function (err) {
@@ -88,14 +164,6 @@ function connectSDL(args) {
                 // console.log(stats.size);
                 currentSDLBytes = fileStat.size;
 
-                console.log("append file");
-
-                //get Pid
-
-
-                // 检测文件类型
-                // console.log("是否为文件(isFile) ? " + stats.isFile());
-                // console.log("是否为目录(isDirectory) ? " + stats.isDirectory());
             });
 
 
@@ -106,38 +174,105 @@ function connectSDL(args) {
         process_child.stderr.on('data', function (data) {
             console.log('stderr : ' + data);
         });
-        
+
+
+
         return "ok";
 
     }
     else {
         return "error";
     }
-
-    SendCmd_Go();
 }
 
-function wait() {
-    console.log("begin");
-    // setTimeout(function(){
-    //     console.log("end");
-    // },5000);
-    sleep(5000);
+
+function executeSavedCmds(targetCmds){
+
+    //console.log("called");
+
+
+    //read cmds from cmds.txt and execute them one by one
+    if(fs.existsSync(targetCmds)){
+        var fileContent = fs.readFileSync(targetCmds);
+        fileContent = fileContent.toString();
+        // console.log("$"+fileContent+"$"+fileContent.replace(/\s/g,'').length);
+
+        if (fileContent.replace(/\s/g,'') != "") {
+
+            // var cmdArray = fileContent.split("\n");
+            var cmdArray = fileContent.match(/[^\r\n]+/g);
+
+            var cmdNum = cmdArray.length;
+            console.log('Saved cmds number : '+cmdNum);
+
+            if(cmdArray.length > 0) {
+
+                var i=0;
+                if(cmdArray[i].replace(/\s/g,'') != "") {
+                    console.log(cmdArray[i]);
+                    writeCmd(cmdArray[i] + "\n");
+                }
+
+                var w = fs.watch(file_path_trace,function (event,filename) {
+                    if (event == "change") {
+                        i++;
+                        if(i == cmdNum) {
+                            SendCMD_Go();
+                            w.close();
+                        }
+                        else {
+                            if(cmdArray[i].replace(/\s/g,'') != "") {
+                                console.log(cmdArray[i]);
+                                writeCmd(cmdArray[i] + "\n");
+                            }
+                        }
+
+                    }
+                });
+            }
+            // if(cmdArray.length > 0) {
+            //     for (var i in cmdArray) {
+            //
+            //         if(cmdArray[i].replace(/\s/g,'') != ""){
+            //             console.log(cmdArray[i]);
+            //             writeCmd(cmdArray[i] + "\n");
+            //         }
+            //     }
+            //
+            //     SendCMD_Go();
+            // }
+        }
+    }
+    else {
+        console.log("cmds.txt not found");
+    }
+    return "ok";
 }
 
 //send cmd "GO" to child process
 function SendCMD_Go(args) {
 
+    fs.appendFile(file_path_trace, "GO ", function(err) {
+          if(err) {
+              return console.log(err);
+          }
+    });
 
-    // fs.appendFile(file_path_trace, "GO ", function(err) {
-    //     if(err) {
-    //         return console.log(err);
-    //     }
-    // });
+
 
     //write cmd "GO" to child process stdin
     process_child.stdin.write("GO \n");
-    console.log("Go sent");
+    // var w = fs.watch(file_path_trace,function (event,filename) {
+    //     if (event == "change") {
+    //         fs.appendFile(file_path_trace, "GO ", function(err) {
+    //             if(err) {
+    //                 return console.log(err);
+    //             }
+    //         });
+    //         w.close();
+    //     }
+    // });
+    //console.log("Go sent");
 
 }
 
@@ -168,8 +303,6 @@ function create_EM (args) {
 
 }
 
-
-
 function check_SDL_output_Pid(text){
 
     //get Pid from text
@@ -184,79 +317,32 @@ function check_SDL_output_Pid(text){
 function sendCmd(cmd){
 
     fs.appendFileSync(file_path_trace, cmd);
+    fs.appendFileSync(cmds_path, cmd);
+
 
     //write cmd to child process stdin
     process_child.stdin.write(cmd);
 
-    //wait until the create AE command finished
-    //TODO  write cmd Go
-    SendCMD_Go();
-}
-
-function readTrace(){
-    var buf = new Buffer(1024 * 5);
-
-    fs.open(file_path_trace, 'r', function(err, fd) {
-        if (err) {
-            return console.error(err);
-        }
-        console.log("reading file begins ...：");
-        fs.read(fd, buf, 0, buf.length, bytesStart, function(err, bytes){
-            if (err){
-               return console.error(err);
-            }
-            console.log(bytes + "  bytes readed");
-
-            if(bytes > 0){
-                var text = buf.slice(0, bytes).toString();
-                console.log(text);
-                //get Pid
-                var Pid = check_SDL_output_Pid(text);
-                console.log("Pid ="+Pid);
-                if(Pid == null) {
-                    console.log("Couldn't get Pid");
-                    result = 'error';
-                }
-                else {
-                    NodeId_Pid[nodeId] = Pid;
-                    console.log(Pid);
-                    result = 'ok';
-                }
-
-                return result;
-            }
-        });
-    });
-
-
-    fs.open(file_path_trace, 'r',function(err,fd){
-        console.log("reading file begins ...：");
-        var bytes = fs.readSync(fd, buf, 0, buf.length, bytesStart);
-        console.log(bytes + "  bytes readed");
-
-        if (bytes > 0) {
-            var text = buf.slice(0, bytes).toString();
-            console.log(text);
-            //get Pid
-            return text;
-        }
-        else {
-            return null;
+    //wait until the create AE command execution finished
+    var w = fs.watch(file_path_trace,function (event,filename) {
+        if (event == "change") {
+            //console.log("Go sent");
+            SendCMD_Go();
+            w.close();
         }
     });
 
+    // SendCMD_Go();
 }
 
+//write saved cmds to child process
+function writeCmd(cmd){
+    fs.appendFileSync(file_path_trace, cmd);
 
-function sleep(milliseconds) {
-    console.log("sleeping...");
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-            break;
-        }
-    }
+    //write cmd to child process stdin
+    process_child.stdin.write(cmd);
 }
+
 
 function listProcess(){
     var cmd = "List-Process - \n";
@@ -316,31 +402,199 @@ var data = {
 };*/
 
 
-if(fs.existsSync(users_path)) {
-    var users_json = fs.readFileSync(users_path, 'utf8');
-    if(users_json == "") {
-        var users = {};
+function saveSession(args){
+    var sName = args[0];
+    var isOverWrite = (args[1] == undefined)? false : args[1];
+
+    //if this session name already exists
+    if(sessions.indexOf(sName) != -1 && !isOverWrite){
+        return "exists";
     }
-    else {
-        var users = JSON.parse(users_json);
+
+    if(isOverWrite) {
+        //remove files
+        if (fs.existsSync(sessions_path+'/'+sName+"/data.txt")) {
+            fs.unlinkSync(sessions_path+'/'+sName+"/data.txt");
+        }
+        if (fs.existsSync(sessions_path+'/'+sName+"/cmds.txt")) {
+            fs.unlinkSync(sessions_path+'/'+sName+"/cmds.txt");
+        }
+        if (fs.existsSync(sessions_path+'/'+sName+"/pid_nodeId.txt")) {
+            fs.unlinkSync(sessions_path+'/'+sName+"/pid_nodeId.txt");
+        }
     }
-}
-else {
-    var users = {};
+    else{
+        fs.mkdirSync(sessions_path+'/'+sName);
+    }
+    //copy data.txt cmds.txt and pid_nodeId.txt to new folder named by sName
+
+    fs.createReadStream(file_path).pipe(fs.createWriteStream(sessions_path+'/'+sName+"/data.txt"));
+    fs.createReadStream(cmds_path).pipe(fs.createWriteStream(sessions_path+'/'+sName+"/cmds.txt"));
+    fs.createReadStream(pidAndNodeId_path).pipe(fs.createWriteStream(sessions_path+'/'+sName+"/pid_nodeId.txt"));
+
+    sessions.push(sName);
+
+    return 'ok';
+
 }
 
-if(fs.existsSync(file_path)) {
-    var data_json = fs.readFileSync(file_path, 'utf8');
-    if(data_json == "") {
-        var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
+function getSessions(){
+    if (!fs.existsSync(sessions_path)){
+        fs.mkdirSync(sessions_path);
     }
+
+    var sessions = getDirectories(sessions_path);
+    console.log("ses:"+sessions);
+    return sessions;
+}
+
+function getDirectories(srcpath) {
+    return fs.readdirSync(srcpath).filter(function(file) {
+        return fs.statSync(path.join(srcpath, file)).isDirectory();
+    });
+}
+
+function changeSession(args){
+    var newSess = args[0];
+
+    //open an existing session
+    if(newSess != null) {
+        //find necessary files
+        if (fs.existsSync(sessions_path + "/" + newSess) && fs.lstatSync(sessions_path + "/" + newSess).isDirectory()) {
+            var targetData = sessions_path + "/" + newSess + "/data.txt";
+            var targetCmds = sessions_path + "/" + newSess + "/cmds.txt";
+            var targetPid = sessions_path + "/" + newSess + "/pid_nodeId.txt";
+
+            if (fs.existsSync(targetData) && fs.existsSync(targetCmds) && fs.existsSync(targetPid)) {
+
+                //clear trace
+                if (fs.existsSync(file_path_trace)) {
+                    fs.writeFileSync(file_path_trace, '');
+                }
+
+                if (process_child) {
+                    process_child.kill();
+                }
+                process_child = spawn(cmd_createCP);
+
+                connectSDL();
+
+                //copy files to main directory and replace old ones if exists
+                if (fs.existsSync(file_path)) {
+                    fs.unlinkSync(file_path);
+                }
+                if (fs.existsSync(cmds_path)) {
+                    fs.unlinkSync(cmds_path);
+                }
+                if (fs.existsSync(pidAndNodeId_path)) {
+                    fs.unlinkSync(pidAndNodeId_path);
+                }
+                try {
+                    fs.createReadStream(targetData).pipe(fs.createWriteStream(file_path));
+                    fs.createReadStream(targetCmds).pipe(fs.createWriteStream(cmds_path));
+                    fs.createReadStream(targetPid).pipe(fs.createWriteStream(pidAndNodeId_path));
+                } catch (e) {
+                    console.log(e);
+                }
+
+
+                if (fs.existsSync(targetPid)) {
+                    var NodeId_Pid_json = fs.readFileSync(targetPid, 'utf8');
+                    if (NodeId_Pid_json == "") {
+                        NodeId_Pid = {};
+                    }
+                    else {
+                        NodeId_Pid = JSON.parse(NodeId_Pid_json);
+                    }
+                }
+                else {
+                    NodeId_Pid = {};
+                }
+                // console.log(NodeId_Pid);
+
+                if (fs.existsSync(targetData)) {
+                    var data_json = fs.readFileSync(targetData, 'utf8');
+                    if (data_json == "") {
+                        data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}};
+                    }
+                    else {
+                        data = JSON.parse(data_json);
+                    }
+                }
+                else {
+                    data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}};
+                }
+
+                data.users = users;
+                data.currentSession = newSess;
+                currentSession = newSess;
+
+                //execute saved cmds
+                setTimeout(function () {
+                    executeSavedCmds(targetCmds);
+                }, 2000);
+
+                return data;
+            }
+            else {
+                return "filesError";
+            }
+        }
+        else {
+            return "dirError";
+        }
+    }
+    //create a new session
     else {
-        var data = JSON.parse(data_json);
+
+        //clear trace
+        if (fs.existsSync(file_path_trace)) {
+            fs.writeFileSync(file_path_trace, '');
+        }
+
+        //clear pid_nodeId
+        if (fs.existsSync(pidAndNodeId_path)) {
+            fs.writeFileSync(pidAndNodeId_path, '');
+        }
+        NodeId_Pid = {};
+
+        //clear data
+        if (fs.existsSync(file_path)) {
+            fs.writeFileSync(file_path, '');
+        }
+
+        data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}, users: users};
+
+
+        //clear cmds
+        if (fs.existsSync(cmds_path)) {
+            fs.writeFileSync(cmds_path, '');
+        }
+
+        if (process_child) {
+            process_child.kill();
+        }
+        process_child = spawn(cmd_createCP);
+
+        connectSDL();
+
+        return data;
+
     }
+    
 }
-else {
-    var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
-}
+
+// function checkFolderExists(foldPath){
+//
+//         // Is it a directory?
+//         if (stats.isDirectory()) {
+//             return true;
+//         }
+//         else {
+//             return false;
+//         }
+//
+// }
 
 /*
 ////  clear the file data.txt every time   ////
@@ -370,8 +624,9 @@ connection.onopen = function (session) {
         var newNode = args[0];
         var name = newNode.label;
         var nodeId = newNode.id;
-        var nodeDes = newNode.description;
+        var nodeDes = (newNode.description == undefined) ? "" : newNode.description;
 
+        //cmd to create an AE
         var cmd = "Output-To Create_AE('"+name+"','"+nodeDes+"',0,0) Builder \n";
 
         bytesStart = currentSDLBytes;
@@ -422,7 +677,7 @@ connection.onopen = function (session) {
                 var result;
                 var msgValid;
 
-                console.log("file changed");
+                //console.log("file changed");
 
                 fs.open(file_path_trace, 'r',function(err,fd){
                     console.log("reading file begins ...：");
@@ -432,10 +687,10 @@ connection.onopen = function (session) {
 
                     if (bytes > 0) {
                         var text = buf.slice(0, bytes).toString();
-                        console.log(text);
-
+                        // console.log(text);
                         //check whether output is ready
                         //TODO
+
                         //if ready ,try to get Pid
                         var Pid = check_SDL_output_Pid(text);
                         console.log("Pid =" + Pid);
@@ -445,6 +700,7 @@ connection.onopen = function (session) {
                         }
                         else {
                            NodeId_Pid[nodeId] = Pid;
+                            updatePidAndNodeIdFile();
                            msgValid = "ok";
                             w.close();
                             var res = ["node","add",newNode,msgValid];
@@ -462,9 +718,7 @@ connection.onopen = function (session) {
             }
         });
 
-
         sendCmd(cmd);
-
 
         // listProcess();
         // examineVariable();
@@ -476,7 +730,21 @@ connection.onopen = function (session) {
     //
     function getData() {
         // console.log("getData() called");
+        if(fs.existsSync(file_path)) {
+            var data_json = fs.readFileSync(file_path, 'utf8');
+            if(data_json == "") {
+                var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
+            }
+            else {
+                var data = JSON.parse(data_json);
+            }
+        }
+        else {
+            var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
+        }
+
         data.users = users;
+        data.currentSession = currentSession;
         return data;
     }
 
@@ -500,6 +768,9 @@ connection.onopen = function (session) {
             var event = args[1];
             var affectedItem = args[2];
             var msgValid = args[3];
+            if(msgValid == undefined) {
+                msgValid = "ok";
+            }
             if(type === 'node') {
                 if(event === 'add'){
 
@@ -523,6 +794,8 @@ connection.onopen = function (session) {
                     var itemId;
                     for(itemId in affectedItem.nodes)
                     {
+                        console.log("#"+affectedItem.nodes[itemId]);
+                        console.log(data.nodes);
                         delete  data.nodes[affectedItem.nodes[itemId]];
                     }
                     for(itemId in affectedItem.edges){
@@ -555,10 +828,12 @@ connection.onopen = function (session) {
             }
             */
 
-            //publish the change data event
-            session.publish("sdlSCI.data.onChange", args);
 
             if(msgValid == "ok") {
+
+                //publish the change data event
+                session.publish("sdlSCI.data.onChange", args);
+
                 //write data to external file .txt
                 var data_json = JSON.stringify(data);
 
@@ -810,6 +1085,34 @@ connection.onopen = function (session) {
         }
     );
 
+    session.register('sdlSCI.data.saveSession', saveSession).then(
+        function (reg) {
+            console.log("procedure saveSession() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure saveSession: " + err);
+        }
+    );
+
+    session.register('sdlSCI.data.getSessions', getSessions).then(
+        function (reg) {
+            console.log("procedure getSessions() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure getSessions: " + err);
+        }
+    );
+
+    session.register('sdlSCI.data.changeSession', changeSession).then(
+        function (reg) {
+            console.log("procedure changeSession() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure changeSession: " + err);
+        }
+    );
+
+    
 
     //subscribe functions used to communicate with child process
     //
@@ -822,6 +1125,17 @@ connection.onopen = function (session) {
             console.log("failed to register procedure: " + err);
         }
     );
+
+    session.register('sdlSCI.data.executeSavedCmds', executeSavedCmds).then(
+        function (reg) {
+            console.log("procedure executeSavedCmds() registered");
+        },
+        function (err) {
+            console.log("failed to register procedure: executeSavedCmds " + err);
+        }
+    );
+
+
 
     session.register('sdlSCI.data.SendCMD_Go', SendCMD_Go).then(
         function (reg) {

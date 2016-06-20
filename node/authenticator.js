@@ -82,7 +82,7 @@ function authenticate (args) {
    var authid = args[1];
    var details = args[2];
 
-   console.log("authenticate called:", realm, authid, details);
+   // console.log("authenticate called:", realm, authid, details);
 
    if (USERDB[authid] !== undefined) {
       return USERDB[authid];
