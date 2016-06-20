@@ -434,6 +434,8 @@ function saveSession(args){
 
     sessions.push(sName);
 
+    currentSession = sName;
+
     return 'ok';
 
 }
@@ -444,7 +446,7 @@ function getSessions(){
     }
 
     var sessions = getDirectories(sessions_path);
-    console.log("ses:"+sessions);
+    console.log("sessions :"+sessions);
     return sessions;
 }
 
@@ -563,7 +565,7 @@ function changeSession(args){
             fs.writeFileSync(file_path, '');
         }
 
-        data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}, users: users};
+        data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}, users: users, currentSession :"untitled"};
 
 
         //clear cmds
@@ -1002,6 +1004,14 @@ connection.onopen = function (session) {
                     data.env = {};
                 }
                 //add env vars
+
+                //check whether variable name already exist
+                for(var i in affectedEnv){
+                    if(data.env.hasOwnProperty(i)){
+                        return "rename_"+i;
+                    }
+                }
+
                 for(var i in affectedEnv){
                     data.env[i] = affectedEnv[i];
                 }
@@ -1033,10 +1043,11 @@ connection.onopen = function (session) {
                     return console.log(err);
                 }
             });
-
+            return "ok";
         }
         else {
             console.log('2 args needed for function changeEnv');
+            return "error";
         }
     }
 
