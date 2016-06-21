@@ -5,6 +5,15 @@ $("#openSessionPopup").draggable();
 $("#saveSession").click(function(){
     closeAllPopup();
     $("#saveSessionPopup").show();
+    $(document).keypress(function(event){
+
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+            $("#saveSessionBtn").click();
+            $(document).unbind("keypress");
+        }
+
+    });
     $("#sessionName").val("");
     $("#saveSessionFormMsg").html("");
     $("#hid_new").val("");
@@ -13,7 +22,17 @@ $("#saveSession").click(function(){
 
 $("#cancelSessionBtn").click(function(){
     $("#saveSessionPopup").hide();
+    $(document).unbind("keypress");
 });
+
+function onChangeSessionName(args) {
+    currentSession = args[0];
+    if(sessions.indexOf(currentSession) == -1) {
+        sessions.push(currentSession);
+        updateExistingSessions();
+    }
+    $("#currentSession").html(currentSession);
+}
 
 $("#saveSessionBtn").click(function(){
     var sName = $("#sessionName").val();
@@ -31,6 +50,7 @@ $("#saveSessionBtn").click(function(){
                             function (res) {
                                 if(res == "ok"){
                                     $("#saveSessionPopup").hide();
+                                    $(document).unbind("keypress");
                                     var nS = $("#hid_open").val();
                                     var newEmptyS = $("#hid_new").val();
                                     if(nS != ""){
@@ -43,8 +63,8 @@ $("#saveSessionBtn").click(function(){
                                     }
                                     else{
                                         //change current session name
-                                        currentSession = sName;
-                                        $("#currentSession").html(currentSession);
+                                        // currentSession = sName;
+                                        // $("#currentSession").html(currentSession);
                                     }
                                 }
                                 else {
@@ -55,9 +75,9 @@ $("#saveSessionBtn").click(function(){
                     }
                 }
                 else if(res == "ok"){
-                    sessions.push(sName);
-                    updateExistingSessions();
+
                     $("#saveSessionPopup").hide();
+                    $(document).unbind("keypress");
                     var nS = $("#hid_open").val();
                     var newEmptyS = $("#hid_new").val();
                     if(nS != ""){
@@ -68,8 +88,8 @@ $("#saveSessionBtn").click(function(){
                     }
                     else{
                         //change current session name
-                        currentSession = sName;
-                        $("#currentSession").html(currentSession);
+                        // currentSession = sName;
+                        // $("#currentSession").html(currentSession);
                     }
                 }
                 else {
@@ -83,11 +103,22 @@ $("#saveSessionBtn").click(function(){
 $("#openSession").click(function(){
     closeAllPopup();
     $("#openSessionPopup").show();
+    $(document).keypress(function(event){
+
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+            $("#openSessionBtn").click();
+            $(document).unbind("keypress");
+        }
+
+    });
+
     updateExistingSessions();
 });
 
 $("#cancelOpenSessionBtn").click(function(){
     $("#openSessionPopup").hide();
+    $(document).unbind("keypress");
 });
 
 $("#openSessionBtn").click(function(){
@@ -98,6 +129,7 @@ $("#openSessionBtn").click(function(){
     else {
 //        if (sessions.indexOf(currentSession) == -1) {
         $("#openSessionPopup").hide();
+        $(document).unbind("keypress");
         if (confirm("Do you want to save changes before opening another session?")) {
             $("#saveSession").trigger("click");
             $("#hid_new").val("");
@@ -139,18 +171,14 @@ function changeSession(newSess,isUnbind){
                 $("#openSessionFormMsg").html("Directory of this session not found.");
                 //TODO remove it
             }
-            else {
-                // if (newSess) {
-                //     currentSession = newSess;
-                // }
-                // else {
-                //     currentSession = "untitled";
-                // }
+            else if(res=="ok") {
+                console.log("open session successfully");
                 //renew interface
-                init(res);
-
-                isConnectSDL = true;
-                $("#connectSDLBtn").html(" SDL Server Connected ");
+                // init(res);
+                //
+                // isConnectSDL = true;
+                // $("#connectSDLBtn").html(" SDL Server Connected ");
+                
                 // $("#currentSession").html(currentSession);
             }
 
@@ -164,6 +192,13 @@ function changeSession(newSess,isUnbind){
 
 }
 
+function onChangeSession(res){
+
+    init(res[0]);
+
+    isConnectSDL = true;
+    $("#connectSDLBtn").html(" SDL Server Connected ");
+}
 
 function updateExistingSessions(){
 

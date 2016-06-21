@@ -731,45 +731,36 @@
         <div id="header_title"><span class="bigtitle">Control Everything in Your Home</span></div>
         <div id="loginInfo">
             <span id="welcome_msg"></span>
-            <!--<a id="logout_btn" class="btn">Log out</a>-->
             <i id="logout_btn" class="fa fa-sign-out" aria-hidden="true">Log out</i>
             <a id="modal_trigger" href="#modal"><i class="fa fa-sign-in" aria-hidden="true"> Login / Sign up</i></a>
-
         </div>
     </div>
     <div id="body" class="clearfix">
         <div id="leftMenu">
             <div class="menuDiv">
                 <div class="menuTitle">
-                    <span>Session</span><span class="seperator">|</span>
-                    <i class="fa fa-folder-open" aria-hidden="true" id="openSession" title="Open Session"></i>
-                    <i class="fa fa-floppy-o" aria-hidden="true" id="saveSession" title="Save Session"></i>
-                    <i class="fa fa-file-o" aria-hidden="true" id="newSession" title="New Session"></i>
+                    <span>Session</span>
+                    <span id="sessionIcons">
+                        <span class="seperator">|</span>
+                        <i class="fa fa-folder-open" aria-hidden="true" id="openSession" title="Open Session"></i>
+                        <i class="fa fa-floppy-o" aria-hidden="true" id="saveSession" title="Save Session"></i>
+                        <i class="fa fa-file-o" aria-hidden="true" id="newSession" title="New Session"></i>
+                    </span>
                 </div>
-                    <!--<div class="menuIcons">-->
-                        <!--<i class="fa fa-folder-open-o" aria-hidden="true" id="openSession" title="Open Session"></i>-->
-                        <!--<i class="fa fa-floppy-o" aria-hidden="true" id="saveSession" title="Save Session"></i>-->
-                        <!--<i class="fa fa-file-o" aria-hidden="true" id="newSession" title="New Session"></i>-->
-                    <!--</div>-->
                 <div class="menuContent">
                     <div id="currentSession"></div>
                 </div>
             </div>
             <div class="menuDiv" id="serverSDLMenu">
-                <div class="menuTitle">SDL Server
-
-                </div>
+                <div class="menuTitle">SDL Server</div>
                 <div class="menuContent">
-
                     <div id="connectSDLBtn">
                         <input type="button" class="btn_sdl" id="btn_connect" value="Connect" /><br/>
                     </div>
-
                 </div>
             </div>
             <div class="menuDiv" id="objClassMenu">
                 <div class="menuTitle"><span>Object Class</span>
-                    <!--<img id="addObjClassIcon" src="image/plus.png" width="15px"/>-->
                     <i id="addObjClassIcon" class="fa fa-plus-circle" aria-hidden="true" title="Add Object Class"></i>
                 </div>
                 <div class="menuContent">
@@ -778,14 +769,12 @@
             </div>
             <div class="menuDiv" id="ruleMenu">
                 <div class="menuTitle"><span>Rules</span>
-                    <!--<img id="addRuleIcon" src="image/plus.png" width="15px"/>-->
                     <i id="addRuleIcon" class="fa fa-plus-circle" aria-hidden="true" title="Add Rule"></i>
                 </div>
                 <div class="menuContent">
                   <div id="userFilter">
                       <span>User: </span>
                       <select id="userList">
-
                       </select>
                   </div>
                   <div id="existingRules"></div>
@@ -794,12 +783,7 @@
         </div>
         <div id="midDiv">
             <div id="topMenu">
-                <!--<div id="addruleBeginIcon">-->
-                    <!--<img  src="image/plus.png" width="20px"/>-->
-                    <!--<span class="btn_lable">Add Rule</span>-->
-                <!--</div>-->
                 <div id="deleteSelectedIcon">
-                    <!--<input id="deleteSelectedIcon" type="button" class="btn_obj btn_red" value="Delete Selected"/>-->
                     <img  src="image/delete.png" width="20px"/>
                     <span class="btn_lable">Delete Selected</span>
                 </div>
@@ -807,7 +791,6 @@
                 <input id="addruleEndIcon" type="button" class="btn_obj" width="50px" value="Done"/>
                 <span class="remindText">Click on a sensor and drag the edge to an actor to connect them by a rule. Click "Done" in the menu to finish.</span>
             </div>
-            <!--<div id="graph" ondrop="drop(event)" ondragover="allowDrop(event)"></div>-->
             <div id="graph"></div>
         </div>
         <div id="rightMenu">
@@ -817,13 +800,11 @@
                     <i id="addEnvIcon" class="fa fa-plus-circle" aria-hidden="true" title="Add Environment Value"></i>
                 </div>
                 <div class="menuIcons">
-                    <!--<img id="addEnvIcon" src="image/plus.png" width="15px"/>-->
                     <i id="startSimulIcon" class="fa fa-play-circle-o" aria-hidden="true" title="Start Simulation"></i>
                     <div id="progressbar"></div>
                 </div>
                 <div class="menuContent">
                     <div id="envVars">
-
                     </div>
                 </div>
             </div>
@@ -842,7 +823,6 @@
                         <div class="checkbox">
                             <input id="remember" type="checkbox"><label for="remember">Remember me</label>
                         </div>
-
                         <div class="action_btns">
                             <div class="one_half">
                                 <a id='loginSubmit' class="btn btn_blue">Login</a>
@@ -1196,6 +1176,8 @@
 
     $("#modal_trigger").leanModal({top:200,overlay:0.3,closeButton: ".modal_close"});
 
+    $("#modal").draggable();
+
     //predefine network and session
     var network = null;
     var session_global = null;
@@ -1384,7 +1366,8 @@
             users: usersArray,
             allEdges : allEdgesDataSet,
             env: envArray,
-            currentSession: res.currentSession
+            currentSession: res.currentSession,
+            isConnectSDL : res.isConnectSDL
         }
 
         localData = data;
@@ -1396,7 +1379,18 @@
          ruleEdges.push(newEdgeId);
          });
          */
-        connectSDLServer();
+
+        isConnectSDL = localData.isConnectSDL;
+
+        //server doesn't connect to SDL server, connect it
+        if(isConnectSDL == false) {
+            connectSDLServer();
+        }
+        else{
+            //server already connected to SDL server
+            $("#connectSDLBtn").html(" SDL Server Connected ");
+        }
+
 
         network = new vis.Network(container, localData, options);
 
@@ -2110,6 +2104,9 @@
                     updateEnv();
                 });
 
+        session.subscribe("sdlSCI.session.onChangeSession",onChangeSession);
+
+        session.subscribe("sdlSCI.session.onChangeSessionName",onChangeSessionName);
 
 
         //show admin Menu for admin user, if not, hide it
@@ -2123,6 +2120,7 @@
                 $("#serverSDLMenu").show();
                 $("#rightMenu").show();
                 $("#midDiv").css("margin-right",'120px');
+                $("#sessionIcons").show();
 
             }
             else {
@@ -2130,18 +2128,18 @@
                 $("#serverSDLMenu").hide();
                 $("#midDiv").show();
                 $("#midDiv").css("margin-right",'0');
+                $("#sessionIcons").hide();
+
 //                options.manipulation.deleteNode = false;
             }
 
         //set menu bars height
         var barHeight = $("#midDiv").css("height");
-        console.log(barHeight);
         $("#leftMenu").css("height",barHeight);
         $("#rightMenu").css("height",barHeight);
 
         // CALL a remote procedure: get initial data
         //
-
 
         session_global.call('sdlSCI.data.getData').then(
                 function (res) {
