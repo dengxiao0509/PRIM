@@ -1,0 +1,88 @@
+#addRuleChooseSE .right{
+    width:45%;
+    float: right;
+    min-height: 100px ;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-left: 2%;
+}
+
+#addRuleChooseSE select{
+    width: 90%;
+}
+
+#addRuleChooseSE .left{
+    border-right: 1px solid gray ;
+    float: left;
+    width:47%;
+    min-height: 100px ;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-right: 4%;
+}
+
+#addRulePopup{
+    /*display: block;*/
+    width: 270px;
+}
+
+
+/*add rule popup*/
+#sensors,
+#actors{
+    margin-bottom: 20px;
+    clear: both;
+}
+
+.sensorDiv,
+.actorDiv{
+    clear:both;
+    margin-top: 10px;
+    width: 100%;
+    text-align: left;
+}
+
+.nameDiv {
+    float:left;
+}
+
+.blockTitle{
+    display: block;
+    text-align: center;
+    font-weight: bold;
+}
+
+/*environment variable label*/
+.envVarLabel {
+    color : lightskyblue;
+    font-weight: bold;
+}
+
+.valInput {
+    width: 100px;
+    margin-left: 5px;
+}
+
+.varRow {
+    height: 30px;
+}
+
+.checkedShow {
+    display: inline-block;
+    float: right;
+    display: none;
+}
+
+.remindText {
+    font-size: small;
+    display: none;
+    padding-top:17px;
+}
+
+#ruleColor {
+    background: none;
+    height: 20px;
+    width: 30px;
+    border: none;
+    padding: 0;
+}

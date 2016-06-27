@@ -7,261 +7,34 @@ $("#addRulePopup").draggable();
 $("#addRuleChooseSE").draggable();
 
 
-//begin to choose edges
-/*
- $("#addruleBeginIcon").click(function(){
- network.addEdgeMode();
- $("#addruleEndIcon").show();
- $("#addruleCancelIcon").show();
+/////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////// buttons in Popups /////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 
- $(".remindText").css("display","inline-block");
- $("#addruleBeginIcon").hide();
+// ----------------  addRuleChooseSE popup ----------------- //
 
- $("#deleteSelectedIcon").hide();
- isAddingRule = true;
- ruleEdges = [];
- });
- */
-/*
- function addEdgesDone(){
- network.disableEditMode();
-
- //create a rule
- var sensors = [];
- var actors = [];
- for(var i in ruleEdges){
- var edgeItem = localData.edges.get(ruleEdges[i]);
- if(edgeItem){
- if(sensors.indexOf(edgeItem.from) == '-1') {
- sensors.push(edgeItem.from);
- }
- if(actors.indexOf(edgeItem.to) == '-1') {
- actors.push(edgeItem.to);
- }
- }
- }
-
- if(sensors.length > 0 && actors.length > 0) {
-
- $("#addRulePopup").show();
- $('#ruleFormTitle').html('Add a rule');
-
- resetRuleForm();
- var sensorsDiv = document.getElementById("sensors");
- var actorsDiv = document.getElementById("actors");
-
- for(var i in sensors){
-
- var sensorItem = localData.nodes.get(sensors[i]);
- var sensorName = sensorItem.label;
- var sensorVars = sensorItem.variables;
- var sensorId = sensorItem.id;
-
- var sensorDiv = document.createElement("div");
- sensorDiv.setAttribute("class","sensorDiv");
- sensorDiv.id = i;
-
- var snDiv = document.createElement("div");
- snDiv.appendChild(document.createTextNode(sensorName));
- snDiv.setAttribute("class","NameDiv");
- sensorDiv.appendChild(snDiv);
-
- var varDiv = document.createElement("div");
- varDiv.setAttribute("class","varDiv");
- var temp = 0;
- for(var j in sensorVars){
- var varRow = document.createElement("div");
- varRow.setAttribute("class","varRow");
-
- //variable name and checkbox
- var varName = document.createElement("input");
- varName.type = "checkbox";
- temp++;
- varName.id = sensorId+"_"+temp;
- varName.value = j;
- varName.setAttribute("class","varName");
-
-
- var label = document.createElement('label')
- label.htmlFor =  sensorId+"_"+temp;
- label.appendChild(document.createTextNode(j));
-
- varRow.appendChild(varName);
- varRow.appendChild(label);
-
- //when checkbox is checked, show this part
- var checkedShowDiv = document.createElement("div");
- checkedShowDiv.setAttribute("class","checkedShow");
-
- //compare operator
- var compSelect = document.createElement("select");
- var opt = document.createElement("option");
- opt.value = "=";
- opt.innerHTML = "=";
- compSelect.appendChild(opt);
- var opt = document.createElement("option");
- opt.value = "!=";
- opt.innerHTML = "!=";
- compSelect.appendChild(opt);
- var opt = document.createElement("option");
- opt.value = ">";
- opt.innerHTML = ">";
- compSelect.appendChild(opt); var opt = document.createElement("option");
- opt.value = "<";
- opt.innerHTML = "<";
- compSelect.appendChild(opt);
-
- checkedShowDiv.appendChild(compSelect);
-
- //input text
- var val = document.createElement("input");
- val.type = "text";
- val.setAttribute("class","valInput");
-
- checkedShowDiv.appendChild(val);
-
- varRow.appendChild(checkedShowDiv);
-
-
- varDiv.appendChild(varRow);
- }
-
- sensorDiv.appendChild(varDiv);
-
- sensorsDiv.appendChild(sensorDiv);
-
-
- }
-
- for(var i in actors){
-
- var actorItem = localData.nodes.get(actors[i]);
- var actorName = actorItem.label;
- var actorVars = actorItem.variables;
- var actorId = actorItem.id;
-
- var actorDiv = document.createElement("div");
- actorDiv.setAttribute("class","actorDiv");
-
- var anDiv = document.createElement("div");
- anDiv.appendChild(document.createTextNode(actorName));
- anDiv.setAttribute("class","NameDiv");
- actorDiv.appendChild(anDiv);
-
- var varDiv = document.createElement("div");
- varDiv.setAttribute("class","varDiv");
- var temp=0;
- for(var j in actorVars){
- var varRow = document.createElement("div");
- varRow.setAttribute("class","varRow");
- var varName = document.createElement("input");
- varName.type = "checkbox";
- temp++;
- varName.id = actorId+"_"+temp;
- varName.setAttribute("class","varName");
-
- var label = document.createElement('label')
- label.htmlFor = actorId+"_"+temp;
- label.appendChild(document.createTextNode(j));
-
-
- varRow.appendChild(varName);
- varRow.appendChild(label);
-
- //when checkbox is checked, show this part
- var checkedShowDiv = document.createElement("div");
- checkedShowDiv.setAttribute("class","checkedShow");
-
- //equal operator
- //                    var equal = document.createElement("div");
- //                    equal.appendChild(document.createTextNode("="));
- checkedShowDiv.appendChild(document.createTextNode("="));
-
- //input text
- var val = document.createElement("input");
- val.type = "text";
- val.setAttribute("class","valInput");
-
- checkedShowDiv.appendChild(val);
-
- varRow.appendChild(checkedShowDiv);
- varDiv.appendChild(varRow);
- }
-
- actorDiv.appendChild(varDiv);
- actorsDiv.appendChild(actorDiv);
- }
-
- $(".varName").change(function(){
-
- if($(this).prop("checked") == true) {
- $(this).siblings(".checkedShow").show();
- }
- else {
- $(this).siblings(".checkedShow").hide();
- }
-
- });
-
- }
- else{
- alert("You need to choose at least one sensor and one actor ...");
- }
-
- $("#addruleBeginIcon").show();
- $("#addruleEndIcon").hide();
- $("#addruleCancelIcon").hide();
- $(".remindText").hide();
- isAddingRule = false;
-
- }
- */
-//add rule icon click
+//open
 $("#addRuleIcon").click(function(){
     closeAllPopup();
     $("#addRuleChooseSE").show();
-    $(document).keypress(function(event){
-
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
-            $("#doneRuleSE").click();
-            $(document).unbind("keypress");
-        }
-
-    });
+    $("#ruleSEFormTitle").html("");
+    enterToSubmit("doneRuleSE");
     updateObjList();
 });
 
-function updateObjList(){
-    var htmlContent = "";
-    localData.nodes.forEach(function(node){
-        htmlContent += "<option value='"+node.id+"'>"+node.label+"</option>";
-    });
-
-    $("#sensorList").html(htmlContent);
-    $("#effectorList").html(htmlContent);
-}
-
-//cancel adding rule
-$("#cancelRuleSE").click(function(){
-    $("#addRuleChooseSE").hide();
-    $(document).unbind("keypress");
-});
-
-//finish choosing sensors and effectors in the new rule popup
+//done button
 $("#doneRuleSE").click(function(){
+
+    if($("#sensorList").val() == null || $("#effectorList").val() == null ){
+        $("#ruleSEFormMsg").html("You must choose at least one sensor and one actor.");
+        return;
+    }
+
     $("#addRuleChooseSE").hide();
     $(document).unbind("keypress");
     $("#addRulePopup").show();
-    $(document).keypress(function(event){
 
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
-            $("#ruleSavebt").click();
-            $(document).unbind("keypress");
-        }
-
-    });
+    enterToSubmit("ruleSavebt");
 
     var sensors = $("#sensorList").val() || [];
     var actors = $("#effectorList").val() || [];
@@ -283,10 +56,11 @@ $("#doneRuleSE").click(function(){
             var sensorItem = localData.nodes.get(sensors[i]);
             var sensorName = sensorItem.label;
             var sensorVars = sensorItem.variables;
-            //TODO  env affected?
-            if(sensorVars.hasOwnProperty("env")) {
-                delete sensorVars["env"];
-            }
+
+            // if(sensorVars.hasOwnProperty("env")) {
+            //     delete sensorVars["env"];
+            // }
+
             var sensorId = sensorItem.id;
 
             sensors_rule.push(sensorId);
@@ -302,62 +76,20 @@ $("#doneRuleSE").click(function(){
 
             var varDiv = document.createElement("div");
             varDiv.setAttribute("class","varDiv");
-            var temp = 0;
+
+
             for(var j in sensorVars){
-                var varRow = document.createElement("div");
-                varRow.setAttribute("class","varRow");
 
-                //variable name and checkbox
-                var varName = document.createElement("input");
-                varName.type = "checkbox";
-                temp++;
-                varName.id = sensorId+"_"+temp;
-                // varName.value = sensorId + "_" +j;
-                varName.setAttribute("class","varName");
-
-
-                var label = document.createElement('label')
-                label.htmlFor =  sensorId+"_"+temp;
-                label.appendChild(document.createTextNode(j));
-
-                varRow.appendChild(varName);
-                varRow.appendChild(label);
-
-                //when checkbox is checked, show this part
-                var checkedShowDiv = document.createElement("div");
-                checkedShowDiv.setAttribute("class","checkedShow");
-
-                //compare operator
-                var compSelect = document.createElement("select");
-                var opt = document.createElement("option");
-                opt.value = "=";
-                opt.innerHTML = "=";
-                compSelect.appendChild(opt);
-                var opt = document.createElement("option");
-                opt.value = "!=";
-                opt.innerHTML = "!=";
-                compSelect.appendChild(opt);
-                var opt = document.createElement("option");
-                opt.value = ">";
-                opt.innerHTML = ">";
-                compSelect.appendChild(opt); var opt = document.createElement("option");
-                opt.value = "<";
-                opt.innerHTML = "<";
-                compSelect.appendChild(opt);
-
-                checkedShowDiv.appendChild(compSelect);
-
-                //input text
-                var val = document.createElement("input");
-                val.type = "text";
-                val.setAttribute("class","valInput");
-
-                checkedShowDiv.appendChild(val);
-
-                varRow.appendChild(checkedShowDiv);
-
-
-                varDiv.appendChild(varRow);
+                if(j == "env"){
+                    for(var envVar_i in sensorVars[j]){
+                        var temp_varRow = createVarRow(sensorId,sensorVars[j][envVar_i],true);
+                        varDiv.appendChild(temp_varRow);
+                    }
+                }
+                else {
+                    var temp_varRow = createVarRow(sensorId,j,false);
+                    varDiv.appendChild(temp_varRow);
+                }
             }
 
             sensorDiv.appendChild(varDiv);
@@ -372,6 +104,8 @@ $("#doneRuleSE").click(function(){
             var actorItem = localData.nodes.get(actors[i]);
             var actorName = actorItem.label;
             var actorVars = actorItem.variables;
+
+            //no environment variables in effectors
             if(actorVars.hasOwnProperty("env")) {
                 delete actorVars["env"];
             }
@@ -453,24 +187,77 @@ $("#doneRuleSE").click(function(){
 
 });
 
-//finish choosing edges and show new rule form
-// $("#addruleEndIcon").click(addEdgesDone);
+//cancel button
+$("#cancelRuleSE").click(function(){
+    $("#addRuleChooseSE").hide();
+    $(document).unbind("keypress");
+});
 
-/*
- $("#addruleCancelIcon").click(function(){
- //delete edges added
- localData.edges.remove(ruleEdges);
- ruleEdges = [];
+//create a variable row in the addRulePopup
+function createVarRow(sensor_Id,variable_Name,isEnvVar){
+    var varRow = document.createElement("div");
+    varRow.setAttribute("class","varRow");
 
- $("#addruleBeginIcon").show();
- $("#addruleEndIcon").hide();
- $("#addruleCancelIcon").hide();
- $(".remindText").hide();
- isAddingRule = false;
- network.disableEditMode();
- });
- */
-////new or edit rule form buttons
+    var temp = 0;
+
+    //variable name and checkbox
+    var varName = document.createElement("input");
+    varName.type = "checkbox";
+    temp++;
+    varName.id = sensor_Id+"_"+temp;
+    varName.setAttribute("class","varName");
+
+
+    var label = document.createElement('label')
+    if(isEnvVar){
+        label.setAttribute("class","envVarLabel");
+    }
+    label.htmlFor =  sensor_Id+"_"+temp;
+    label.appendChild(document.createTextNode(variable_Name));
+
+    varRow.appendChild(varName);
+    varRow.appendChild(label);
+
+    //when checkbox is checked, show this part
+    var checkedShowDiv = document.createElement("div");
+    checkedShowDiv.setAttribute("class","checkedShow");
+
+    //compare operator
+    var compSelect = document.createElement("select");
+    var opt = document.createElement("option");
+    opt.value = "=";
+    opt.innerHTML = "=";
+    compSelect.appendChild(opt);
+    var opt = document.createElement("option");
+    opt.value = "!=";
+    opt.innerHTML = "!=";
+    compSelect.appendChild(opt);
+    var opt = document.createElement("option");
+    opt.value = ">";
+    opt.innerHTML = ">";
+    compSelect.appendChild(opt); var opt = document.createElement("option");
+    opt.value = "<";
+    opt.innerHTML = "<";
+    compSelect.appendChild(opt);
+
+    checkedShowDiv.appendChild(compSelect);
+
+    //input text
+    var val = document.createElement("input");
+    val.type = "text";
+    val.setAttribute("class","valInput");
+
+    checkedShowDiv.appendChild(val);
+
+    varRow.appendChild(checkedShowDiv);
+
+    return varRow;
+}
+
+
+
+// ---------------   addRulePopup  popup ------------------- //
+
 //save button
 $("#ruleSavebt").click(function () {
 
@@ -542,7 +329,6 @@ $("#ruleSavebt").click(function () {
             var temp_id = sensorVals[i].id;
             var t = temp_id.split("_");
             var s = t[0];  //sensor id
-//                var v = t[1];   // variable name
 
             var v =$("#"+temp_id).siblings("label").html();
             console.log(v);
@@ -608,7 +394,7 @@ $("#ruleSavebt").click(function () {
             return;
         }
 
-        localData.rules[newRule.id] = newRule;
+        // localData.rules[newRule.id] = newRule;
 
         //change data in server
         if(!isEdit) {
@@ -686,7 +472,7 @@ $("#deleteThisRule").click(function () {
             deleteEdges.push(localData.allEdges.get(data.edges[i]).id);
 
         }
-        console.log(deleteEdges);
+        // console.log(deleteEdges);
 
         session_global.call('sdlSCI.data.changeRule', ['delete', deleteRule, deleteEdges]).then(
             function (res) {
@@ -722,7 +508,7 @@ function resetRuleForm() {
 
 }
 
-//double click on a rule label, show edit rule form
+//double click on a rule label, open edit rule popup
 function dblclickRule(target) {
 
     var ruleId = target.id;
@@ -734,15 +520,7 @@ function dblclickRule(target) {
 
     $('#ruleFormTitle').html('Edit a rule');
     $('#addRulePopup').show();
-    $(document).keypress(function(event){
-
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
-            $("#ruleSavebt").click();
-            $(document).unbind("keypress");
-        }
-
-    });
+    enterToSubmit("ruleSavebt");
 
     $('#ruleName').val(data.name);
     $("#ruleColor").val(data.color)
@@ -758,10 +536,6 @@ function dblclickRule(target) {
         var sensorItem = localData.nodes.get(i);
         var sensorName = sensorItem.label;
         var sensorVars = sensorItem.variables;
-        //TODO  env affected?
-        if(sensorVars.hasOwnProperty("env")) {
-            delete sensorVars["env"];
-        }
 
         var sensorDiv = document.createElement("div");
         sensorDiv.setAttribute("class", "sensorDiv");
@@ -774,72 +548,22 @@ function dblclickRule(target) {
 
         var varDiv = document.createElement("div");
         varDiv.setAttribute("class", "varDiv");
-        var temp = 0;
+
         for (var j in sensorVars) {
-            var varRow = document.createElement("div");
-            varRow.setAttribute("class", "varRow");
-
-            //variable name and checkbox
-            var varName = document.createElement("input");
-            varName.type = "checkbox";
-            temp++;
-            varName.id = i + "_" + temp;
-            varName.name = i;
-            varName.value = j;
-            varName.setAttribute("class", "varName");
-
-
-            var label = document.createElement('label')
-            label.htmlFor = i + "_" +temp;
-            label.appendChild(document.createTextNode(j));
-
-            varRow.appendChild(varName);
-            varRow.appendChild(label);
-
-            //when checkbox is checked, show this part
-            var checkedShowDiv = document.createElement("div");
-            checkedShowDiv.setAttribute("class", "checkedShow");
-
-            //compare operator
-            var compSelect = document.createElement("select");
-            var opt = document.createElement("option");
-            opt.value = "=";
-            opt.innerHTML = "=";
-            compSelect.appendChild(opt);
-            var opt = document.createElement("option");
-            opt.value = "!=";
-            opt.innerHTML = "!=";
-            compSelect.appendChild(opt);
-            var opt = document.createElement("option");
-            opt.value = ">";
-            opt.innerHTML = ">";
-            compSelect.appendChild(opt);
-            var opt = document.createElement("option");
-            opt.value = "<";
-            opt.innerHTML = "<";
-            compSelect.appendChild(opt);
-
-            checkedShowDiv.appendChild(compSelect);
-
-            //input text
-            var val = document.createElement("input");
-            val.type = "text";
-            val.setAttribute("class", "valInput");
-
-            checkedShowDiv.appendChild(val);
-
-            varRow.appendChild(checkedShowDiv);
-
-
-            varDiv.appendChild(varRow);
-
+            if(j == "env"){
+                for(var envVar_i in sensorVars[j]){
+                    var temp_varRow = createVarRow(i,sensorVars[j][envVar_i],true);
+                    varDiv.appendChild(temp_varRow);
+                }
+            }
+            else {
+                var temp_varRow = createVarRow(i,j,false);
+                varDiv.appendChild(temp_varRow);
+            }
         }
 
         sensorDiv.appendChild(varDiv);
-
         sensorsDiv.appendChild(sensorDiv);
-
-
     }
 
     for (var i in data.then) {
@@ -956,10 +680,7 @@ function dblclickRule(target) {
         }
     }
 
-
     $("#deleteThisRule").show();
-
-
 }
 
 //click on a rule label, show edges of this rule
@@ -985,66 +706,64 @@ function updateExistingRules(){
     //hide all edges
     localData.edges.clear();
 
-    //show rules belonging to the selected user(s)
-    if(targetUser == "all"){
-        for(var k in localData.rules){
-            var ruleName = localData.rules[k]["name"];
-            htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' onclick='clickRule(this)'  id='" + k + "'>" + ruleName + "</div>";
+    if(user == "admin") {
+        //show rules belonging to the selected user(s)
+        if (targetUser == "all") {
+            for (var k in localData.rules) {
+                var ruleName = localData.rules[k]["name"];
+                htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' onclick='clickRule(this)'  id='" + k + "'>" + ruleName + "</div>";
+            }
+            /*
+             localData.edges.clear();
+             localData.edges.add(localData.allEdges.get());
+             */
         }
-        /*
-         localData.edges.clear();
-         localData.edges.add(localData.allEdges.get());
-         */
-    }
-    else if(targetUser == "allUsers"){
-        //var ruleGroup = [];
+        else if (targetUser == "allUsers") {
+            //var ruleGroup = [];
 
-        for(var k in localData.rules){
-            var ruleItem = localData.rules[k];
-            if(ruleItem.user !== "admin") {
-                var ruleName = ruleItem.name;
-                htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' onclick='clickRule(this)' id='" + k + "'>" + ruleName + "</div>";
+            for (var k in localData.rules) {
+                var ruleItem = localData.rules[k];
+                if (ruleItem.user !== "admin") {
+                    var ruleName = ruleItem.name;
+                    htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' onclick='clickRule(this)' id='" + k + "'>" + ruleName + "</div>";
 
-                /*
-                 //get all edges of this user's rules
-                 for(var e in ruleItem.edges){
-                 var eId = ruleItem.edges[e];
-                 if(ruleGroup.indexOf(eId) == '-1'){
-                 ruleGroup.push(eId);
-                 }
-                 }
-                 */
+                    /*
+                     //get all edges of this user's rules
+                     for(var e in ruleItem.edges){
+                     var eId = ruleItem.edges[e];
+                     if(ruleGroup.indexOf(eId) == '-1'){
+                     ruleGroup.push(eId);
+                     }
+                     }
+                     */
+                }
+            }
+            /*
+             localData.edges.clear();
+             localData.edges.add(localData.allEdges.get(ruleGroup));
+             */
+        }
+        else {
+            // var ruleGroup = [];
+            for (var k in localData.rules) {
+                var ruleItem = localData.rules[k];
+
+                if (ruleItem.user == targetUser) {
+                    var ruleName = ruleItem.name;
+                    htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' onclick='clickRule(this)' id='" + k + "'>" + ruleName + "</div>";
+                }
             }
         }
-        /*
-         localData.edges.clear();
-         localData.edges.add(localData.allEdges.get(ruleGroup));
-         */
     }
     else {
-        // var ruleGroup = [];
-        for(var k in localData.rules){
+        for (var k in localData.rules) {
             var ruleItem = localData.rules[k];
 
-            if(ruleItem.user == targetUser) {
+            if (ruleItem.user == user) {
                 var ruleName = ruleItem.name;
                 htmlContent += "<div class='objClassDiv' ondblclick='dblclickRule(this)' onclick='clickRule(this)' id='" + k + "'>" + ruleName + "</div>";
-
-                /*
-                 //get all edges of this user's rules
-                 for (var e in ruleItem.edges) {
-                 var eId = ruleItem.edges[e];
-                 if (ruleGroup.indexOf(eId) == '-1') {
-                 ruleGroup.push(eId);
-                 }
-                 }
-                 */
             }
         }
-        /*
-         localData.edges.clear();
-         localData.edges.add(localData.allEdges.get(ruleGroup));
-         */
     }
 
     $("#existingRules").html(htmlContent);
@@ -1067,3 +786,53 @@ $("#userList").change(function(){
 });
 
 $(".vis-connect").hide();
+
+
+//update Object List
+function updateObjList(){
+    var htmlContent = "";
+    localData.nodes.forEach(function(node){
+        htmlContent += "<option value='"+node.id+"'>"+node.label+"</option>";
+    });
+
+    $("#sensorList").html(htmlContent);
+    $("#effectorList").html(htmlContent);
+}
+
+
+//subscribe procedures
+function onChangeRule(args){
+    var type = args[0];
+    var affectedRule = args[1];
+    var affectedEdges = args[2];
+
+    if(type == "add") {
+        //add Edges
+        for(var i in affectedEdges){
+            if (localData.allEdges.get(affectedEdges[i].id) == null) {
+                localData.allEdges.add(affectedEdges[i]);
+            }
+        }
+        //add Rule
+        localData.rules[affectedRule.id]  = affectedRule;
+    }
+    else if(type == 'update') {
+        localData.rules[affectedRule.id] = affectedRule;
+        for(var i in affectedRule.edges){
+            var eId = affectedRule.edges[i];
+            var e = localData.allEdges.get(eId);
+            e.color = affectedRule.color;
+            e.title = affectedRule.name;
+            localData.allEdges.update(e);
+        }
+    }
+    else if(type == "delete"){
+        delete localData.rules[affectedRule.id];
+        for(var i in affectedEdges){
+            localData.allEdges.remove(affectedEdges[i]);
+        }
+    }
+
+    updateExistingRules();
+
+}

@@ -1,734 +1,42 @@
 <!DOCTYPE html>
 <!--###############################################################################
-##
+## This page is used to control SDL server and visulize results returned
 ###############################################################################
 -->
+
 <html>
 <head>
     <title>Control Interface</title>
     <script>AUTOBAHN_DEBUG = true;</script>
     <script src="http://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"></script>
 
-
-    <!--<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>-->
     <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-
-    <!--<script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>-->
-    <!--<link href="lib/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet"/>-->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.15.1/vis.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.15.1/vis.min.css" rel="stylesheet"/>
 
     <script type="text/javascript" src="lib/jquery.leanModal.min.js"></script>
+
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
 
-    <script src="lib/tag-it.min.js"></script>
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
-    <link href="css/jquery.tagit.css" rel="stylesheet" type="text/css">
 
+    <link rel="stylesheet" type="text/css" href="css/index.css"/>
+    <link rel="stylesheet" type="text/css" href="css/popup.css"/>
+    <link rel="stylesheet" type="text/css" href="css/object.css"/>
+    <link rel="stylesheet" type="text/css" href="css/rule.css"/>
+    <link rel="stylesheet" type="text/css" href="css/env.css"/>
+    <link rel="stylesheet" type="text/css" href="css/login.css"/>
 
-    <style>
-
-        body{
-            font-size: 16px;
-            font-family:Times New Roman;
-        }
-
-        #header {
-            width: 100%;
-            height: 60px;
-            margin: 7px auto;
-            padding: 15px 0;
-            min-width: 860px;
-            /*border-bottom: 1px solid lightgray;*/
-        }
-
-        #header .bigtitle {
-            font-size: 2em;
-            font-weight: bold;
-        }
-
-        #body {
-            width: 100%;
-            /*\height: 570px;*/
-            height: 100%;
-            height: 100%;
-            margin: 0 auto;
-            min-width: 860px;
-        }
-
-        #leftMenu{
-            width:200px;
-            /*height:570px;*/
-            position:absolute;
-            border: lightblue 2px solid;
-            display: none;
-        }
-
-        #midDiv{
-            margin-left:200px;
-            margin-right: 115px;
-            /*height: 570px;*/
-            height: 100%;
-            border-top:2px lightblue solid;
-            border-bottom:2px lightblue solid;
-            padding-left: 5px;
-            overflow: hidden;
-            display: none;
-        }
-
-        #rightMenu {
-            width: 125px;
-            /*height: 570px;*/
-            position: absolute;
-            border: lightblue 2px solid;
-            right: 0;
-            top: 105px;
-            display: none;
-        }
-
-        #topMenu{
-            height: 40px;
-            width: 100%;
-            border-bottom: 1px solid gainsboro;
-            overflow: hidden;
-            padding-left: 10px;
-        }
-
-        #graph {
-            width: 100%;
-            height: 528px;
-        }
-
-        #footer {
-            width: 980px;
-            height: 0px;
-            margin: 0 auto;
-            min-width: 860px;
-        }
-
-
-        .clearfix {
-            clear: both;
-        }
-
-        #addObjClassPopup,
-        #newNodePopup,
-        #addRulePopup,
-        #addEnvPopup,
-        #editEnvPopup,
-        #editNodePopup,
-        #addRuleChooseSE,
-        #saveSessionPopup,
-        #openSessionPopup{
-            position: absolute;
-            left: 400px;
-            top: 120px;
-            border: 3px solid lightskyblue;
-            padding: 10px;
-            width: 300px;
-            height: auto;
-            z-index: 100px;
-            background-color: #f9f9f9;
-            text-align: center;
-            display: none;
-        }
-
-        #addRuleChooseSE .right{
-            width:45%;
-            float: right;
-            min-height: 100px ;
-            margin-top: 30px;
-            margin-bottom: 30px;
-            padding-left: 2%;
-        }
-
-        #addRuleChooseSE select{
-            width: 90%;
-        }
-
-        #addRuleChooseSE .left{
-            border-right: 1px solid gray ;
-            float: left;
-            width:47%;
-            min-height: 100px ;
-            margin-top: 30px;
-            margin-bottom: 30px;
-            padding-right: 4%;
-        }
-
-        #addRulePopup{
-            /*display: block;*/
-            width: 270px;
-        }
-        
-        #NodeShapeBts {
-            display: inline;
-        }
-
-        #NodeShapeBts input[type="radio"] {
-            display: none;
-        }
-
-        #NodeShapeBts label{
-            display: inline-block;
-        }
-
-        /*add node form*/
-        .table {
-            display: block;
-        }
-
-        .row {
-            clear: both;
-            display: block;
-            margin-bottom: 10px;
-            height:20px;
-        }
-
-        .cell{
-            display: block;
-            text-align: left;
-        }
-
-        .row_textarea {
-            margin-top: 30px;
-            height: 35px;
-        }
-
-        .celllabel {
-            width: 107px;
-            text-align: left;
-            float: left;
-        }
-
-        /*#userFields {*/
-            /*display: none;*/
-        /*}*/
-
-        .cell textarea,
-        .cell input[type="text"],
-        .cell input[type="number"]{
-            width: 150px;
-        }
-
-        #header_title {
-            float:left;
-        }
-
-        .header_obj {
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 16px;
-            text-transform: uppercase;
-        }
-
-        .btn_radio{
-            padding: 5px 10px;
-            background: #F4F4F2;
-            cursor: pointer;
-        }
-
-        .btn_radio_small {
-            padding: 2px 2px;
-            background: #F4F4F2;
-        }
-
-        #NodeShapeBts input[type="radio"]:checked+label {
-            background: lightblue;
-        }
-
-        #loginInfo {
-            float:right;
-            height: 20px;
-            margin-top: 25px;
-        }
-
-        /* Overlay when Modal is open */
-        #lean_overlay {
-            position: fixed;
-            z-index:100;
-            top: 0px;
-            left: 0px;
-            height:100%;
-            width:100%;
-            background: #000;
-            display: none;
-        }
-
-        /* Modal box or Popup box */
-        .popupContainer{
-            position:absolute;
-            width:330px;
-            height: auto;
-            left:45%;
-            top:80px;
-            background: #FFF;
-        }
-
-        #logout_btn {
-            display: none;
-        }
-        
-        #welcome_msg {
-            display: none;
-            margin-right: 10px;
-        }
-
-        /*Popup */
-        .popupHeader {
-            font-size: 16px;
-            text-transform: uppercase;
-            background: #F4F4F2;
-            position: relative;
-            padding:10px 20px;
-            border-bottom: 1px solid #DDD;
-            font-weight: bold;
-        }
-
-        .popupHeader .modal_close {
-            position: absolute;
-            right: 0;
-            top: 0;
-            padding:10px 15px;
-            background: #E4E4E2;
-            cursor: pointer;
-            color: #aaa;
-            font-size: 16px;
-        }
-
-        .popupBody {
-            padding: 20px;
-        }
-
-        /* Buttons */
-
-        .btn{
-            padding: 10px 20px;
-            background: #F4F4F2;
-            cursor: pointer;
-        }
-
-        .btn_obj{
-            padding: 5px 10px;
-            background: #F4F4F2;
-            cursor: pointer;
-            border: none;
-            margin-right: 15px ;
-        }
-
-        .btns_obj {
-            padding-left: 50px;
-            margin-top: 24px;
-            clear: both;
-        }
-
-        .btn:hover,
-        .btn_obj:hover,
-        .btn_radio:hover{
-            background:  #E4E4E2;
-        }
-
-        .btn_blue {
-            background: lightblue;
-            color: #FFF;
-        }
-
-        .btn_blue:hover  {
-            background:  lightseagreen;
-        }
-
-        .btn_red {
-            color: red;
-            float:left;
-        }
-
-        a.btn {
-            color: #666;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        a:visited {
-            /*text-decoration: none;*/
-            color: black;
-        }
-
-
-        .one_half {
-            width: 50%;
-            display: block;
-            float: left;
-        }
-
-        .one_half.last {
-            width: 45%;
-            margin-left: 5%;
-        }
-
-        /*User Login Form*/
-        .user_login {
-            /*display: none;*/
-        }
-
-        .user_login label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .user_login input[type='text'],
-        .user_login input[type='password']{
-            display: block;
-            width: 90%;
-            padding:10px;
-            border:1px solid #DDD;
-            color: #666
-        }
-
-        .user_login input[type='checkbox'] {
-            float:left;
-            margin-right:5px;
-        }
-
-        .user_login input[type='checkbox']+label {
-            float: left;
-        }
-
-        .user_login .checkbox {
-            margin-bottom:10px;
-            clear:both;
-            overflow: hidden;
-        }
-
-        .action_btns {
-            clear:both;
-            overflow: hidden;
-        }
-
-        .action_btns a {
-            display: block;
-        }
-
-        /*User Register Form*/
-        .user_register {
-            display:none;
-        }
-
-        .user_register label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .user_register input[type='text'],
-        .user_register input[type='password']{
-            display: block;
-            width: 90%;
-            padding: 10px;
-            border: 1px solid #DDD;
-            color:#666;
-        }
-
-        .err_msg {
-            color: red;
-            margin-bottom: 10px;
-        }
-
-
-        .menuDiv{
-            width: 100%;
-            /*border-bottom: 1px solid lightgrey;*/
-            /*margin:10px 0 ;*/
-            position:relative;
-        }
-
-        .menuContent {
-            padding: 10px 0;
-        }
-
-        .btn_sdl{
-            margin: 5px 0 5px 5px;
-            width: 80px;
-        }
-        
-        .btn_sdl:hover,
-        .btn_sdl_small:hover{
-            cursor: pointer;
-        }
-
-        .btn_sdl_small {
-            margin: 5px 0 5px 5px;
-            width: 50px;
-            display: inline;
-        }
-
-        .menuTitle {
-            text-align: left;
-            padding: 5px 5px;
-            font-weight: bold;
-            background: lightblue;
-        }
-
-        #existingObj,
-        #existingRules{
-            height: 150px;
-            overflow: auto;
-        }
-
-        .fix .btn_obj{
-            margin: 10px auto;
-        }
-
-        #addObjClassIcon {
-            /*position: absolute;*/
-            /*left: 125px;*/
-            /*top: 6px;*/
-            cursor: pointer;
-        }
-
-        #addObjClassIcon:hover,
-        #addVarIcon:hover,
-        .deleteVarIcon:hover{
-            opacity: 0.8;
-            cursor: pointer;
-        }
-
-        #newVar,
-        #editNodeVars{
-            clear: both;
-            height:auto;
-        }
-
-   
-        #newVar .row input[type="text"],
-        #newEnvVar .row input[type="text"],
-        #editNodeVars .row input[type='text']{
-            width: 80px;
-            float: left;
-            margin-right: 10px;
-        }
-
-        .deleteVarIcon{
-            float: left;
-        }
-
-        .newVarLabel{
-
-        }
-
-        .objClassDiv {
-            margin: 5px 5px;
-            display: inline-block;
-            border: 1px solid gainsboro;
-        }
-
-        .objClassDiv:hover {
-            cursor: pointer;
-        }
-
-        /*add rule form*/
-        #sensors,
-        #actors{
-            margin-bottom: 20px;
-            clear: both;
-        }
-
-        .sensorDiv,
-        .actorDiv{
-            clear:both;
-            margin-top: 10px;
-            width: 100%;
-            text-align: left;
-        }
-
-        .nameDiv {
-            float:left;
-        }
-        
-        .blockTitle{
-            display: block;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .valInput {
-            width: 100px;
-            margin-left: 5px;
-        }
-        
-        .varRow {
-            height: 30px;
-        }
-
-        .checkedShow {
-            display: inline-block;
-            float: right;
-            display: none;
-        }
-
-        .remindText {
-            font-size: small;
-            display: none;
-            padding-top:17px;
-        }
-
-        #addruleEndIcon,
-        #addruleCancelIcon{
-            display: none;
-            padding: 2px 5px;
-            color: #f4f4f4;
-            background: #f47e7e;
-            font-weight: bold;
-            border-radius: 4px;
-            border: solid 0 #e3edf4;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            margin-top: 6px;
-            height: 26px;
-        }
-
-        #addruleCancelIcon{
-            background: #F4F4F2;
-            color: black;
-            font-weight: normal;
-        }
-
-        #addruleBeginIcon{
-            padding: 2px 5px;
-            border-radius: 4px;
-            border: solid 1 #e3edf4;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            width: 90px;
-            margin-top: 6px;
-            display: inline-block;
-            vertical-align:middle
-        }
-
-        #deleteSelectedIcon{
-            padding: 2px 5px;
-            border-radius: 4px;
-            border: solid 1 #e3edf4;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            display: none;
-            float:none;
-            /*margin-left: 30px;*/
-            width: 125px;
-            margin-top: 6px;
-            vertical-align:middle
-        }
-
-        #addruleBeginIcon img,
-        #deleteSelectedIcon img,
-        .btn_lable{
-            vertical-align: middle;
-        }
-        
-        #addruleEndIcon:hover,
-        #addruleBeginIcon:hover,
-        #deleteSelectedIcon:hover{
-            cursor: pointer;
-        }
-
-        #addruleEndIcon:hover{
-            background: #e76969;
-        }
-
-        #addruleCancelIcon:hover{
-            background: #e3edf4;
-        }
-
-
-        #ruleColor {
-            background: none;
-            height: 20px;
-            width: 30px;
-            border: none;
-            padding: 0;
-        }
-
-        #userFilter{
-            margin-left:5px;
-            margin-bottom: 10px;
-        }
-
-        #userList {
-            width:60px;
-        }
-
-        select#nodeEnvVars,
-        select#editNodeEnvVars{
-            float: left;
-            width: 50%;
-            margin: 20px 0;
-        }
-
-        .inlineDiv {
-            display: inline;
-        }
-
-        .img_icon{
-            width: 18px;
-            margin-right: 8px;
-        }
-
-        .img_icon:hover{
-            cursor: pointer;
-        }
-
-        .fa:hover{
-            cursor: pointer;
-            opacity:0.8;
-        }
-        .fa {
-            margin-right: 5px;
-        }
-
-        #Session_btns {
-            display: inline-block;
-            margin-left: 10px;
-        }
-
-        #editEnvPopup input[type='number']{
-            width: 40px;
-            float: left;
-        }
-
-        #editEnvPopup span.line {
-            float: left;
-            width: 6px;
-            margin: 0 8px;
-        }
-
-        #evolutionDiv {
-            display: none;
-        }
-
-        .menuIcons {
-            padding: 5px;
-            background: lightblue;
-            border-top: 1px solid black;
-        }
-
-        #progressbar {
-            width: 80px;
-            height:10px;
-            display: none;
-        }
-
-        span.seperator {
-            margin:0 10px;
-        }
-
-    </style>
 </head>
 
 <body>
 <div id="wrapper">
     <div id="header">
-        <div id="header_title"><span class="bigtitle">Control Everything in Your Home</span></div>
+        <div id="header_title"><span class="bigtitle">Control Everything in Your Home</span><span id="title_msg" class="err_msg"></span></div>
         <div id="loginInfo">
             <span id="welcome_msg"></span>
             <i id="logout_btn" class="fa fa-sign-out" aria-hidden="true">Log out</i>
@@ -787,9 +95,6 @@
                     <img  src="image/delete.png" width="20px"/>
                     <span class="btn_lable">Delete Selected</span>
                 </div>
-                <input id="addruleCancelIcon" type="button" class="btn_obj" width="50px" value="Cancel"/>
-                <input id="addruleEndIcon" type="button" class="btn_obj" width="50px" value="Done"/>
-                <span class="remindText">Click on a sensor and drag the edge to an actor to connect them by a rule. Click "Done" in the menu to finish.</span>
             </div>
             <div id="graph"></div>
         </div>
@@ -811,7 +116,7 @@
         </div>
         <div id="modal" class="popupContainer" style="display: none;">
             <header class="popupHeader">
-                <span class="header_title">Login</span>
+                <span class="header_title" id="loginFormTitle">Login</span>
                 <span class="modal_close"><i class="fa fa-times"></i></span>
             </header>
             <section class="popupBody">
@@ -876,42 +181,8 @@
                     <div class="celllabel">Name *</div>
                     <div class="cell"><input type="text" id="nodeName" name="nodeName" /></div>
                 </div>
-                <!--<div class="row">-->
-                    <!--<div class="celllabel">Icon *</div>-->
-                    <!--<div class="cell">-->
-                        <!--<div id="nodeIcons">-->
-                            <!--<input type="radio" name="nodeIcon" value="dot" checked/><img src="image/plus.png" width="15px"/>-->
-                            <!--<input type="radio" name="nodeIcon" value="square"> <img src="image/delete.png" width="15px"/>-->
-                        <!--</div>-->
-                    <!--</div>-->
-
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<div class="celllabel">Color *</div>-->
-                    <!--<div class="cell">-->
-                        <!--<input type="color" name="favcolor">-->
-                    <!--</div>-->
-                <!--</div>-->
             </div>
             <div id="EMFields">
-                <!--<div class="row">-->
-                    <!--<div class="celllabel">Device State</div>-->
-                    <!--<div class="cell">-->
-                        <!--<input type="text" id="dsVal"/>-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<div class="celllabel">Consumption</div>-->
-                    <!--<div class="cell">-->
-                        <!--<input type="number" id="cVal"/>-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<div class="celllabel">Priority Level</div>-->
-                    <!--<div class="cell">-->
-                        <!--<input type="number" id="plVal"/>-->
-                    <!--</div>-->
-                <!--</div>-->
                 <div class="row row_textarea">
                     <div class="celllabel">Description</div>
                     <div class="cell">
@@ -921,36 +192,22 @@
                 <div class="row">
                     <div class="celllabel">Environment
                         <i id="nodeClassAddEnvVarIcon" class="fa fa-plus-circle" aria-hidden="true" title="add an environment variable"></i>
-                        <!--<img id="nodeClassAddEnvVarIcon" title="add an environment variable" src="image/plus.png" width="16px">-->
                     </div>
                 </div>
                 <div id="envEditDiv">
                     <div id="envVarsDiv">
                         <select id='nodeEnvVars' multiple></select>
                     </div>
-                    <!--<div class="inlineDiv">-->
-                        <!--<input class="btn_blue btn" type="button" value="Add" id="addEnvBtn"/>-->
-                    <!--</div>-->
                     <div id="envVarsSelected" class="inlineDiv">
-
                     </div>
                 </div>
                 <div class="row newVarLabel">
                     <div class="celllabel">Variables
-                        <!--<img id="addVarIcon" title="add a variable" src="image/plus.png" width="16px"/>-->
                         <i id="addVarIcon" class="fa fa-plus-circle" aria-hidden="true" title="add a variable"></i>
                     </div>
                 </div>
                 <div id="newVar"></div>
             </div>
-            <!--<div id="userFields">-->
-                <!--<div class="row">-->
-                    <!--<div class="celllabel">Authority Level</div>-->
-                    <!--<div class="cell">-->
-                        <!--<input type="number" id="alVal"/>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
         </div>
         <br/>
         <div class="btns_obj">
@@ -1006,7 +263,6 @@
         <div class="row">
             <div class="celllabel">Environment
                 <i id="editNodeAddEnvVarIcon" class="fa fa-plus-circle" aria-hidden="true" title="add a variable"></i>
-                <!--<img id="editNodeAddEnvVarIcon" title="add an environment variable" src="image/plus.png" width="16px">-->
             </div>
         </div>
         <div id="editNodeEnvEditDiv">
@@ -1016,7 +272,6 @@
         </div>
         <div class="row newVarLabel">
             <div class="celllabel">Variables
-                <!--<img id="addVarIconEditNode" title="add a variable" src="image/plus.png" width="16px"/>-->
                 <i id="addVarIconEditNode" class="fa fa-plus-circle" aria-hidden="true" title="add a variable"></i>
             </div>
         </div>
@@ -1045,7 +300,6 @@
             <span>Effectors</span>
             <div>
                 <select id="effectorList" multiple>
-
                 </select>
             </div>
         </div>
@@ -1072,9 +326,9 @@
                     <input type="color" id="ruleColor" value="#848484"/>
                 </div>
             </div>
-            <span class="blockTitle"> ---------   Sensors   --------</span>
+            <span class="blockTitle">Sensors</span>
             <div id="sensors"></div>
-            <span class="blockTitle">---------   Actors   ---------</span>
+            <span class="blockTitle">Effectors</span>
             <div id="actors"></div>
             <div class="btns_obj">
                 <input type="button" id="deleteThisRule" class="btn_red btn_obj" value="Delete"/>
@@ -1091,7 +345,6 @@
         <p id="envFormMsg" class="err_msg"></p>
         <div class="row newVarLabel">
             <div class="celllabel">Variables
-                <!--<img id="addEnvVarIcon" title="add a variable" src="image/plus.png" width="16px"/>-->
                 <i id="addEnvVarIcon" class="fa fa-plus-circle" aria-hidden="true" title="add a variable"></i>
             </div>
         </div>
@@ -1099,7 +352,6 @@
 
         </div>
         <div class="btns_obj">
-            <!--<input type="button" id="deleteThisEnv" class="btn_red btn_obj" value="Delete"/>-->
             <input type="button" class="btn_obj" value="Cancel" id="cancelEnvbt"/>
             <input type="button" class="btn_blue btn_obj" value="Save" id="saveEnvbt"/>
         </div>
@@ -1168,24 +420,26 @@
             <input type="button" class="btn_blue btn_obj" value="Open" id="openSessionBtn"/>
         </div>
     </div>
-
-
 </div>
 
 <script>
 
+    //login and register popup
     $("#modal_trigger").leanModal({top:200,overlay:0.3,closeButton: ".modal_close"});
-
     $("#modal").draggable();
 
     //predefine network and session
     var network = null;
-    var session_global = null;
     var localUsers = null;
 
     var leftMenuWidth = "200px";
-    var isConnectSDL = false;
 
+    var session_global = null;
+    var currentSession = "untitled";
+    var isConnectSDL = false;
+    var user = "";
+
+    //destroy graph
     function destroy(){
         if(network !== null){
             network.destroy();
@@ -1193,9 +447,7 @@
         }
     }
 
-    var currentSession = "untitled";
-    var user = "";
-
+    //close all popups
     function closeAllPopup(){
         $("#addObjClassPopup").hide();
         $("#newNodePopup").hide();
@@ -1206,14 +458,25 @@
         $("#editEnvPopup").hide();
         $("#saveSessionPopup").hide();
         $("#openSessionPopup").hide();
-
     }
+
+    //press enter key to submit form
+    function enterToSubmit(saveBtId){
+        $(document).keypress(function(event){
+
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if(keycode == '13'){
+                $("#"+saveBtId).click();
+            }
+        });
+    }
+
 </script>
 
-<!--/////////////////////////////////   Manage session //////////////////////////////////////////////////////////////////-->
+<!--/////////////////////////////////   Manage Session //////////////////////////////////////////////////////////////////-->
 <script src="js/session.js"></script>
 
-<!--/////////////////////////////////   Environment //////////////////////////////////////////////////////////////////-->
+<!--/////////////////////////////////   Manage Environment //////////////////////////////////////////////////////////////////-->
 <script src="js/environment.js"></script>
 
 <!--/////////////////////////////////   Manage Objects(Nodes) ////////////////////////////////////////////////////////-->
@@ -1225,7 +488,10 @@
 <!--////////////////////////////////////////////  SDL Server //////////////////-->
 <script>
 
+    //connect to SDL server
     function connectSDLServer(){
+
+        //call remote function in server.js to connect to SDL server
         session_global.call('sdlSCI.data.connectSDL').then(
                 function(res){
                     if(res == "ok"){
@@ -1243,27 +509,15 @@
                 },session_global.log);
 
     }
-
-    $("#btn_connect").click(connectSDLServer);
+    $("#btn_connect").click(connectSDLServer);  // this btn is hidden, when page loaded, try to connect to SDL server automatically
 
 
     /////////////////// graph /////////////////////////////////////////////////
-
     var container = document.getElementById('graph');
 
-    function onchallenge(session, method, extra) {
-        if (method === 'wampcra') {
-            return autobahn.auth_cra.sign(key, extra.challenge);
-        } else {
-            throw "don't know how to authenticate using '" + method + "'";
-        }
-    }
-
-    //define options for Network
+    //define options for Network (graph)
     /***********************************************************/
     var options = {
-    //            locale : 'en_dx',
-    //            locales : locales,
         physics:{
             stabilization: true,
             timestep: 0.3
@@ -1272,44 +526,8 @@
             enabled: false,
             addNode: false,
             addEdge: false,
-            /*
-             function (data, callback) {
-             setTimeout(function () {network.addEdgeMode();},0);
-             if(data.from == data.to){
-             if(confirm("Do you want to connect this node to itself?")){
-             callback(data);
-             }
-             }
-             else {
-             callback(data);
-             }
-
-             }, */
             editEdge: false,
-            /*function (data, callback) {
-             if (data.from == data.to) {
-             var r = confirm("Do you want to connect this object to itself?");
-             if (r) {
-             callback(data);
-             session.call('sdlSCI.data.changeData', ['edge', 'update', data]).then(
-             function (res) {
-             console.log(res);
-             }, session.log);
-             }
-             else {
-             callback(null);
-             }
-             }
-             else {
-             callback(data);
-             session.call('sdlSCI.data.changeData', ['edge', 'update', data]).then(
-             function (res) {
-             console.log(res);
-             }, session.log);
-             }
-             },*/
             deleteNode: function (data, callback) {
-
                 if (confirm("Are you sure that you want to delete this node?")) {
                     callback(data);
                     //data is an array of selected Nodes and Edges
@@ -1342,10 +560,15 @@
             physics: false
         }
     };
-
     /***********************************************************/
 
+    //initialize graph and menus display according to data got from server.js
     function init(res){
+
+        /* Store all data returned by server to a local variable called 'localData'
+        /* including  nodes(object),edges,rules,nodeclass(object class),environment variables, sessions, sdl server status.
+        /* we need node and edge information to draw graph later.
+        */
         var nodesArray = Object.keys(res.nodes).map(key => res.nodes[key]);
         var edgesArray = Object.keys(res.edges).map(key => res.edges[key]);
         var usersArray = Object.keys(res.users);
@@ -1371,18 +594,13 @@
         }
 
         localData = data;
+
+        //session and connect sdl server status
         currentSession = res.currentSession;
         $("#currentSession").html(currentSession);
-        /*
-         localData.edges.on("add",function(event,prop,senderId){
-         var newEdgeId = prop.items[0];
-         ruleEdges.push(newEdgeId);
-         });
-         */
-
         isConnectSDL = localData.isConnectSDL;
 
-        //server doesn't connect to SDL server, connect it
+        //if web server doesn't connect to SDL server, connect it
         if(isConnectSDL == false) {
             connectSDLServer();
         }
@@ -1391,22 +609,22 @@
             $("#connectSDLBtn").html(" SDL Server Connected ");
         }
 
-
+        //draw graph
         network = new vis.Network(container, localData, options);
 
-
+        //drag node end event (change node position)
         network.on("dragEnd", function (params) {
             dragEndEventHandler(params);
         });
 
-
+        //double click node event => edit node
         network.on("doubleClick", function (params) {
             var nodeId = params.nodes[0];
             //double click on nodes to edit their labels
             if (nodeId != undefined) {
                 if (user == "admin") {
-    //                                $("#NewNodeFormTitle").html('Edit an object');
                     $("#editNodePopup").show();
+                    enterToSubmit("saveEditNode");
                     $("#editNodeID").val(nodeId);
 
                     var node = localData.nodes.get(nodeId);
@@ -1465,90 +683,107 @@
             }
         });
 
+        //clear edges shown when click anywhere in the graph
         network.on("click",function(params){
             localData.edges.clear();
         });
-        updateExistingUsers();
 
+        //if loged user is admin, add the possibility of deleting nodes
+        //if not, hide user list in the left menu
         if(user == "admin"){
-            network.on("selectNode",function(params){
+            //select nodes event handler => delete nodes
+            network.on("selectNode", function (params) {
                 //show delete selected button
-                if(!isAddingRule) {
-                    $("#deleteSelectedIcon").css("display","inline-block");
 
-                    var nodes = params.nodes;
-                    var edges = params.edges;
-                    var args = {};
-                    args.nodes = nodes;
-                    args.edges = edges;
-                    args.rules = [];
+                $("#deleteSelectedIcon").css("display", "inline-block");
 
-                    document.getElementById("deleteSelectedIcon").onclick = function () {
+                var nodes = params.nodes;
+                var edges = params.edges;
+                var args = {};
+                args.nodes = nodes;
+                args.edges = edges;
+                args.rules = [];
 
-                        if (confirm("Are you sure that you want to delete selected nodes?")) {
+                //delete node event handler
+                document.getElementById("deleteSelectedIcon").onclick = function () {
 
-    //                                        localData.nodes.remove(nodes);
-                            for(var n in nodes) {
+                    if (confirm("Are you sure that you want to delete selected nodes?")) {
 
-                                //delete referring edges and rules
-                                var group_del = localData.allEdges.get({
-                                    filter: function (item) {
-                                        console.log(item.from+";;"+item.to);
-                                        return (item.from == nodes[n] || item.to == nodes[n]);
-                                    }
-                                });
+                        for (var n in nodes) {
 
-                                var edges_del = [];  //ids of edges connecting this node
-
-                                for(var j in group_del){
-                                    edges_del.push(group_del[j].id);
+                            //delete referring edges and rules
+                            var group_del = localData.allEdges.get({
+                                filter: function (item) {
+                                    console.log(item.from + ";;" + item.to);
+                                    return (item.from == nodes[n] || item.to == nodes[n]);
                                 }
+                            });
 
-                                for(var i in localData.rules){
-                                    var ruleItem = localData.rules[i];
-                                    for(var j in edges_del){
-                                        if(ruleItem.edges.indexOf(edges_del[j]) !== -1){
-                                            //delete this rule
-                                            if(args.rules.indexOf(i) == "-1") {
-                                                args.rules.push(i);
-                                            }
-                                            break;
+                            var edges_del = [];  //ids of edges connecting this node
+
+                            for (var j in group_del) {
+                                edges_del.push(group_del[j].id);
+                            }
+
+                            for (var i in localData.rules) {
+                                var ruleItem = localData.rules[i];
+                                for (var j in edges_del) {
+                                    if (ruleItem.edges.indexOf(edges_del[j]) !== -1) {
+                                        //delete this rule
+                                        if (args.rules.indexOf(i) == "-1") {
+                                            args.rules.push(i);
                                         }
+                                        break;
                                     }
                                 }
                             }
-
-                            //data is an array of selected Nodes and Edges
-                            session_global.call('sdlSCI.data.changeData', ['node', 'remove', args]).then(
-                                    function (res) {
-                                        $("#deleteSelectedIcon").hide();
-                                    }, session_global.log);
                         }
+
+                        //data is an array of selected Nodes and Edges
+                        session_global.call('sdlSCI.data.changeData', ['node', 'remove', args]).then(
+                                function (res) {
+                                    $("#deleteSelectedIcon").hide();
+                                }, session_global.log);
                     }
                 }
+
+            });
+            //hide top menu when deselect nodes in the graph
+            network.on("deselectNode",function(params){
+                $("#deleteSelectedIcon").hide();
             });
         }
-        //hide user filter and only show logging user's rules
         else{
+            //hide user filter and only show logging user's rules
             $("#userList option[value='"+user+"']").prop("selected",true);
             $("#userList").change();
             $("#userFilter").hide();
         }
 
+        //update user list in the left menu 'Rules' block
+        updateExistingUsers();
+
+        //update object class
         updateExistingObjClass();
 
+        //update rules
         updateExistingRules();
 
+        //update environment variables in the right menu
         updateEnv();
-
-        network.on("deselectNode",function(params){
-            $("#deleteSelectedIcon").hide();
-        });
 }
 
 
+    //authentication
+    function onchallenge(session, method, extra) {
+        if (method === 'wampcra') {
+            return autobahn.auth_cra.sign(key, extra.challenge);
+        } else {
+            throw "don't know how to authenticate using '" + method + "'";
+        }
+    }
+
     // the URL of the WAMP Router (Crossbar.io)
-    //
     var wsuri;
     if (document.location.origin == "file://") {
         wsuri = "ws://127.0.0.1:8080/ws";
@@ -1560,16 +795,18 @@
 
     //////////////////////////      Register and Login   ////////////////////////////////////////
 
+    //open register form
     $("#register_form").click(function(){
         $(".user_register").show();
         $(".user_login").hide();
-        $(".header_title").text('Register');
+        $("#loginFormTitle").text('Register');
     });
 
+    //open login form
     $("#back_btn").click(function(){
         $(".user_login").show();
         $(".user_register").hide();
-        $(".header_title").text('Login');
+        $("#loginFormTitle").text('Login');
 
         //clear register form
         $("#newUsername").val("");
@@ -1577,8 +814,22 @@
         $("#newPwConfirm").val("");
     });
 
-    // CALL a remote procedure: when user registering
-    //
+    //close login/register popup
+    function close_modal_login(){
+        $("#modal").hide();
+        $("#lean_overlay").hide();
+
+        $(".user_login").show();
+        $(".user_register").hide();
+
+        $("#loginFormTitle").html("Login");
+    }
+
+
+
+    //  ------  Register form submit ------
+    // When user registering, open a connection and try to register him in the server side
+    // including password and username validity check
     $("#register_btn").click(function(){
         $("#register_msg").html("");
 
@@ -1595,16 +846,14 @@
             var connection = new autobahn.Connection({
                 url: wsuri,
                 realm: "realm1",
-
-                //
                 authmethods: ["wampcra"],
                 authid: user,
                 onchallenge: onchallenge
-
             });
 
             connection.onopen = function (session, details) {
 
+                //handle eventuel errors according to respose of authenticator.js
                 session.call('sdl.auth.registerUser', [newUsername, newPw]).then(
                         function (res) {
                             console.log(res);
@@ -1617,13 +866,8 @@
                                 $(".user_login").show();
                                 $(".user_register").hide();
 
-                                $(".header_title").html("Login");
+                                $("#loginFormTitle").html("Login");
                                 $("#login_msg").html("Sign up finished successfully, now you can log in and enjoy !");
-
-
-                                //close_modal_login();
-                                //alert("Sign up finished with success ;), now you can log in and enjoy !");
-
 
                                 connection.close('Register procedure finished with success.');
                             }
@@ -1648,15 +892,113 @@
             }
 
             connection.open();
-
         }
         else{
             $("#register_msg").html("* Two passwords entered are different,please try again ...");
         }
     });
 
+    //  ------  Login form submit ------
+    // When user loging in, check his authentication then open a session, initialize graph  and interface
+    // if remember me is checked, store his login info in web Storage
+    // logout event handler is also defined here
+    $("#loginSubmit").click(function () {
+
+        $("#login_msg").html("");
+
+        user = $("#username").val();
+        key = $("#pw").val();
+
+        // the WAMP connection to the Router
+        //
+        var connection = new autobahn.Connection({
+            url: wsuri,
+            realm: "realm1",
+            authmethods: ["wampcra"],
+            authid: user,
+            onchallenge: onchallenge
+
+        });
+
+        connection.onclose = function (reason, details) {
+//            console.log(details);
+            if(details.reason === "wamp.error.authentication_failed") {
+                $("#login_msg").html("* Wrong username or password!");
+            }
+            onclose(reason, details);
+        }
+
+        connection.onopen = function (session, details) {
+
+            session_global = session;
+
+            main(session, details,user);
+
+            //close login popup
+            close_modal_login();
+
+            $("#title_msg").html("");
+
+            //change Login/Register Button to Welcome Username
+            $("#welcome_msg").html("<i class=\"fa fa-user\" aria-hidden=\"true\"></i>Welcome "+user);
+            $("#welcome_msg").show();
+            $("#modal_trigger").hide();
+            $("#logout_btn").show();
+
+
+            if (typeof (Storage) !== "undefined") {
+                localStorage.username = user;
+                localStorage.pw = key;
+
+                if($("#remember").prop('checked')) {
+                    localStorage.remember = "true";
+                }
+                else {
+                    localStorage.remember = "false";
+                }
+                localStorage.isLogin = "true";
+
+                //define log out event handler
+                document.getElementById("logout_btn").onclick = function(){
+//                    console.log('logout');
+
+                    $("#welcome_msg").html('');
+                    $("#welcome_msg").hide();
+                    $("#modal_trigger").show();
+                    $("#logout_btn").hide();
+
+                    $("#midDiv").hide();
+                    $("#rightMenu").hide();
+                    $("#leftMenu").hide();
+
+                    //remember me not checked
+                    if(localStorage.remember == "false") {
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('pw');
+                        localStorage.removeItem('remember');
+                        localStorage.removeItem('isLogin');
+                    }
+                    else {
+                        localStorage.isLogin = "false";
+                    }
+                    connection.close('User Loged out.');
+                    destroy();
+                }
+            }
+            else {
+                console.log('sorry, no web localstorage support...');
+            }
+        }
+
+        // now actually open the connection
+        //
+        connection.open();
+    });
+
+
     if (typeof (Storage) !== "undefined") {
 
+        //open login popup event, fill the fileds username and password if stored in web storage
         $("#modal_trigger").click(function(){
 
             if(localStorage.username) {
@@ -1673,29 +1015,25 @@
             $(".user_login").show();
             $(".user_register").hide();
 
-            $(".header_title").html("Login");
+            $("#loginFormTitle").html("Login");
             $("#register_msg").html("");
             $("#login_msg").html("");
         });
 
-        // check whether there exists saved username and password
+        // check whether there exists username and password in web storage
+        // if yes, log in automatically and open a connection then initialize interface
         if (localStorage.username && localStorage.isLogin == "true") {
 
             user = localStorage.username;
             key = localStorage.pw;
 
-
             // the WAMP connection to the Router
-            //
             var connection = new autobahn.Connection({
                 url: wsuri,
                 realm: "realm1",
-
-                //
                 authmethods: ["wampcra"],
                 authid: user,
                 onchallenge: onchallenge
-
             });
 
             connection.onopen = function (session, details) {
@@ -1711,11 +1049,14 @@
                 session_global = session;
 
                 main(session, details,user);
+                $("#title_msg").html("");
             }
             connection.onclose = function (reason, details) {
+                //if authentication fails
                 if(details.reason === "wamp.error.authentication_failed") {
 
                     //when localStorage is not empty and user.txt doesn't contain this user
+                    //for exemple, user.txt is removed  then restart the computer
                     if($("#modal").css("display") == "none") {
 
                         $("#welcome_msg").html('');
@@ -1767,18 +1108,18 @@
                 }
 
                 connection.close('User Loged out.');
-
                 destroy();
             }
 
             // now actually open the connection
-
             connection.open();
 
         }
-        //no login saved
+
+        //if no, no login saved
         else {
             console.log("no login");
+            $("#title_msg").html("  (No connection)");
             $("#welcome_msg").html('');
             $("#welcome_msg").hide();
             $("#modal_trigger").show();
@@ -1787,14 +1128,13 @@
             $("#leftMenu").hide();
             $("#midDiv").hide();
             $("#rightMenu").hide();
-
 //            alert("please log in first...");
         }
-
     }
     else {
         console.log('Sorry, no web storage support.');
         console.log("no login");
+        $("#title_msg").html("  (No connection)");
         $("#welcome_msg").html('');
         $("#welcome_msg").hide();
         $("#modal_trigger").show();
@@ -1803,313 +1143,16 @@
         $("#midDiv").hide();
         $("#rightMenu").hide();
         $("#leftMenu").hide();
-
-//        $("#midDiv").css("margin-left","0");
     }
 
 
-    $("#loginSubmit").click(function () {
-
-        $("#login_msg").html("");
-
-        user = $("#username").val();
-        key = $("#pw").val();
-
-        // the WAMP connection to the Router
-        //
-        var connection = new autobahn.Connection({
-            url: wsuri,
-            realm: "realm1",
-
-            //
-            authmethods: ["wampcra"],
-            authid: user,
-            onchallenge: onchallenge
-
-        });
-
-        connection.onclose = function (reason, details) {
-//            console.log(details);
-            if(details.reason === "wamp.error.authentication_failed") {
-                $("#login_msg").html("* Wrong username or password!");
-            }
-            onclose(reason, details);
-        }
-
-        connection.onopen = function (session, details) {
-
-            session_global = session;
-
-            main(session, details,user);
-
-            close_modal_login();
-
-
-            //change Login/Register Button to Welcome Username
-            $("#welcome_msg").html("<i class=\"fa fa-user\" aria-hidden=\"true\"></i>Welcome "+user);
-            $("#welcome_msg").show();
-            $("#modal_trigger").hide();
-            $("#logout_btn").show();
-
-
-
-            if (typeof (Storage) !== "undefined") {
-                localStorage.username = user;
-                localStorage.pw = key;
-
-                if($("#remember").prop('checked')) {
-                    localStorage.remember = "true";
-                }
-                else {
-                    localStorage.remember = "false";
-                }
-                localStorage.isLogin = "true";
-
-                //define log out event handler
-
-                  document.getElementById("logout_btn").onclick = function(){
-//                    console.log('logout');
-
-                    $("#welcome_msg").html('');
-                    $("#welcome_msg").hide();
-                    $("#modal_trigger").show();
-                    $("#logout_btn").hide();
-
-                    $("#midDiv").hide();
-                    $("#rightMenu").hide();
-                    $("#leftMenu").hide();
-
-                    //remember me not checked
-                    if(localStorage.remember == "false") {
-                        localStorage.removeItem('username');
-                        localStorage.removeItem('pw');
-                        localStorage.removeItem('remember');
-                        localStorage.removeItem('isLogin');
-                    }
-                    else {
-                        localStorage.isLogin = "false";
-                    }
-                    connection.close('User Loged out.');
-                    destroy();
-                }
-            }
-            else {
-                console.log('sorry, no web localstorage support...');
-            }
-        }
-
-
-        // now actually open the connection
-        //
-        connection.open();
-    });
-
-
     // fired when connection is established and session attached
-    //
+    // including set page display(menus displayed or not) and initialize
     function main(session, details,user) {
 
-//        console.log("Connected");
-//        console.log("connected session with ID " + session.id);
-//        console.log("authenticated using method '" + details.authmethod + "' and provider '" + details.authprovider + "'");
-//        console.log("authenticated with authid '" + details.authid + "' and authrole '" + details.authrole + "'");
+        // ------ SET page display according to logging user (admin or not) ----------
 
-        // subscribe to future change data event
-        session.subscribe("sdlSCI.data.onChange",
-                function (args) {
-                    var type = args[0];
-                    var event = args[1];
-                    var affectedItem = args[2];
-                    var msgValide = args[3];
-
-                    if (type === 'node') {
-                        if (event === 'add') {
-                            if(msgValide == "ok"){
-                                //success
-
-                                if (localData.nodes.get(affectedItem.id) == null) {
-                                    localData.nodes.add(affectedItem);
-                                }
-                                updateObjList();
-                                if($("#newNodePopup").css("display") !== "none"){
-                                    $("#nodeClassId").val("");
-                                    $("#newNodePopup").hide();
-                                    $(document).unbind("keypress");
-                                    $("#saveNewNode").prop("disabled",false);
-                                    $("#saveNewNode").val("Save");
-                                    $("#cancelNewNode").show();
-                                }
-                            }
-                            else{
-                                //error
-                                if($("#newNodePopup").css("display") !== "none") {
-                                    console.log("failed creating nodes :"+msgValide);
-                                    $("#newNodeFormMsg").html("Failed creating node in SDL server.");
-                                    $("#saveNewNode").prop("disabled", false);
-                                    $("#saveNewNode").val("Save");
-                                    $("#cancelNewNode").show();
-                                }
-                            }
-
-                        }
-                        else if (event === 'remove') {
-                            var itemId;
-                            for (itemId in affectedItem.nodes) {
-                                if (localData.nodes.get(affectedItem.nodes[itemId])) {
-                                    localData.nodes.remove(affectedItem.nodes[itemId]);
-                                }
-                            }
-                            for (itemId in affectedItem.edges) {
-                                if (localData.allEdges.get(affectedItem.edges[itemId])) {
-                                    localData.allEdges.remove(affectedItem.edges[itemId]);
-                                }
-                            }
-                            for(i in affectedItem.rules){
-                                if(localData.rules.hasOwnProperty(affectedItem.rules[i])){
-                                    delete localData.rules[affectedItem.rules[i]];
-                                }
-                            }
-                            updateExistingRules();
-                        }
-                        else if (event === 'update') {
-                            if (localData.nodes.get(affectedItem.id)) {
-                                localData.nodes.update(affectedItem);
-                            }
-                        }
-                        else {
-                            console.log('event unknown :', event);
-                        }
-                    }
-                            /*
-                    else if (type === 'edge') {
-                        if (event === 'add') {
-                            if (localData.edges.get(affectedItem.id) == null) {
-                                localData.edges.add(affectedItem);
-                            }
-                        }
-                        else if (event === 'remove') {
-                            var itemId;
-                            for (itemId in affectedItem.edges) {
-                                if (localData.edges.get(affectedItem.edges[itemId])) {
-                                    localData.edges.remove(affectedItem.edges[itemId]);
-                                }
-                            }
-                        }
-                        else if (event === 'update') {
-                            if (localData.edges.get(affectedItem.id)) {
-                                localData.edges.update(affectedItem);
-                            }
-                        }
-                        else {
-                            console.log('event unknown:', event);
-                        }
-                    }
-                    */
-                    else {
-                        console.log('Type of affected item unknown');
-                    }
-                });
-
-        session.subscribe("sdlSCI.data.onUpdatePos",
-                function(args){
-                    var nodePos = args[0];
-                    if(args) {
-                        for (var k in nodePos) {
-
-                            console.log(localData.nodes[k]);
-                            localData.nodes.update({id:k,x:nodePos[k]["x"],y:nodePos[k]["y"]});
-
-                        }
-                    }
-
-                });
-
-        session.subscribe("sdlSCI.data.onchangeNodeClass",
-                function(args){
-                    var type = args[0];
-                    var affectedNodeClass = args[1];
-
-                    if(type == "add") {
-                        localData.nodeClasses[affectedNodeClass.id] = affectedNodeClass;
-                    }
-                    else if(type == 'update') {
-                        localData.nodeClasses[affectedNodeClass.id] = affectedNodeClass;
-                    }
-                    else if(type == "delete"){
-                        delete localData.nodeClasses[affectedNodeClass.id];
-                    }
-                    updateExistingObjClass();
-
-                });
-
-        session.subscribe("sdlSCI.data.onChangeRule",
-                function(args){
-                    var type = args[0];
-                    var affectedRule = args[1];
-                    var affectedEdges = args[2];
-
-                    if(type == "add") {
-                        //add Edges
-                        for(var i in affectedEdges){
-                            if (localData.allEdges.get(affectedEdges[i].id) == null) {
-                                localData.allEdges.add(affectedEdges[i]);
-                            }
-                        }
-                        //add Rule
-                        localData.rules[affectedRule.id]  = affectedRule;
-                    }
-                    else if(type == 'update') {
-                        localData.rules[affectedRule.id] = affectedRule;
-                        for(var i in affectedRule.edges){
-                            var eId = affectedRule.edges[i];
-                            var e = localData.allEdges.get(eId);
-                            e.color = affectedRule.color;
-                            e.title = affectedRule.name;
-                            localData.allEdges.update(e);
-                        }
-                    }
-                    else if(type == "delete"){
-                        delete localData.rules[affectedRule.id];
-                        for(var i in affectedEdges){
-                            localData.allEdges.remove(affectedEdges[i]);
-                        }
-                    }
-
-                    updateExistingRules();
-
-                });
-
-        session.subscribe("sdlSCI.data.onChangeEnv",
-                function(args){
-                    var type = args[0];
-                    var affectedEnv = args[1];
-
-                    if(type == "add") {
-                        if(localData.env == undefined){
-                            localData.env = {};
-                        }
-                        for(var i in affectedEnv){
-                            localData.env[i] = affectedEnv[i];
-                        }
-                    }
-                    else if(type == "delete"){
-                         delete localData.env[affectedEnv];
-                    }
-                    else if(type == "update"){
-                        for(var i in affectedEnv){
-                            localData.env[i] = affectedEnv[i];
-                        }
-                    }
-
-                    updateEnv();
-                });
-
-        session.subscribe("sdlSCI.session.onChangeSession",onChangeSession);
-
-        session.subscribe("sdlSCI.session.onChangeSessionName",onChangeSessionName);
-
-
-        //show admin Menu for admin user, if not, hide it
+        //show admin menus for admin user, if not, hide it
         $("#leftMenu").show();
         $("#midDiv").css("margin-left",leftMenuWidth);
 
@@ -2129,206 +1172,69 @@
                 $("#midDiv").show();
                 $("#midDiv").css("margin-right",'0');
                 $("#sessionIcons").hide();
-
-//                options.manipulation.deleteNode = false;
             }
 
-        //set menu bars height
+        //set menu bars height for adapting to the screen size
         var barHeight = $("#midDiv").css("height");
         $("#leftMenu").css("height",barHeight);
         $("#rightMenu").css("height",barHeight);
 
-        // CALL a remote procedure: get initial data
-        //
 
+        // ------- subscribe to future change data event --------
+
+        //node data changed
+        session.subscribe("sdlSCI.data.onChangeObj",onChangeObj);
+
+        // nodes' positions changed
+        session.subscribe("sdlSCI.data.onUpdatePos", onUpdatePos);
+
+        // node class data changed
+        session.subscribe("sdlSCI.data.onchangeNodeClass",onchangeNodeClass);
+
+        // rule data changed
+        session.subscribe("sdlSCI.data.onChangeRule",onChangeRule);
+
+        // environment data changed
+        session.subscribe("sdlSCI.data.onChangeEnv", onChangeEnv);
+
+        // session changed (when opening or create a new session)
+        session.subscribe("sdlSCI.session.onChangeSession",onChangeSession);
+
+        // session name changed (when clicking 'save session')
+        session.subscribe("sdlSCI.session.onChangeSessionName",onChangeSessionName);
+
+        // -------- Initialize -------
+        // CALL a remote procedure: get initial data
         session_global.call('sdlSCI.data.getData').then(
                 function (res) {
-                    init(res);
+                    init(res);  //initialize interface
                 },
-                //// ????????  if get data error?  sychronous ?
+                // if get data error
                 function (err) {
                     console.log("getData() error:", err);
-
-                    /*
-                    network = new vis.Network(container, localData, options);
-
-                    network.on("dragEnd", function (params) {
-                        console.log("dragEnd!", params);
-                        dragEndEventHandler(params);
-                    });
-
-                    function dragEndEventHandler(params) {
-                        var dragedNodeIDs = params.nodes;
-                        if(dragedNodeIDs.length > 0) {
-                            var dragedNodePos =  network.getPositions(dragedNodeIDs);
-                            session.call('sdlSCI.data.updateNodePosition', [dragedNodePos]).then(
-                                    session.log, session.log);
-                        }
-
-                    }
-                    */
                 }
         );
 
+        //get saved sessions
         session_global.call('sdlSCI.data.getSessions').then(
                 function(res){
                     sessions = res;
                 },session_global.log
         )
 
-
-
-        /*
-        $("#addRule").click(function(){
-
-            $("#addRuleCancel").show();
-            $("#addRule").hide();
-            $("#addRuleMsg").html("Please select the actor...");
-
-
-            var action,condition,rule;
-
-            network.once("select",function(params){
-
-                if(params.nodes.length == 0){
-                    alert("You must select an object...");
-                    return;
-                }
-                var actorId = params.nodes[0];
-
-                var nodeVars = localData.nodes.get(actorId).variables;
-
-                console.log(actorId + "\n" +nodeVars);
-
-                $("#set_action").show();
-                $("#set_action .vars").html("<div>"+nodeVars+"</div><div><input id='actionInput' type='text'/></div>");
-                $("#action_ok").unbind("click");
-                $("#action_ok").click(function(){
-                    action = $("#actionInput").val();
-                    $("#set_action").hide();
-                    $("#addRuleMsg").html("Now, select the trigger...");
-
-                    network.once("select",function(params){
-                        if(params.nodes.length == 0){
-                            alert("You must select an object...");
-                            return;
-                        }
-                        var triggerId = params.nodes[0];
-                        var nodeVars = localData.nodes.get(triggerId).variables;
-                        console.log(triggerId);
-
-                        $("#set_condition").show();
-                        $("#set_condition .vars").html("<div>"+nodeVars+"</div><div><input id='conditionInput' type='text'/></div>")
-                        $("#condition_ok").unbind("click");
-                        $("#condition_ok").click(function () {
-
-                            condition = $("#conditionInput").val();
-
-                            $("#addRuleMsg").html("");
-                            $("#addRuleCancel").hide();
-                            $("#addRule").show();
-
-                            $("#set_condition").hide();
-
-//                        $("#addRuleDone").show();
-//                        $("#addRuleDone").click(function () {
-                            rule = {actor:actorId,action:action,trigger:triggerId,condition:condition};
-                            condition = "";
-                            action = "";
-                            //add an edge
-                            var newEdgeId = (Math.random() * 1e7).toString(32);
-
-                            var newEdgeObj = {id:newEdgeId,from:actorId,to:triggerId,rule:rule};
-
-                            var htmlContent = " <div>";
-                            for(var key in newEdgeObj){
-                                if(key !== "from" && key!== "to" && key!== "rule" ) continue;
-                                var val = newEdgeObj[key];
-
-                                if(val) {
-
-                                    if(key == "from" || key == "to"){
-
-                                        val = localData.nodes.get(val).label;
-                                    }
-
-                                    if(key == "rule") {
-                                        htmlContent += "<br/><div>------- rule ------- </div>";
-                                        for(var k in val){
-                                            var sub_val = val[k];
-                                            if(k == "actor" || k == "trigger") {
-                                                sub_val = localData.nodes.get(sub_val).label;
-                                            }
-                                            htmlContent += "<div>" + k + " : " + sub_val + "</div>";
-                                        }
-                                    }
-                                    else {
-                                        htmlContent += "<div>" + key + " : " + val + "</div>";
-                                    }
-                                }
-                            }
-                            htmlContent += "</div>";
-
-                            newEdgeObj["title"] = htmlContent;
-
-                            localData.edges.add(newEdgeObj);
-
-                            //update rules and edges
-                            session.call('sdlSCI.data.changeData', ['edge', 'add', newEdgeObj]).then(
-                                    function (res) {
-                                        console.log(res);
-                                    }, session.log);
-
-//                        });
-
-
-
-                        });
-                        $("#condition_cancel").unbind("click");
-                        $("#condition_cancel").click(function () {
-                            $("#set_condition").hide();
-                            action = "";
-                            condition = "";
-                        });
-
-                    });
-                });
-                $("#action_cancel").unbind("click");
-                $("#action_cancel").click(function () {
-                    $("#set_action").hide();
-                    action = "";
-                });
-
-
-            });
-
-        });
-        */
     }
 
 
     // fired when connection was lost (or could not be established)
-    //
-
     function onclose(reason, details) {
         console.log("Connection lost: " + reason);
 
         //TODO
         //disable all operations
-
-//        if (reason !== "lost") {
-//            network = new vis.Network(container, localData, options);
-//        }
-    }
-
-    function close_modal_login(){
-        $("#modal").hide();
-        $("#lean_overlay").hide();
-
-        $(".user_login").show();
-        $(".user_register").hide();
-
-        $(".header_title").html("Login");
+        if(localStorage.isLogin == 'true') {
+            $("#logout_btn").click();
+        }
+        $("#title_msg").html("  (No connection)");
     }
 
 

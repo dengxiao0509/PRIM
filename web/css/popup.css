@@ -1,0 +1,119 @@
+#addObjClassPopup,
+#newNodePopup,
+#addRulePopup,
+#addEnvPopup,
+#editEnvPopup,
+#editNodePopup,
+#addRuleChooseSE,
+#saveSessionPopup,
+#openSessionPopup{
+    position: absolute;
+    left: 400px;
+    top: 120px;
+    border: 3px solid lightskyblue;
+    padding: 10px;
+    width: 300px;
+    height: auto;
+    z-index: 100px;
+    background-color: #f9f9f9;
+    text-align: center;
+    display: none;
+}
+
+.table {
+    display: block;
+}
+
+.row {
+    clear: both;
+    display: block;
+    margin-bottom: 10px;
+    height:20px;
+}
+
+.cell{
+    display: block;
+    text-align: left;
+}
+
+.row_textarea {
+    margin-top: 30px;
+    height: 35px;
+}
+
+.celllabel {
+    width: 107px;
+    text-align: left;
+    float: left;
+}
+
+.cell textarea,
+.cell input[type="text"],
+.cell input[type="number"]{
+    width: 150px;
+}
+
+.header_obj {
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.err_msg {
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.btn{
+    padding: 10px 20px;
+    background: #F4F4F2;
+    cursor: pointer;
+}
+
+.btn_obj{
+    padding: 5px 10px;
+    background: #F4F4F2;
+    cursor: pointer;
+    border: none;
+    margin-right: 10px ;
+}
+
+.btns_obj {
+    padding-left: 50px;
+    margin-top: 24px;
+    clear: both;
+}
+
+.btn:hover,
+.btn_obj:hover{
+    background:  #E4E4E2;
+}
+
+.btn_blue {
+    background: lightblue;
+    color: #FFF;
+}
+
+.btn_blue:hover  {
+    background:  lightseagreen;
+}
+
+.btn_red {
+    color: red;
+    float:left;
+}
+
+/*new variables*/
+#newVar .row input[type="text"],
+#editNodeVars .row input[type='text'],
+#newEnvVar .row input[type="text"]{
+    width: 80px;
+    float: left;
+    margin-right: 10px;
+}
+
+.deleteVarIcon{
+    float: left;
+}

@@ -1,0 +1,55 @@
+#NodeShapeBts {
+    display: inline;
+}
+
+#NodeShapeBts input[type="radio"] {
+    display: none;
+}
+
+#NodeShapeBts label{
+    display: inline-block;
+}
+
+#NodeShapeBts input[type="radio"]:checked+label {
+    background: lightblue;
+}
+
+.btn_radio_small {
+    padding: 2px 2px;
+    background: #F4F4F2;
+}
+
+/*object class popup*/
+#addVarIcon:hover,
+.deleteVarIcon:hover{
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+#newVar,
+#editNodeVars{
+    clear: both;
+    height:auto;
+}
+
+.objClassDiv {
+    margin: 5px 5px;
+    display: inline-block;
+    border: 1px solid gainsboro;
+}
+
+.objClassDiv:hover {
+    cursor: pointer;
+}
+
+select#nodeEnvVars,
+select#editNodeEnvVars{
+    float: left;
+    width: 50%;
+    margin: 20px 0;
+}
+
+.inlineDiv {
+    display: inline;
+}
+

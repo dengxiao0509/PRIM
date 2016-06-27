@@ -1,49 +1,18 @@
 $("#addEnvPopup").draggable();
 $("#editEnvPopup").draggable();
 
-function deleteNewVar(node){
-    var p = node.parentNode;
-    p.parentNode.removeChild(p);
-}
 
-function newVarRow() {
-    var nodeDiv = document.createElement("div");
-    nodeDiv.setAttribute("class","row");
+/////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////// buttons in Popups /////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 
-    var nodeInput1 = document.createElement("input");
-    nodeInput1.setAttribute("placeholder","Name");
-    nodeInput1.setAttribute("type","text");
+// -------------------- addEnvPopup ----------------------------------//
 
-    var nodeInput2 = document.createElement("input");
-    nodeInput2.setAttribute("placeholder","Value");
-    nodeInput2.setAttribute("type","text");
-
-    var nodeImg = document.createElement("img");
-    nodeImg.setAttribute("class","deleteVarIcon");
-    nodeImg.setAttribute("onclick","deleteNewVar(this)");
-    nodeImg.setAttribute("src",'image/delete.png');
-    nodeImg.setAttribute("width",'16px');
-    nodeImg.setAttribute("title",'delete this variable');
-
-    nodeDiv.appendChild(nodeInput1);
-    nodeDiv.appendChild(nodeInput2);
-    nodeDiv.appendChild(nodeImg);
-
-    return nodeDiv;
-}
-
+//open
 $("#addEnvIcon").click(function(){
     closeAllPopup();
     $("#addEnvPopup").show();
-    $(document).keypress(function(event){
-
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
-            $("#saveEnvbt").click();
-            $(document).unbind("keypress");
-        }
-
-    });
+    enterToSubmit("saveEnvbt");
     $("#envFormMsg").html("");
     var div = document.getElementById("newEnvVar");
     while (div.firstChild) {
@@ -51,13 +20,7 @@ $("#addEnvIcon").click(function(){
     }
 });
 
-$("#addEnvVarIcon").click(function(){
-    var container = document.getElementById("newEnvVar");
-    var nodeDiv = newVarRow();
-    container.appendChild(nodeDiv);
-});
-
-//savebt
+//save button
 $("#saveEnvbt").click(function () {
     envVariables = {};
     var varRows = document.getElementById("newEnvVar").getElementsByTagName('div');
@@ -96,33 +59,61 @@ $("#saveEnvbt").click(function () {
         }, session_global.log);
 });
 
-//cancel
+//cancel button
 $("#cancelEnvbt").click(function(){
     $("#addEnvPopup").hide();
     $(document).unbind("keypress");
 });
 
-function updateEnv(){
-    var htmlContent = "";
-    for(var k in localData.env){
-        var VName = k;
-        htmlContent += "<div class='objClassDiv' ondblclick='dblclickEnv(this)' id='env_"+k+"'>"+ VName+" : "+localData.env[k]['value'] +"</div>";
-    }
-    $("#envVars").html(htmlContent);
+//new var button
+$("#addEnvVarIcon").click(function(){
+    var container = document.getElementById("newEnvVar");
+    var nodeDiv = newVarRow();
+    container.appendChild(nodeDiv);
+});
+
+//add or delete new variables
+function deleteNewVar(node){
+    var p = node.parentNode;
+    p.parentNode.removeChild(p);
 }
 
+function newVarRow() {
+    var nodeDiv = document.createElement("div");
+    nodeDiv.setAttribute("class","row");
+
+    var nodeInput1 = document.createElement("input");
+    nodeInput1.setAttribute("placeholder","Name");
+    nodeInput1.setAttribute("type","text");
+
+    var nodeInput2 = document.createElement("input");
+    nodeInput2.setAttribute("placeholder","Value");
+    nodeInput2.setAttribute("type","text");
+
+    var nodeImg = document.createElement("img");
+    nodeImg.setAttribute("class","deleteVarIcon");
+    nodeImg.setAttribute("onclick","deleteNewVar(this)");
+    nodeImg.setAttribute("src",'image/delete.png');
+    nodeImg.setAttribute("width",'16px');
+    nodeImg.setAttribute("title",'delete this variable');
+
+    nodeDiv.appendChild(nodeInput1);
+    nodeDiv.appendChild(nodeInput2);
+    nodeDiv.appendChild(nodeImg);
+
+    return nodeDiv;
+}
+
+
+
+// -------------------- editEnvPopup ----------------------------------//
+
+//open
 function dblclickEnv(target){
     closeAllPopup();
     $("#editEnvPopup").show();
-    $(document).keypress(function(event){
+    enterToSubmit("saveEnvEditbt");
 
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
-            $("#saveEnvEditbt").click();
-            $(document).unbind("keypress");
-        }
-
-    });
     var VName = target.id.split("_")[1];
     var obj = localData.env[VName];
     var vVar = obj["value"];
@@ -148,8 +139,8 @@ function dblclickEnv(target){
     $("#editEnvPopup input[type='hidden']").val(VName);
 }
 
+//save button
 $("#saveEnvEditbt").click(function(){
-
 
     var vName = $("#editEnvPopup input[type='hidden']").val();
     var rangeFrom = $("#rangeFrom").val();
@@ -187,11 +178,13 @@ $("#saveEnvEditbt").click(function(){
 
 });
 
+//cancel button
 $("#cancelEnvEditbt").click(function(){
     $("#editEnvPopup").hide();
     $(document).unbind("keypress");
 });
 
+//delete button
 $("#deleteThisEnv").click(function(){
     if(confirm("Do you want to delete this environment variable?")) {
         var vName = $("#editEnvPopup input[type='hidden']").val();
@@ -208,12 +201,15 @@ $("#deleteThisEnv").click(function(){
     }
 });
 
-//evolution checkbox in edit env popup
+//evolution checkbox
 $("#isEvolute").change(function(){
     $("#evolutionDiv").toggle();
 });
 
-//simulation
+
+
+
+//start simulation button
 $("#startSimulIcon").click(function(){
     //get all environment variables
     var env = localData.env;
@@ -270,3 +266,39 @@ $("#startSimulIcon").click(function(){
         $("#progressbar").progressbar("option", "value", (100/increLength)*i);
     })();
 });
+
+//update environment variables list
+function updateEnv(){
+    var htmlContent = "";
+    for(var k in localData.env){
+        var VName = k;
+        htmlContent += "<div class='objClassDiv' ondblclick='dblclickEnv(this)' id='env_"+k+"'>"+ VName+" : "+localData.env[k]['value'] +"</div>";
+    }
+    $("#envVars").html(htmlContent);
+}
+
+
+//subscribe procedures
+function onChangeEnv(args){
+    var type = args[0];
+    var affectedEnv = args[1];
+
+    if(type == "add") {
+        if(localData.env == undefined){
+            localData.env = {};
+        }
+        for(var i in affectedEnv){
+            localData.env[i] = affectedEnv[i];
+        }
+    }
+    else if(type == "delete"){
+        delete localData.env[affectedEnv];
+    }
+    else if(type == "update"){
+        for(var i in affectedEnv){
+            localData.env[i] = affectedEnv[i];
+        }
+    }
+
+    updateEnv();
+}
