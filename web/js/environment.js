@@ -210,6 +210,8 @@ $("#isEvolute").change(function(){
 
 
 //start simulation button
+// TODO
+// define environment evolution here
 $("#startSimulIcon").click(function(){
     //get all environment variables
     var env = localData.env;
@@ -230,7 +232,7 @@ $("#startSimulIcon").click(function(){
     //
     //     }
     // },interval);
-    var incre = [3,2,1,-1,-2,-4];
+    var incre = [3,2,1,-1,-2,-4];   //array of increment
     var i=0;
     var increLength = incre.length;
 
