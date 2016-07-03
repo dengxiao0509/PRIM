@@ -178,8 +178,6 @@ $("#doneRuleSE").click(function(){
 
         });
 
-        //add edges
-        //TODO
     }
     else{
         alert("You need to choose at least one sensor and one actor ...");
@@ -206,6 +204,8 @@ function createVarRow(sensor_Id,variable_Name,isEnvVar){
     temp++;
     varName.id = sensor_Id+"_"+temp;
     varName.setAttribute("class","varName");
+    varName.name = sensor_Id;
+    varName.value = variable_Name;
 
 
     var label = document.createElement('label')
@@ -508,6 +508,8 @@ function resetRuleForm() {
 
 }
 
+// ---------------   editRulePopup  popup ------------------- //
+
 //double click on a rule label, open edit rule popup
 function dblclickRule(target) {
 
@@ -573,7 +575,7 @@ function dblclickRule(target) {
         var actorItem = localData.nodes.get(i);
         var actorName = actorItem.label;
         var actorVars = actorItem.variables;
-        //TODO
+
         if(actorVars.hasOwnProperty("env")) {
             delete actorVars["env"];
         }
@@ -683,6 +685,8 @@ function dblclickRule(target) {
     $("#deleteThisRule").show();
 }
 
+
+
 //click on a rule label, show edges of this rule
 function clickRule(target){
     var ruleId = target.id;
@@ -772,8 +776,8 @@ function updateExistingRules(){
 function updateExistingUsers() {
     var htmlContent ="";
     htmlContent += "<option value='all' selected='selected'>All</option><option value='admin'>admin</option><option value='allUsers'>All users</option>";
-    for(var k in localData.users){
-        var u = localData.users[k];
+    for(var k in localUsers){
+        var u = localUsers[k];
         if(u !== "admin" && u !== "registerUser"){
             htmlContent += "<option value='"+ u +"'>"+u+"</option>";
         }

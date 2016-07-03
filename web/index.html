@@ -430,7 +430,7 @@
 
     //predefine network and session
     var network = null;
-    var localUsers = null;
+    var localUsers = {};
 
     var leftMenuWidth = "200px";
 
@@ -571,7 +571,7 @@
         */
         var nodesArray = Object.keys(res.nodes).map(key => res.nodes[key]);
         var edgesArray = Object.keys(res.edges).map(key => res.edges[key]);
-        var usersArray = Object.keys(res.users);
+       // var usersArray = Object.keys(res.users);
         var nodeClassesArray = res.nodeClasses;
         var rulesArray = res.rules;
         var envArray = res.env;
@@ -586,7 +586,7 @@
             edges: edgesDataSet,
             nodeClasses: nodeClassesArray,
             rules: rulesArray,
-            users: usersArray,
+            //users: usersArray,
             allEdges : allEdgesDataSet,
             env: envArray,
             currentSession: res.currentSession,
@@ -825,7 +825,15 @@
         $("#loginFormTitle").html("Login");
     }
 
+    function onChangeUser(args){
+        var event = args[0];
+        var username = args[1];
 
+        localUsers.push(username);
+        updateExistingUsers();
+        console.log("onchange user");
+
+    }
 
     //  ------  Register form submit ------
     // When user registering, open a connection and try to register him in the server side
@@ -1203,6 +1211,10 @@
         // session name changed (when clicking 'save session')
         session.subscribe("sdlSCI.session.onChangeSessionName",onChangeSessionName);
 
+        //user list changed
+        session.subscribe("sdl.auth.onChangeUser",onChangeUser);
+        
+
         // -------- Initialize -------
         // CALL a remote procedure: get initial data
         session_global.call('sdlSCI.data.getData').then(
@@ -1212,6 +1224,18 @@
                 // if get data error
                 function (err) {
                     console.log("getData() error:", err);
+                }
+        );
+
+        //get users
+        session_global.call('sdl.auth.getUsers').then(
+                function (res) {
+                    localUsers = res;
+                    updateExistingUsers();
+                },
+                // if  error
+                function (err) {
+                    console.log("getUsers() error:", err);
                 }
         );
 

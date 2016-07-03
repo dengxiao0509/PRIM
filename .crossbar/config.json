@@ -17,7 +17,7 @@
                                     "allow": {
                                         "call": false,
                                         "register": true,
-                                        "publish": false,
+                                        "publish": true,
                                         "subscribe": false
                                     },
                                     "disclose": {

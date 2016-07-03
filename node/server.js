@@ -31,21 +31,22 @@ var connection = new autobahn.Connection({
     }
 );
 
+
 // ----------  initialize variables from text files  ----------//
 
 //users
-if(fs.existsSync(users_path)) {
-    var users_json = fs.readFileSync(users_path, 'utf8');
-    if(users_json == "") {
-        var users = {};
-    }
-    else {
-        var users = JSON.parse(users_json);
-    }
-}
-else {
-    var users = {};
-}
+// if(fs.existsSync(users_path)) {
+//     var users_json = fs.readFileSync(users_path, 'utf8');
+//     if(users_json == "") {
+//         var users = {};
+//     }
+//     else {
+//         var users = JSON.parse(users_json);
+//     }
+// }
+// else {
+//     var users = {};
+// }
 
 //data :  nodes, edges, nodeClasses, rules, environment variables
 if(fs.existsSync(data_path)) {
@@ -109,6 +110,7 @@ fs.writeFile(data_path, '', function (err) {
         return console.log(err);
     }
 });
+
 
 
 //update node_pid.txt
@@ -332,7 +334,7 @@ connection.onopen = function (session) {
             var data = {nodeClasses:{},nodes:{},edges:{},rules:{},env:{}};
         }
 
-        data.users = users;
+       // data.users = users;
         data.currentSession = currentSession;
         data.isConnectSDL = isConnectSDL;
         return data;
@@ -733,7 +735,7 @@ connection.onopen = function (session) {
                         data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}};
                     }
 
-                    data.users = users;
+                    //data.users = users;
                     data.currentSession = newSess;
                     currentSession = newSess;
                     data.isConnectSDL = isConnectSDL;
@@ -774,7 +776,8 @@ connection.onopen = function (session) {
                 fs.writeFileSync(data_path, '');
             }
 
-            data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}, users: users, currentSession :"untitled"};
+            // data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}, users: users, currentSession :"untitled"};
+            data = {nodeClasses: {}, nodes: {}, edges: {}, rules: {}, env: {}, currentSession :"untitled"};
 
 
             //clear cmds

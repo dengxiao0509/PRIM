@@ -58,42 +58,6 @@ function onchallenge (session, method, extra) {
    }
 }
 
-// Register an user, if valid, save to user.txt
-//args: username and pw
-function registerUser(args){
-   var username = args[0];
-   var pw = args[1];
-
-   //fields control
-   ///
-
-   //if username already exists
-   if(username in USERDB) {
-      return "duplicate_username";
-   }
-
-   if(pw.length < 6){
-      return "short_pw";
-   }
-
-   USERDB[username] = {"secret":pw,"role":"frontend"};
-
-   //renew User list in external file
-   var USERDB_json = JSON.stringify(USERDB);
-   fs.writeFile(file_path, '', function(err) {
-      if(err) {
-         return console.log(err);
-      }
-   });
-
-   fs.writeFile(file_path, USERDB_json, function(err) {
-      if(err) {
-         return console.log(err);
-      }
-   });
-
-   return "ok";
-}
 
 var connection = new autobahn.Connection({
    url: process.argv[2],
@@ -110,7 +74,69 @@ var connection = new autobahn.Connection({
 connection.onopen = function (session) {
 
    console.log("custom authenticator connected");
-   
+
+   // Register an user, if valid, save to user.txt
+//args: username and pw
+   function registerUser(args){
+      var username = args[0];
+      var pw = args[1];
+
+      //fields control
+      ///
+
+      //if username already exists
+      if(username in USERDB) {
+         return "duplicate_username";
+      }
+
+      if(pw.length < 6){
+         return "short_pw";
+      }
+
+      USERDB[username] = {"secret":pw,"role":"frontend"};
+
+      //renew User list in external file
+      var USERDB_json = JSON.stringify(USERDB);
+      fs.writeFile(file_path, '', function(err) {
+         if(err) {
+            return console.log(err);
+         }
+      });
+
+      fs.writeFile(file_path, USERDB_json, function(err) {
+         if(err) {
+            return console.log(err);
+         }
+      });
+
+
+      session.publish("sdl.auth.onChangeUser",["add",username]);
+
+      return "ok";
+   }
+
+   function getUsers(){
+      //users
+      var userNames = [];
+      if(fs.existsSync(file_path)) {
+          var users_json = fs.readFileSync(file_path, 'utf8');
+          if(users_json == "") {
+              var users = {};
+          }
+          else {
+             var users = JSON.parse(users_json);
+
+             for(var userN in users){
+                userNames.push(userN);
+             }
+          }
+      }
+      else {
+          var users = {};
+      }
+      return userNames;
+   }
+
    session.register('sdl.auth.authenticate', authenticate).then(
       function () {
          console.log("Ok, custom WAMP-CRA authenticator procedure registered");
@@ -127,6 +153,15 @@ connection.onopen = function (session) {
       function(err){
          console.log("Uups, could not register custom WAMP-CRA registerUser",err);
       }
+   );
+
+   session.register('sdl.auth.getUsers',getUsers).then(
+       function() {
+          console.log("OK, custom WAMP-CRA getUsers procedure registered");
+       },
+       function(err){
+          console.log("Uups, could not register custom WAMP-CRA getUsers",err);
+       }
    );
 };
 
